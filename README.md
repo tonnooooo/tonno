@@ -111,6 +111,20 @@ turno verifica le invarianti:
 Esce con codice 1 e l'elenco dei problemi se un'invariante salta. È lo
 strumento da rilanciare dopo ogni modifica.
 
+### Test di una chat gia' in funzione
+
+```bash
+python3 scripts/test_chat_live.py --url http://IP:PORTA --api-key CHIAVE --giri 6
+```
+
+Va eseguito da una macchina che raggiunge il servizio. Non cancella nulla.
+Rileva, sul sistema vivo: disallineamento tra la finestra di contesto
+dichiarata dalla UI e quella reale del motore, la lunghezza esatta a cui la
+conversazione si rompe e con quale errore, se la compattazione perde le
+informazioni (con un dato "canarino" piantato all'inizio e verificato dopo
+ogni ciclo), la tenuta sotto richieste concorrenti e dove sta la cronologia.
+Stampa un rapporto con i difetti classificati per gravita'.
+
 ---
 
 ## Diagnostica della VM
