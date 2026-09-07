@@ -126,6 +126,36 @@ vengono mascherate.
 
 ---
 
+## Mandare il proprio codice per l'analisi
+
+Se l'assistente non puo' collegarsi alla VM (rete chiusa, niente SSH), invece
+di condividere accessi si manda il codice:
+
+```bash
+cd /percorso/del/progetto
+bash scripts/impacchetta_progetto.sh > progetto.txt
+```
+
+Produce un unico file di testo con l'albero dei file e il contenuto dei
+sorgenti, escludendo pesi del modello, ambienti virtuali e cache, e
+**mascherando** chiavi API, token e password. Prima di inviarlo conviene
+comunque scorrerlo: il mascheramento e' euristico, non infallibile.
+
+In alternativa, se sulla VM c'e' git configurato, il modo piu' comodo e'
+pubblicare lo stato attuale su un branch dedicato:
+
+```bash
+cd /percorso/del/progetto
+git init 2>/dev/null; git add -A && git commit -m "stato attuale della VM"
+git remote add origin https://github.com/<utente>/<repo> 2>/dev/null
+git push origin HEAD:refs/heads/stato-vm
+```
+
+Attenzione a non pubblicare il file `.env`: va aggiunto a `.gitignore` prima
+del commit.
+
+---
+
 ## Note sul modello
 
 `LLM_MODEL` e `CONTEXT_WINDOW` vanno allineati al modello effettivamente
