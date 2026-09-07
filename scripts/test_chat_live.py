@@ -56,10 +56,13 @@ def nota(gravita: str, titolo: str, dettaglio: str = "") -> None:
 
 
 class Client:
-    def __init__(self, base: str, api_key: str, timeout: float = 180.0):
+    def __init__(self, base: str, api_key: str, timeout: float = 180.0,
+                 chat_path: str = "/v1/chat/completions", sse: bool = False):
         self.base = base.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
+        self.chat_path = chat_path
+        self.sse = sse
         self.ultimo_errore = ""
 
     def chiama(self, percorso: str, dati: dict | None = None, metodo: str = "GET",
@@ -194,13 +197,54 @@ def invia(c: Client, messaggi: list[dict[str, str]], api: str, modello: str | No
     dati = {"messages": messaggi, "max_tokens": max_tokens, "temperature": 0.3}
     if modello:
         dati["model"] = modello
-    stato, corpo, dt = c.chiama("/v1/chat/completions", dati)
-    if stato and stato < 400 and isinstance(corpo, dict):
-        try:
-            return stato, corpo["choices"][0]["message"]["content"], "", dt
-        except Exception:  # noqa: BLE001
+    if c.sse:
+        dati["stream"] = True
+    stato, corpo, dt = c.chiama(c.chat_path, dati)
+    if stato and stato < 400:
+        if c.sse and isinstance(corpo, str):
+            return stato, _da_sse(corpo), "", dt
+        if isinstance(corpo, dict):
+            try:
+                return stato, corpo["choices"][0]["message"]["content"], "", dt
+            except Exception:  # noqa: BLE001
+                pass
+            for k in ("content", "text", "output", "response"):
+                if isinstance(corpo.get(k), str):
+                    return stato, corpo[k], "", dt
             return stato, "", json.dumps(corpo)[:400], dt
+        if isinstance(corpo, str):
+            return stato, _da_sse(corpo) if "data:" in corpo else corpo, "", dt
     return stato, "", (corpo if isinstance(corpo, str) else json.dumps(corpo))[:600], dt
+
+
+def _da_sse(grezzo: str) -> str:
+    """Ricompone il testo da una risposta SSE e toglie i blocchi <think>.
+
+    I modelli della famiglia Qwen emettono il ragionamento dentro <think>...</think>:
+    se finisce nel contenuto e' un difetto dell'interfaccia, non del test, ma qui
+    va rimosso per non falsare la verifica del canarino."""
+    pezzi: list[str] = []
+    for riga in grezzo.splitlines():
+        riga = riga.strip()
+        if not riga.startswith("data:"):
+            continue
+        d = riga[5:].strip()
+        if d in ("", "[DONE]"):
+            continue
+        try:
+            j = json.loads(d)
+        except ValueError:
+            pezzi.append(d)
+            continue
+        try:
+            pezzi.append(j["choices"][0]["delta"].get("content") or "")
+        except Exception:  # noqa: BLE001
+            for k in ("content", "text", "token"):
+                if isinstance(j.get(k), str):
+                    pezzi.append(j[k])
+                    break
+    testo = "".join(pezzi)
+    return re.sub(r"(?is)<think>.*?</think>", "", testo).strip()
 
 
 # ---------------------------------------------------------------- FASE 2
@@ -271,7 +315,8 @@ def fase3_compattazione(c: Client, api: str, modello: str | None, limite: int, g
         prova = messaggi + [{"role": "user", "content": CANARINO_DOMANDA}]
         stato_c, testo_c, errore_c, _ = invia(c, prova, api, modello, max_tokens=60)
         if stato_c and stato_c < 400:
-            ok = CANARINO_VALORE.split("-")[0] in (testo_c or "").upper()
+            ripulito = re.sub(r"(?is)<think>.*?</think>", "", testo_c or "")
+            ok = CANARINO_VALORE.split("-")[0] in ripulito.upper()
             print(f"    giro {giro}: canarino {'PRESENTE' if ok else 'PERSO'} "
                   f"| risposta: {(testo_c or '').strip()[:70]!r}", flush=True)
             if not ok and canarino_perso_al_giro is None:
@@ -349,6 +394,13 @@ def main() -> int:
     ap.add_argument("--url", required=True, help="es. http://213.181.123.31:38108")
     ap.add_argument("--api-key", default="", help="chiave per l'API della chat")
     ap.add_argument("--giri", type=int, default=6, help="cicli di riempimento nella fase 3")
+    ap.add_argument("--chat-path", default="/v1/chat/completions",
+                    help="endpoint da testare. IMPORTANTE: /v1/chat/completions e' l'API grezza del "
+                         "motore, dove nessuna compattazione esiste. Per misurare il comportamento "
+                         "REALE della chat va indicato l'endpoint della propria applicazione "
+                         "(es. /agent, /api/chat).")
+    ap.add_argument("--sse", action="store_true",
+                    help="l'endpoint risponde in streaming SSE invece che con un JSON unico")
     ap.add_argument("--timeout", type=float, default=180.0)
     a = ap.parse_args()
 
@@ -357,7 +409,13 @@ def main() -> int:
     print(f"avvio: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 72)
 
-    c = Client(a.url, a.api_key, a.timeout)
+    c = Client(a.url, a.api_key, a.timeout, a.chat_path, a.sse)
+    print(f"endpoint sotto test: {a.chat_path}" + ("  (SSE)" if a.sse else ""))
+    if a.chat_path == "/v1/chat/completions":
+        print("ATTENZIONE: questa e' l'API GREZZA del motore. Non passa dalla logica di\n"
+              "            compattazione dell'applicazione: la Fase 3 misurera' il\n"
+              "            comportamento del motore nudo, non quello della chat reale.\n"
+              "            Per la chat reale: --chat-path /tuo/endpoint [--sse]")
     scoperta = fase0_scoperta(c)
     if scoperta["api"] is None:
         print("\nImpossibile proseguire: il servizio non espone un'API riconosciuta.")
