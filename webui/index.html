@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quadro Contesto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#e9ecf0; --surface:#ffffff; --surface-2:#f3f5f8; --sunken:#dfe4ea;
+  --ink:#141a21; --muted:#5b6774; --faint:#8996a4; --line:#cdd5de; --line-soft:#e0e6ec;
+  --accent:#26557f; --accent-ink:#ffffff; --accent-soft:#dce8f3;
+  --ok:#2c7a56; --warn:#a4761a; --crit:#b34239;
+  --ok-soft:#dcece4; --warn-soft:#f6ecd6; --crit-soft:#f6dedb;
+  --user-bg:#e4ebf2; --shadow:0 1px 2px rgba(20,26,33,.06),0 4px 14px rgba(20,26,33,.05);
+  --radius:6px;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1218; --surface:#161d25; --surface-2:#1b232c; --sunken:#0a0e13;
+    --ink:#dde4ec; --muted:#8d9aa9; --faint:#6b7885;
+    --line:#28323d; --line-soft:#1f2831;
+    --accent:#7cb3e0; --accent-ink:#0e1218; --accent-soft:#1c2c3a;
+    --ok:#5cbb8f; --warn:#d5a445; --crit:#e0736a;
+    --ok-soft:#16281f; --warn-soft:#2a2317; --crit-soft:#2c1b19;
+    --user-bg:#1c242e; --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1218; --surface:#161d25; --surface-2:#1b232c; --sunken:#0a0e13;
+  --ink:#dde4ec; --muted:#8d9aa9; --faint:#6b7885; --line:#28323d; --line-soft:#1f2831;
+  --accent:#7cb3e0; --accent-ink:#0e1218; --accent-soft:#1c2c3a;
+  --ok:#5cbb8f; --warn:#d5a445; --crit:#e0736a;
+  --ok-soft:#16281f; --warn-soft:#2a2317; --crit-soft:#2c1b19;
+  --user-bg:#1c242e; --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.28);
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ---------- impianto ---------- */
+.app{display:grid;grid-template-columns:264px minmax(0,1fr);height:100vh;height:100dvh}
+.rail{background:var(--surface-2);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+
+/* ---------- rail ---------- */
+.brand{display:flex;align-items:center;gap:9px;padding:14px 16px 12px}
+.brand-mark{width:22px;height:22px;flex:none}
+.brand-name{font-weight:600;letter-spacing:-.01em;font-size:14px}
+.rail-head{display:flex;gap:8px;padding:0 12px 12px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);
+  padding:7px 11px;font-size:13px;font-weight:500;transition:background .12s,border-color .12s}
+.btn:hover{background:var(--surface-2);border-color:var(--muted)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{background:var(--accent);filter:brightness(1.08)}
+.btn-wide{flex:1;text-align:center}
+.btn-icon{padding:6px 8px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.rail-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);padding:6px 16px 4px}
+.convs{flex:1;overflow-y:auto;padding:0 8px 8px;min-height:0}
+.conv{width:100%;text-align:left;padding:8px 10px;border-radius:var(--radius);display:flex;
+  align-items:baseline;gap:8px;color:var(--muted);font-size:13.5px}
+.conv:hover{background:var(--sunken)}
+.conv[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.conv-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conv-meta{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.rail-foot{border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- barra di stato ---------- */
+.status{border-bottom:1px solid var(--line);background:var(--surface);padding:9px 20px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;
+  padding:3px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip b{font-weight:500;color:var(--ink)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.chip.warn{border-color:var(--warn);background:var(--warn-soft);color:var(--warn)}
+.chip.crit{border-color:var(--crit);background:var(--crit-soft);color:var(--crit)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.status-spacer{flex:1}
+
+/* ---------- misuratore di contesto: l'elemento forte ---------- */
+.gauge{padding:12px 20px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.gauge-head{display:flex;align-items:baseline;gap:10px;margin-bottom:7px}
+.gauge-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.gauge-read{font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;margin-left:auto;color:var(--muted)}
+.gauge-read b{color:var(--ink);font-weight:600}
+.track{position:relative;height:12px;background:var(--sunken);border-radius:2px;margin-top:19px}
+.fill{height:100%;width:0;max-width:100%;background:var(--ok);transition:width .3s ease,background .3s ease;border-radius:2px}
+.fill.warn{background:var(--warn)} .fill.crit{background:var(--crit)}
+.tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.55}
+.tick::after{content:attr(data-label);position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--muted);white-space:nowrap;opacity:.9}
+.gauge-scale{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--mono);
+  font-size:10px;color:var(--faint);font-variant-numeric:tabular-nums}
+
+/* ---------- trascrizione ---------- */
+.scroll{flex:1;overflow-y:auto;min-height:0}
+.thread{max-width:760px;margin:0 auto;padding:22px 20px 8px;display:flex;flex-direction:column;gap:16px}
+.msg{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:start}
+.msg-role{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);padding-top:9px;text-align:right}
+.bubble{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);
+  padding:11px 14px;box-shadow:var(--shadow);min-width:0}
+.msg.user .bubble{background:var(--user-bg);border-color:transparent;box-shadow:none}
+.bubble p{margin:0 0 .7em}
+.bubble p:last-child{margin-bottom:0}
+.bubble pre{background:var(--sunken);border-radius:4px;padding:10px 12px;overflow-x:auto;
+  font-family:var(--mono);font-size:12.5px;line-height:1.5;margin:.6em 0}
+.bubble code{font-family:var(--mono);font-size:.9em;background:var(--sunken);padding:1px 4px;border-radius:3px}
+.bubble pre code{background:none;padding:0}
+.msg-foot{display:flex;gap:10px;align-items:center;margin-top:7px;opacity:0;transition:opacity .12s}
+.msg:hover .msg-foot,.msg:focus-within .msg-foot{opacity:1}
+.msg-tok{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.msg-act{font-size:11.5px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.msg-act:hover{color:var(--accent)}
+.cursor{display:inline-block;width:7px;height:1em;background:var(--accent);vertical-align:-2px;
+  animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- eventi nella trascrizione ---------- */
+.event{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center}
+.event-body{border-top:1px solid var(--line);position:relative;padding-top:0}
+.event-tag{display:inline-flex;align-items:center;gap:8px;background:var(--bg);padding:0 10px 0 0;
+  transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--muted)}
+.event-tag b{color:var(--ink);font-weight:500}
+.summary{background:var(--surface-2);border:1px dashed var(--line);border-radius:var(--radius);padding:11px 14px}
+.summary-head{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:6px}
+.errbox{background:var(--crit-soft);border:1px solid var(--crit);border-radius:var(--radius);padding:11px 14px}
+.errbox-head{font-weight:600;font-size:13.5px;color:var(--crit);margin-bottom:5px}
+.errbox-detail{font-family:var(--mono);font-size:11.5px;color:var(--ink);word-break:break-word;
+  background:var(--surface);border-radius:4px;padding:7px 9px;margin-top:7px;max-height:170px;overflow:auto}
+.errbox-hint{font-size:12.5px;color:var(--muted);margin-top:7px}
+
+/* ---------- composer ---------- */
+.composer{border-top:1px solid var(--line);background:var(--surface);padding:12px 20px 16px}
+.composer-inner{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:flex-end}
+.input{flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:10px 12px;resize:none;max-height:210px;min-height:44px;line-height:1.5}
+.input:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.composer-hint{max-width:760px;margin:7px auto 0;font-family:var(--mono);font-size:10.5px;color:var(--faint);
+  display:flex;gap:14px;flex-wrap:wrap}
+
+/* ---------- pannello impostazioni ---------- */
+.sheet{position:fixed;inset:0;background:rgba(10,14,19,.5);display:grid;place-items:center;padding:20px;z-index:20}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
+  width:min(560px,100%);max-height:min(86vh,760px);overflow:auto}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;
+  border-bottom:1px solid var(--line-soft);position:sticky;top:0;background:var(--surface)}
+.panel-title{font-size:16px;font-weight:600}
+.panel-body{padding:16px 20px 20px;display:grid;gap:14px}
+.field{display:grid;gap:5px}
+.field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.field input,.field select,.field textarea{background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:8px 10px;width:100%;font-size:13.5px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.field .note{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel-foot{display:flex;gap:8px;justify-content:flex-end;padding:0 20px 20px}
+.probe{font-family:var(--mono);font-size:11.5px;background:var(--sunken);border-radius:4px;padding:9px 11px;
+  white-space:pre-wrap;word-break:break-word;max-height:190px;overflow:auto}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .rail{position:fixed;inset:0 auto 0 0;width:264px;z-index:15;transform:translateX(-100%);transition:transform .18s}
+  .rail[data-open="true"]{transform:none}
+  .msg,.event{grid-template-columns:1fr;gap:5px}
+  .msg-role{text-align:left;padding-top:0}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail" id="rail">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.5" y="6" width="19" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <rect x="5" y="9" width="8" height="6" rx="1" fill="currentColor" opacity=".8"/>
+        <line x1="16" y1="6" x2="16" y2="18" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+      <span class="brand-name">Quadro Contesto</span>
+    </div>
+    <div class="rail-head">
+      <button class="btn btn-primary btn-wide" id="newChat">Nuova chat</button>
+      <button class="btn btn-icon" id="openSettings" title="Impostazioni" aria-label="Impostazioni">⚙</button>
+    </div>
+    <div class="rail-label">Conversazioni</div>
+    <div class="convs" id="convs"></div>
+    <div class="rail-foot">
+      <button class="btn btn-icon" id="exportBtn">Esporta</button>
+      <button class="btn btn-icon" id="importBtn">Importa</button>
+      <button class="btn btn-icon" id="themeBtn">Tema</button>
+      <input type="file" id="importFile" accept="application/json" hidden>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="status" id="status"></div>
+
+    <section class="gauge" aria-label="Occupazione del contesto">
+      <div class="gauge-head">
+        <span class="gauge-title">Finestra di contesto</span>
+        <span class="gauge-read" id="gaugeRead"></span>
+      </div>
+      <div class="track" id="track">
+        <div class="fill" id="fill"></div>
+        <div class="tick" id="tick" data-label="compattazione"></div>
+      </div>
+      <div class="gauge-scale"><span>0</span><span id="scaleMax"></span></div>
+    </section>
+
+    <div class="scroll" id="scroll"><div class="thread" id="thread"></div></div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <textarea class="input" id="input" rows="1" placeholder="Scrivi un messaggio…"></textarea>
+        <button class="btn btn-primary" id="send">Invia</button>
+        <button class="btn" id="stop" hidden>Ferma</button>
+      </div>
+      <div class="composer-hint">
+        <span>Invio per inviare · Maiusc+Invio per andare a capo</span>
+        <span id="draftTok"></span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+    <div class="panel-head">
+      <span class="panel-title" id="panelTitle">Impostazioni</span>
+      <button class="btn btn-icon" id="closeSettings" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label for="sUrl">Indirizzo del server</label>
+        <input id="sUrl" placeholder="http://127.0.0.1:5001" spellcheck="false">
+        <span class="note">Lascialo vuoto per la modalità dimostrativa, senza server.</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="sKey">Chiave API</label>
+          <input id="sKey" type="password" placeholder="facoltativa" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="sApi">Tipo di API</label>
+          <select id="sApi">
+            <option value="auto">rilevamento automatico</option>
+            <option value="openai">OpenAI-compatible</option>
+            <option value="kobold">KoboldCpp</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="sModel">Modello</label>
+        <input id="sModel" placeholder="rilevato dal server" spellcheck="false">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="sCtx">Finestra di contesto</label>
+          <input id="sCtx" type="number" min="512" step="512">
+          <span class="note" id="ctxNote"></span>
+        </div>
+        <div class="field">
+          <label for="sOut">Token in risposta</label>
+          <input id="sOut" type="number" min="64" step="64">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="sTemp">Temperatura</label>
+          <input id="sTemp" type="number" min="0" max="2" step="0.05">
+        </div>
+        <div class="field">
+          <label for="sKeep">Messaggi tenuti interi</label>
+          <input id="sKeep" type="number" min="2" step="1">
+          <span class="note">Non vengono mai compattati.</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="sSys">Istruzioni di sistema</label>
+        <textarea id="sSys" rows="3" spellcheck="false"></textarea>
+      </div>
+      <div class="field">
+        <label>Verifica del server</label>
+        <div style="display:flex;gap:8px"><button class="btn" id="probeBtn">Interroga il server</button></div>
+        <div class="probe" id="probeOut" hidden></div>
+      </div>
+    </div>
+    <div class="panel-foot">
+      <button class="btn" id="cancelSettings">Annulla</button>
+      <button class="btn btn-primary" id="saveSettings">Salva</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ------------------------------------------------------------------ stato */
+const LS = "quadro-contesto-v1";
+const DEFAULTS = {
+  url:"", key:"", api:"auto", model:"", ctx:8192, out:512, temp:0.7, keep:6,
+  sys:"Sei un assistente di ricerca conciso e preciso. Rispondi in italiano."
+};
+const TRIGGER = 0.75, TARGET = 0.45;
+
+let S = {...DEFAULTS}, convs = [], activeId = null, streaming = null, probed = null;
+
+function store(){
+  try{ localStorage.setItem(LS, JSON.stringify({S, convs, activeId})); }catch(e){}
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    S = {...DEFAULTS, ...(d.S||{})}; convs = d.convs||[]; activeId = d.activeId;
+    return convs.length > 0;
+  }catch(e){ return false; }
+}
+
+/* stima token: volutamente prudente. Il conteggio esatto lo fa il server,
+   qui serve a decidere QUANDO compattare, e sbagliare per eccesso e' meglio. */
+function tok(t){ if(!t) return 0; return Math.ceil(Math.max(t.length/3.0, t.split(" ").length)) + 8; }
+function ctxTokens(c){
+  return tok(S.sys) + c.messages.filter(m=>!m.archived).reduce((n,m)=>n+tok(m.content),0) + 8;
+}
+const uid = () => Math.random().toString(36).slice(2,10);
+const esc = s => s.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+
+/* ------------------------------------------------------- conversazioni */
+function nuova(seed){
+  const c = {id:uid(), title:"Nuova chat", messages:[], created:Date.now()};
+  if(seed) Object.assign(c, seed);
+  convs.unshift(c); activeId = c.id; return c;
+}
+const attiva = () => convs.find(c=>c.id===activeId) || convs[0];
+
+function esempio(){
+  const c = nuova({title:"Esempio — come si legge", messages:[
+    {id:uid(), role:"user", content:"Il mio codice cliente è ZX-7741. Analizziamo i log del server di ieri sera."},
+    {id:uid(), role:"assistant", content:"Annotato il codice ZX-7741. Ho letto i log: tre picchi di latenza tra le 21:40 e le 22:05, tutti su richieste con contesto sopra i 6.000 token.", archived:true},
+    {id:uid(), role:"user", content:"E gli errori 400?", archived:true},
+    {id:uid(), role:"assistant", content:"Sono 47, tutti con lo stesso messaggio del motore sul superamento della finestra di contesto.", archived:true},
+    {id:uid(), role:"system", kind:"summary", content:"• Codice cliente dell'utente: ZX-7741.\n• Analisi dei log di ieri sera: tre picchi di latenza fra 21:40 e 22:05, tutti su richieste sopra i 6.000 token.\n• 47 errori 400 dal motore, tutti per superamento della finestra di contesto.\n• Questione aperta: capire se la soglia di compattazione è troppo alta.", compaction:{absorbed:3, before:7840, after:2110}},
+    {id:uid(), role:"user", content:"Ti ricordi il mio codice cliente?"},
+    {id:uid(), role:"assistant", content:"Sì: **ZX-7741**. È sopravvissuto alla compattazione perché il riassunto conserva i dati concreti invece di scartare i messaggi vecchi."},
+    {id:uid(), role:"error", content:"400 · This model's maximum context length is 8192 tokens, however you requested 9314 tokens.", hint:"Il contesto non è stato ridotto prima dell'invio. Con la soglia impostata al 75% questa richiesta sarebbe stata compattata prima di partire."}
+  ]});
+  return c;
+}
+
+/* -------------------------------------------------------------- rete */
+function headers(){
+  const h = {"Content-Type":"application/json"};
+  if(S.key){ h["Authorization"] = "Bearer " + S.key; h["X-API-Key"] = S.key; }
+  return h;
+}
+async function get(path, ms=8000){
+  const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms);
+  try{
+    const r = await fetch(S.url.replace(/\/$/,"") + path, {headers:headers(), signal:ac.signal});
+    const txt = await r.text();
+    try{ return {ok:r.ok, status:r.status, body:JSON.parse(txt)}; }
+    catch(e){ return {ok:r.ok, status:r.status, body:txt}; }
+  }catch(e){ return {ok:false, status:0, body:String(e)}; }
+  finally{ clearTimeout(t); }
+}
+
+async function interroga(){
+  if(!S.url) return null;
+  const out = {api:null, model:null, vera:null, righe:[]};
+  const oa = await get("/v1/models");
+  if(oa.ok){ out.api="openai"; out.righe.push("/v1/models → " + oa.status);
+    try{ out.model = oa.body.data[0].id; }catch(e){} }
+  if(!out.api){
+    const kb = await get("/api/v1/model");
+    if(kb.ok){ out.api="kobold"; out.righe.push("/api/v1/model → " + kb.status);
+      try{ out.model = kb.body.result; }catch(e){} }
+  }
+  const vera = await get("/api/extra/true_max_context_length");
+  if(vera.ok && vera.body && typeof vera.body.value === "number"){
+    out.vera = vera.body.value;
+    out.righe.push("true_max_context_length → " + out.vera);
+  }
+  probed = out; return out;
+}
+
+async function completa(messaggi, maxTok, onDelta, segnale){
+  if(!S.url) return demo(messaggi, onDelta);
+  const base = S.url.replace(/\/$/,"");
+  const api = S.api === "auto" ? ((probed && probed.api) || "openai") : S.api;
+
+  if(api === "kobold"){
+    const prompt = messaggi.map(m =>
+      (m.role==="assistant" ? "### Risposta:\n" : "### Istruzione:\n") + m.content + "\n\n").join("") + "### Risposta:\n";
+    const r = await fetch(base + "/api/v1/generate", {method:"POST", headers:headers(), signal:segnale,
+      body:JSON.stringify({prompt, max_length:maxTok, temperature:S.temp})});
+    const txt = await r.text();
+    if(!r.ok) throw new ServerError(r.status, txt);
+    let out = ""; try{ out = JSON.parse(txt).results[0].text; }catch(e){ throw new ServerError(r.status, txt); }
+    onDelta && onDelta(out);
+    return out;
+  }
+
+  const r = await fetch(base + "/v1/chat/completions", {method:"POST", headers:headers(), signal:segnale,
+    body:JSON.stringify({model:S.model||undefined, messages:messaggi, max_tokens:maxTok,
+                         temperature:S.temp, stream:true})});
+  if(!r.ok) throw new ServerError(r.status, await r.text());
+  if(!r.body){ const j = await r.json(); const t = j.choices[0].message.content||""; onDelta&&onDelta(t); return t; }
+
+  const reader = r.body.getReader(), dec = new TextDecoder();
+  let buf = "", acc = "";
+  while(true){
+    const {done, value} = await reader.read();
+    if(done) break;
+    buf += dec.decode(value, {stream:true});
+    const righe = buf.split("\n"); buf = righe.pop();
+    for(const riga of righe){
+      if(!riga.startsWith("data:")) continue;
+      const d = riga.slice(5).trim();
+      if(d === "[DONE]") continue;
+      try{
+        const j = JSON.parse(d);
+        const delta = (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || "";
+        if(delta){ acc += delta; onDelta && onDelta(delta); }
+      }catch(e){ /* frame spezzato: si ignora, arriva completo al giro dopo */ }
+    }
+  }
+  return acc;
+}
+
+class ServerError extends Error{
+  constructor(status, raw){
+    super(status + " · " + (raw||"").slice(0,500));
+    this.status = status; this.raw = raw||"";
+    this.contesto = /context length|maximum context|too long|exceed|max_model_len/i.test(this.raw);
+  }
+}
+
+async function demo(messaggi, onDelta){
+  const ultimo = (messaggi[messaggi.length-1]||{}).content || "";
+  const testo = /zx-?7741/i.test(JSON.stringify(messaggi))
+    ? "Il tuo codice cliente è ZX-7741. (Modalità dimostrativa: nessun server collegato — impostane uno da ⚙ per usare il modello vero.)"
+    : "Modalità dimostrativa: non c'è nessun server collegato, quindi questa risposta è finta. "
+      + "Apri le impostazioni e inserisci l'indirizzo del tuo server per parlare con il modello. "
+      + "Hai scritto: " + JSON.stringify(ultimo.slice(0,120));
+  for(const p of testo.split(" ")){
+    await new Promise(r=>setTimeout(r,18));
+    onDelta && onDelta(p + " ");
+  }
+  return testo;
+}
+
+/* ------------------------------------------------------- compattazione */
+function daCompattare(c){
+  const attivi = c.messages.filter(m=>!m.archived);
+  const utili = attivi.slice(0, Math.max(0, attivi.length - S.keep));
+  // il taglio non deve mai cadere dentro un gruppo di strumenti
+  while(utili.length && attivi[utili.length] && attivi[utili.length].role === "tool") utili.pop();
+  return utili;
+}
+
+async function compatta(c){
+  const blocco = daCompattare(c);
+  if(blocco.length < 2) return {stato:"noop", motivo:"troppo pochi messaggi da compattare"};
+  const testo = blocco.map(m => (m.kind==="summary" ? "RIASSUNTO PRECEDENTE" : m.role.toUpperCase()) + ": " + m.content).join("\n\n");
+  const richiesta = [
+    {role:"system", content:"Comprimi la conversazione conservando TUTTO ciò che serve a proseguirla: obiettivi, decisioni, fatti, nomi, identificativi esatti, URL, numeri, questioni aperte. Punti elenco densi, in italiano. Niente commenti."},
+    {role:"user", content:"Riassumi:\n\n" + testo.slice(0, S.ctx*2)}
+  ];
+  let riassunto = "";
+  try{ riassunto = await completa(richiesta, Math.min(700, S.out*2), null, null); }
+  catch(e){ return {stato:"errore", motivo:e.message}; }
+  if(!riassunto.trim()) return {stato:"errore", motivo:"il modello non ha prodotto un riassunto"};
+
+  // Solo ORA si archivia: se il riassunto fosse fallito, la chat resta intatta.
+  const prima = ctxTokens(c);
+  const ids = new Set(blocco.map(m=>m.id));
+  const pos = c.messages.findIndex(m => m.id === blocco[blocco.length-1].id);
+  c.messages.forEach(m => { if(ids.has(m.id)) m.archived = true; });
+  c.messages.splice(pos+1, 0, {id:uid(), role:"system", kind:"summary", content:riassunto.trim(),
+    compaction:{absorbed:blocco.length, before:prima, after:0}});
+  const m = c.messages.find(x => x.kind==="summary" && x.compaction && x.compaction.after===0);
+  if(m) m.compaction.after = ctxTokens(c);
+  store();
+  return {stato:"ok", assorbiti:blocco.length};
+}
+
+/* -------------------------------------------------------------- invio */
+async function invia(testo){
+  const c = attiva() || nuova();
+  c.messages.push({id:uid(), role:"user", content:testo});
+  if(c.title === "Nuova chat") c.title = testo.slice(0,42) + (testo.length>42 ? "…" : "");
+  render(); store();
+
+  const soglia = (S.ctx - S.out) * TRIGGER;
+  let giri = 0;
+  while(ctxTokens(c) > soglia && giri < 3){
+    giri++;
+    const r = await compatta(c);
+    render();
+    if(r.stato !== "ok") break;
+    if(ctxTokens(c) <= (S.ctx - S.out) * TARGET) break;
+  }
+
+  const bozza = {id:uid(), role:"assistant", content:"", streaming:true};
+  c.messages.push(bozza); render();
+
+  const ac = new AbortController(); streaming = ac;
+  document.getElementById("stop").hidden = false;
+  document.getElementById("send").disabled = true;
+
+  const payload = [{role:"system", content:S.sys}].concat(
+    c.messages.filter(m=>!m.archived && !m.streaming && m.role!=="error")
+              .map(m => ({role: m.kind==="summary" ? "system" : m.role, content:m.content})));
+
+  try{
+    await completa(payload, S.out, d => { bozza.content += d; renderStream(bozza); }, ac.signal);
+    delete bozza.streaming;
+  }catch(e){
+    delete bozza.streaming;
+    if(!bozza.content) c.messages.pop();
+    const err = e instanceof ServerError ? e : new ServerError(0, String(e && e.message || e));
+    c.messages.push({id:uid(), role:"error", content:err.message,
+      hint: err.contesto
+        ? "Il server dice che il contesto è troppo lungo. Abbassa «Finestra di contesto» nelle impostazioni finché non combacia con il valore con cui è avviato il motore: se qui è più alto del reale, la compattazione parte troppo tardi."
+        : "Controlla che il server sia raggiungibile all'indirizzo impostato e che la chiave API sia corretta."});
+  }finally{
+    streaming = null;
+    document.getElementById("stop").hidden = true;
+    document.getElementById("send").disabled = false;
+    render(); store();
+  }
+}
+
+/* ----------------------------------------------------------- rendering */
+function md(t){
+  let h = esc(t);
+  h = h.replace(/```([\s\S]*?)```/g, (m,c)=>"<pre><code>"+c.replace(/^\n/,"")+"</code></pre>");
+  h = h.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  h = h.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  return h.split(/\n{2,}/).map(p=>"<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");
+}
+
+function render(){
+  const c = attiva();
+  // rail
+  const rail = document.getElementById("convs");
+  rail.innerHTML = convs.map(x => `<button class="conv" data-id="${x.id}" aria-current="${x.id===activeId}">
+      <span class="conv-title">${esc(x.title)}</span>
+      <span class="conv-meta">${x.messages.filter(m=>!m.archived&&m.role!=="error").length}</span></button>`).join("");
+  rail.querySelectorAll(".conv").forEach(b => b.onclick = () => { activeId = b.dataset.id; render(); store(); });
+
+  // stato
+  const st = document.getElementById("status");
+  const collegato = !!S.url;
+  const chips = [];
+  chips.push(`<span class="chip ${collegato?"ok":""}"><span class="dot"></span>${collegato ? esc(S.url) : "modalità dimostrativa"}</span>`);
+  chips.push(`<span class="chip">modello <b>${esc((probed&&probed.model)||S.model||"non rilevato")}</b></span>`);
+  if(probed && probed.vera && S.ctx > probed.vera){
+    chips.push(`<span class="chip crit"><span class="dot"></span>finestra dichiarata ${S.ctx} &gt; reale ${probed.vera}</span>`);
+  }
+  chips.push(`<span class="chip">temp <b>${S.temp}</b></span>`);
+  st.innerHTML = chips.join("") + '<span class="status-spacer"></span>';
+
+  // misuratore
+  const usati = c ? ctxTokens(c) : 0, budget = Math.max(1, S.ctx - S.out);
+  const q = Math.min(1, usati/budget);
+  const fill = document.getElementById("fill");
+  fill.style.width = (q*100).toFixed(1) + "%";
+  fill.className = "fill" + (q >= 0.9 ? " crit" : q >= TRIGGER ? " warn" : "");
+  document.getElementById("tick").style.left = (TRIGGER*100) + "%";
+  document.getElementById("gaugeRead").innerHTML =
+    `<b>${usati.toLocaleString("it")}</b> / ${budget.toLocaleString("it")} token · ${Math.round(q*100)}%`;
+  document.getElementById("scaleMax").textContent = budget.toLocaleString("it") + " token utili";
+
+  // trascrizione
+  const th = document.getElementById("thread");
+  if(!c){ th.innerHTML = ""; return; }
+  th.innerHTML = c.messages.filter(m=>!m.archived).map(m => {
+    if(m.role === "error") return `<div class="event"><div></div><div class="errbox">
+        <div class="errbox-head">Il server ha rifiutato la richiesta</div>
+        <div>La conversazione è salva: nessun messaggio è stato perso.</div>
+        <div class="errbox-detail">${esc(m.content)}</div>
+        <div class="errbox-hint">${esc(m.hint||"")}</div></div></div>`;
+    if(m.kind === "summary"){
+      const k = m.compaction||{};
+      return `<div class="event"><div></div><div class="event-body">
+          <span class="event-tag">contesto compattato · <b>${k.absorbed||0}</b> messaggi assorbiti · <b>${(k.before||0).toLocaleString("it")}</b> → <b>${(k.after||0).toLocaleString("it")}</b> token</span>
+        </div></div>
+        <div class="msg"><div class="msg-role">riassunto</div><div class="summary">
+          <div class="summary-head">Memoria conservata</div>${md(m.content)}</div></div>`;
+    }
+    return `<div class="msg ${m.role}"><div class="msg-role">${m.role==="user"?"tu":"modello"}</div>
+      <div><div class="bubble" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="cursor"></span>':""}</div>
+      <div class="msg-foot"><span class="msg-tok">${tok(m.content)} token</span>
+      <button class="msg-act" data-copy="${m.id}">copia</button></div></div></div>`;
+  }).join("");
+
+  th.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
+    const msg = c.messages.find(m=>m.id===b.dataset.copy);
+    navigator.clipboard && navigator.clipboard.writeText(msg.content);
+    b.textContent = "copiato"; setTimeout(()=>b.textContent="copia", 1200);
+  });
+  const sc = document.getElementById("scroll");
+  sc.scrollTop = sc.scrollHeight;
+}
+
+function renderStream(m){
+  const el = document.querySelector(`.bubble[data-id="${m.id}"]`);
+  if(!el){ render(); return; }
+  el.innerHTML = md(m.content) + '<span class="cursor"></span>';
+  const sc = document.getElementById("scroll");
+  if(sc.scrollHeight - sc.scrollTop - sc.clientHeight < 120) sc.scrollTop = sc.scrollHeight;
+}
+
+/* ------------------------------------------------------------- eventi */
+const $ = id => document.getElementById(id);
+
+$("input").addEventListener("input", e => {
+  e.target.style.height = "auto";
+  e.target.style.height = Math.min(e.target.scrollHeight, 210) + "px";
+  $("draftTok").textContent = e.target.value ? tok(e.target.value) + " token nella bozza" : "";
+});
+$("input").addEventListener("keydown", e => {
+  if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); manda(); }
+});
+$("send").onclick = manda;
+$("stop").onclick = () => streaming && streaming.abort();
+function manda(){
+  const t = $("input").value.trim();
+  if(!t || streaming) return;
+  $("input").value = ""; $("input").style.height = "auto"; $("draftTok").textContent = "";
+  invia(t);
+}
+
+$("newChat").onclick = () => { nuova(); render(); store(); $("input").focus(); };
+$("themeBtn").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : cur === "light" ? null : "dark";
+  if(next) document.documentElement.setAttribute("data-theme", next);
+  else document.documentElement.removeAttribute("data-theme");
+  try{ localStorage.setItem(LS+"-theme", next||""); }catch(e){}
+};
+$("exportBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify({convs, exported:new Date().toISOString()}, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "conversazioni-" + new Date().toISOString().slice(0,10) + ".json";
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+};
+$("importBtn").onclick = () => $("importFile").click();
+$("importFile").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const d = JSON.parse(await f.text());
+    if(Array.isArray(d.convs)){ convs = d.convs.concat(convs); activeId = convs[0].id; render(); store(); }
+  }catch(err){ alert("File non leggibile: " + err.message); }
+  e.target.value = "";
+};
+
+/* impostazioni */
+function apriImpostazioni(){
+  $("sUrl").value = S.url; $("sKey").value = S.key; $("sApi").value = S.api;
+  $("sModel").value = S.model; $("sCtx").value = S.ctx; $("sOut").value = S.out;
+  $("sTemp").value = S.temp; $("sKeep").value = S.keep; $("sSys").value = S.sys;
+  $("ctxNote").textContent = probed && probed.vera
+    ? "Il motore ne serve " + probed.vera : "Deve combaciare con il valore di avvio del motore.";
+  $("sheet").hidden = false; $("sUrl").focus();
+}
+$("openSettings").onclick = apriImpostazioni;
+$("closeSettings").onclick = $("cancelSettings").onclick = () => { $("sheet").hidden = true; };
+$("sheet").addEventListener("click", e => { if(e.target === $("sheet")) $("sheet").hidden = true; });
+document.addEventListener("keydown", e => { if(e.key === "Escape") $("sheet").hidden = true; });
+
+$("saveSettings").onclick = async () => {
+  S.url = $("sUrl").value.trim(); S.key = $("sKey").value; S.api = $("sApi").value;
+  S.model = $("sModel").value.trim(); S.ctx = +$("sCtx").value || DEFAULTS.ctx;
+  S.out = +$("sOut").value || DEFAULTS.out; S.temp = +$("sTemp").value;
+  S.keep = Math.max(2, +$("sKeep").value || DEFAULTS.keep); S.sys = $("sSys").value;
+  $("sheet").hidden = true; store(); render();
+  if(S.url){ await interroga(); render(); }
+};
+$("probeBtn").onclick = async () => {
+  S.url = $("sUrl").value.trim(); S.key = $("sKey").value;
+  const out = $("probeOut"); out.hidden = false; out.textContent = "interrogazione in corso…";
+  if(!S.url){ out.textContent = "Nessun indirizzo impostato."; return; }
+  const r = await interroga();
+  if(!r || !r.api){ out.textContent = "Nessuna API riconosciuta a questo indirizzo.\nVerifica indirizzo, porta e che il server risponda."; return; }
+  let t = "API: " + r.api + "\nmodello: " + (r.model||"non dichiarato") + "\n" + r.righe.join("\n");
+  if(r.vera){
+    t += "\n\nfinestra reale del motore: " + r.vera;
+    const q = +$("sCtx").value;
+    t += q > r.vera
+      ? "\n\n⚠ Qui è impostato " + q + ", più del reale: il motore taglierà da solo, in silenzio.\n   Porta la finestra a " + r.vera + "."
+      : "\n\n✓ La finestra impostata sta dentro quella reale.";
+    if(!q || q > r.vera) $("sCtx").value = r.vera;
+  }
+  out.textContent = t;
+};
+
+/* ---------------------------------------------------------- avvio */
+try{
+  const t = localStorage.getItem(LS+"-theme");
+  if(t) document.documentElement.setAttribute("data-theme", t);
+}catch(e){}
+
+if(!load() || convs.length === 0) esempio();
+render();
+if(S.url) interroga().then(render);
+</script>
+</body>
+</html>
