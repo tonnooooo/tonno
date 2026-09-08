@@ -6,229 +6,244 @@
 <title>Quadro Contesto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 :root{
-  --bg:#e9ecf0; --surface:#ffffff; --surface-2:#f3f5f8; --sunken:#dfe4ea;
-  --ink:#141a21; --muted:#5b6774; --faint:#8996a4; --line:#cdd5de; --line-soft:#e0e6ec;
-  --accent:#26557f; --accent-ink:#ffffff; --accent-soft:#dce8f3;
-  --ok:#2c7a56; --warn:#a4761a; --crit:#b34239;
-  --ok-soft:#dcece4; --warn-soft:#f6ecd6; --crit-soft:#f6dedb;
-  --user-bg:#e4ebf2; --shadow:0 1px 2px rgba(20,26,33,.06),0 4px 14px rgba(20,26,33,.05);
-  --radius:6px;
+  --page:#fcfcfd; --rail:#f1f3f6; --raised:#ffffff; --sunken:#e8ebf0;
+  --ink:#161c23; --muted:#5d6875; --faint:#939ead;
+  --line:#e4e8ee; --line-strong:#d2d8e0;
+  --accent:#2a5f8f; --accent-ink:#ffffff; --accent-wash:#eaf1f8;
+  --solid:#2a5f8f; --on-solid:#ffffff;
+  --ok:#2f7d59; --warn:#a1761c; --crit:#b34239; --crit-wash:#fbf0ef;
+  --you:#eef1f5;
   --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0e1218; --surface:#161d25; --surface-2:#1b232c; --sunken:#0a0e13;
-    --ink:#dde4ec; --muted:#8d9aa9; --faint:#6b7885;
-    --line:#28323d; --line-soft:#1f2831;
-    --accent:#7cb3e0; --accent-ink:#0e1218; --accent-soft:#1c2c3a;
-    --ok:#5cbb8f; --warn:#d5a445; --crit:#e0736a;
-    --ok-soft:#16281f; --warn-soft:#2a2317; --crit-soft:#2c1b19;
-    --user-bg:#1c242e; --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.28);
+    --page:#111519; --rail:#0c1013; --raised:#181d23; --sunken:#0a0d10;
+    --ink:#e2e7ed; --muted:#95a1af; --faint:#6c7885;
+    --line:#232a32; --line-strong:#2f3843;
+    --accent:#83b6e2; --accent-ink:#111519; --accent-wash:#182430;
+    --solid:#2d6699; --on-solid:#f2f7fb;
+    --ok:#5fbd92; --warn:#d3a44a; --crit:#e2776d; --crit-wash:#241a19;
+    --you:#1a2028;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0e1218; --surface:#161d25; --surface-2:#1b232c; --sunken:#0a0e13;
-  --ink:#dde4ec; --muted:#8d9aa9; --faint:#6b7885; --line:#28323d; --line-soft:#1f2831;
-  --accent:#7cb3e0; --accent-ink:#0e1218; --accent-soft:#1c2c3a;
-  --ok:#5cbb8f; --warn:#d5a445; --crit:#e0736a;
-  --ok-soft:#16281f; --warn-soft:#2a2317; --crit-soft:#2c1b19;
-  --user-bg:#1c242e; --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.28);
+  --page:#111519; --rail:#0c1013; --raised:#181d23; --sunken:#0a0d10;
+  --ink:#e2e7ed; --muted:#95a1af; --faint:#6c7885;
+  --line:#232a32; --line-strong:#2f3843;
+  --accent:#83b6e2; --accent-ink:#111519; --accent-wash:#182430;
+  --solid:#2d6699; --on-solid:#f2f7fb;
+  --ok:#5fbd92; --warn:#d3a44a; --crit:#e2776d; --crit-wash:#241a19;
+  --you:#1a2028;
 }
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
-  -webkit-font-smoothing:antialiased}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;background:none;border:none}
+button{cursor:pointer;background:none;border:none;padding:0}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint)}
 
-/* ---------- impianto ---------- */
-.app{display:grid;grid-template-columns:264px minmax(0,1fr);height:100vh;height:100dvh}
-.rail{background:var(--surface-2);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);height:100dvh}
+
+/* ───────────── colonna sinistra ───────────── */
+.rail{background:var(--rail);display:flex;flex-direction:column;min-height:0;
+  border-right:1px solid var(--line)}
+.rail-top{display:flex;align-items:center;gap:9px;padding:16px 16px 14px}
+.mark{width:20px;height:20px;flex:none;color:var(--accent)}
+.wordmark{font-size:13.5px;font-weight:600;letter-spacing:-.005em}
+.new{margin:0 12px 16px;padding:8px 12px;border-radius:5px;background:var(--solid);
+  color:var(--on-solid);font-size:13.5px;font-weight:500;text-align:center;
+  transition:filter .12s}
+.new:hover{filter:brightness(1.1)}
+.rail-section{padding:0 16px 6px}
+.list{flex:1;overflow-y:auto;padding:0 8px 12px;min-height:0}
+.item{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;
+  padding:6px 8px 6px 10px;border-radius:4px;color:var(--muted);font-size:13.5px;
+  border-left:2px solid transparent;transition:color .12s}
+.item:hover{color:var(--ink)}
+.item[aria-current="true"]{color:var(--ink);font-weight:500;border-left-color:var(--accent);
+  background:var(--raised)}
+.item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-n{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.rail-end{padding:12px 16px 16px;display:flex;gap:16px;border-top:1px solid var(--line)}
+.link{font-size:12.5px;color:var(--muted);transition:color .12s}
+.link:hover{color:var(--accent)}
+
+/* ───────────── testata unica: titolo + lettura del contesto ───────────── */
 .main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;align-items:center;gap:16px;padding:0 26px;height:52px;flex:none}
+.top-title{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;min-width:0}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:18px;flex:none}
+.readout{display:flex;align-items:baseline;gap:7px;font-family:var(--mono);font-size:12px;
+  color:var(--muted);font-variant-numeric:tabular-nums}
+.readout .pct{font-size:14px;font-weight:500;color:var(--ink)}
+.readout .pct.warn{color:var(--warn)} .readout .pct.crit{color:var(--crit)}
+.host{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;color:var(--muted);
+  max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.led{width:6px;height:6px;border-radius:50%;background:var(--faint);flex:none}
+.led.on{background:var(--ok)}
+.gear{color:var(--muted);font-size:15px;line-height:1}
+.gear:hover{color:var(--ink)}
 
-/* ---------- rail ---------- */
-.brand{display:flex;align-items:center;gap:9px;padding:14px 16px 12px}
-.brand-mark{width:22px;height:22px;flex:none}
-.brand-name{font-weight:600;letter-spacing:-.01em;font-size:14px}
-.rail-head{display:flex;gap:8px;padding:0 12px 12px}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);
-  padding:7px 11px;font-size:13px;font-weight:500;transition:background .12s,border-color .12s}
-.btn:hover{background:var(--surface-2);border-color:var(--muted)}
-.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn-primary:hover{background:var(--accent);filter:brightness(1.08)}
-.btn-wide{flex:1;text-align:center}
-.btn-icon{padding:6px 8px;font-family:var(--mono);font-size:12px;color:var(--muted)}
-.rail-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--faint);padding:6px 16px 4px}
-.convs{flex:1;overflow-y:auto;padding:0 8px 8px;min-height:0}
-.conv{width:100%;text-align:left;padding:8px 10px;border-radius:var(--radius);display:flex;
-  align-items:baseline;gap:8px;color:var(--muted);font-size:13.5px}
-.conv:hover{background:var(--sunken)}
-.conv[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
-.conv-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.conv-meta{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-.rail-foot{border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap}
+/* misuratore: una sola linea sottile, integrata sotto la testata */
+.meter{position:relative;height:3px;background:var(--sunken);flex:none}
+.meter-fill{height:100%;width:0;background:var(--ok);transition:width .35s ease,background .35s ease}
+.meter-fill.warn{background:var(--warn)} .meter-fill.crit{background:var(--crit)}
+.meter-tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line-strong)}
+.meter-tick::after{content:"";position:absolute;top:-2px;left:-1px;width:3px;height:7px;
+  background:var(--line-strong);border-radius:1px}
 
-/* ---------- barra di stato ---------- */
-.status{border-bottom:1px solid var(--line);background:var(--surface);padding:9px 20px;
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;
-  padding:3px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
-.chip b{font-weight:500;color:var(--ink)}
-.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
-.chip.warn{border-color:var(--warn);background:var(--warn-soft);color:var(--warn)}
-.chip.crit{border-color:var(--crit);background:var(--crit-soft);color:var(--crit)}
-.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
-.status-spacer{flex:1}
+/* avviso di disallineamento: unico elemento che merita di gridare */
+.mismatch{display:flex;gap:10px;align-items:baseline;padding:10px 26px;background:var(--crit-wash);
+  border-bottom:1px solid var(--line);font-size:13px;color:var(--ink)}
+.mismatch b{color:var(--crit);font-weight:600}
 
-/* ---------- misuratore di contesto: l'elemento forte ---------- */
-.gauge{padding:12px 20px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
-.gauge-head{display:flex;align-items:baseline;gap:10px;margin-bottom:7px}
-.gauge-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
-.gauge-read{font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;margin-left:auto;color:var(--muted)}
-.gauge-read b{color:var(--ink);font-weight:600}
-.track{position:relative;height:12px;background:var(--sunken);border-radius:2px;margin-top:19px}
-.fill{height:100%;width:0;max-width:100%;background:var(--ok);transition:width .3s ease,background .3s ease;border-radius:2px}
-.fill.warn{background:var(--warn)} .fill.crit{background:var(--crit)}
-.tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.55}
-.tick::after{content:attr(data-label);position:absolute;top:-15px;left:50%;transform:translateX(-50%);
-  font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--muted);white-space:nowrap;opacity:.9}
-.gauge-scale{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--mono);
-  font-size:10px;color:var(--faint);font-variant-numeric:tabular-nums}
-
-/* ---------- trascrizione ---------- */
+/* ───────────── trascrizione ───────────── */
 .scroll{flex:1;overflow-y:auto;min-height:0}
-.thread{max-width:760px;margin:0 auto;padding:22px 20px 8px;display:flex;flex-direction:column;gap:16px}
-.msg{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:start}
-.msg-role{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--faint);padding-top:9px;text-align:right}
-.bubble{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);
-  padding:11px 14px;box-shadow:var(--shadow);min-width:0}
-.msg.user .bubble{background:var(--user-bg);border-color:transparent;box-shadow:none}
-.bubble p{margin:0 0 .7em}
-.bubble p:last-child{margin-bottom:0}
-.bubble pre{background:var(--sunken);border-radius:4px;padding:10px 12px;overflow-x:auto;
-  font-family:var(--mono);font-size:12.5px;line-height:1.5;margin:.6em 0}
-.bubble code{font-family:var(--mono);font-size:.9em;background:var(--sunken);padding:1px 4px;border-radius:3px}
-.bubble pre code{background:none;padding:0}
-.msg-foot{display:flex;gap:10px;align-items:center;margin-top:7px;opacity:0;transition:opacity .12s}
-.msg:hover .msg-foot,.msg:focus-within .msg-foot{opacity:1}
-.msg-tok{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-.msg-act{font-size:11.5px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
-.msg-act:hover{color:var(--accent)}
-.cursor{display:inline-block;width:7px;height:1em;background:var(--accent);vertical-align:-2px;
-  animation:blink 1s steps(2) infinite}
+.thread{max-width:720px;margin:0 auto;padding:30px 26px 12px;display:flex;flex-direction:column;gap:26px}
+.turn{display:flex;flex-direction:column;gap:5px}
+.turn-label{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint)}
+.turn-body{min-width:0}
+.turn.user .turn-body{background:var(--you);border-radius:6px;padding:11px 15px}
+.turn-body p{margin:0 0 .72em}
+.turn-body p:last-child{margin-bottom:0}
+.turn-body pre{background:var(--sunken);border-radius:5px;padding:12px 14px;overflow-x:auto;
+  font-family:var(--mono);font-size:12.5px;line-height:1.55;margin:.7em 0}
+.turn-body code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1px 4px;border-radius:3px}
+.turn-body pre code{background:none;padding:0}
+.turn-meta{display:flex;gap:12px;align-items:center;opacity:0;transition:opacity .14s}
+.turn:hover .turn-meta,.turn:focus-within .turn-meta{opacity:1}
+.turn-meta span{font-family:var(--mono);font-size:10px;color:var(--faint);font-variant-numeric:tabular-nums}
+.turn-meta button{font-size:11.5px;color:var(--muted)}
+.turn-meta button:hover{color:var(--accent)}
+.caret{display:inline-block;width:6px;height:1em;background:var(--accent);vertical-align:-2px;
+  animation:blink 1.1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
 
-/* ---------- eventi nella trascrizione ---------- */
-.event{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center}
-.event-body{border-top:1px solid var(--line);position:relative;padding-top:0}
-.event-tag{display:inline-flex;align-items:center;gap:8px;background:var(--bg);padding:0 10px 0 0;
-  transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--muted)}
-.event-tag b{color:var(--ink);font-weight:500}
-.summary{background:var(--surface-2);border:1px dashed var(--line);border-radius:var(--radius);padding:11px 14px}
-.summary-head{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--faint);margin-bottom:6px}
-.errbox{background:var(--crit-soft);border:1px solid var(--crit);border-radius:var(--radius);padding:11px 14px}
-.errbox-head{font-weight:600;font-size:13.5px;color:var(--crit);margin-bottom:5px}
-.errbox-detail{font-family:var(--mono);font-size:11.5px;color:var(--ink);word-break:break-word;
-  background:var(--surface);border-radius:4px;padding:7px 9px;margin-top:7px;max-height:170px;overflow:auto}
-.errbox-hint{font-size:12.5px;color:var(--muted);margin-top:7px}
+/* eventi: una riga sottile, non un riquadro */
+.rule{display:flex;align-items:center;gap:12px;color:var(--faint)}
+.rule::before,.rule::after{content:"";height:1px;background:var(--line);flex:1}
+.rule span{font-family:var(--mono);font-size:10.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rule b{color:var(--muted);font-weight:500}
 
-/* ---------- composer ---------- */
-.composer{border-top:1px solid var(--line);background:var(--surface);padding:12px 20px 16px}
-.composer-inner{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:flex-end}
-.input{flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);
-  padding:10px 12px;resize:none;max-height:210px;min-height:44px;line-height:1.5}
-.input:focus{outline:none;border-color:var(--accent);background:var(--surface)}
-.composer-hint{max-width:760px;margin:7px auto 0;font-family:var(--mono);font-size:10.5px;color:var(--faint);
-  display:flex;gap:14px;flex-wrap:wrap}
+/* memoria conservata: filetto a sinistra, niente scatola */
+.memo{border-left:2px solid var(--accent);padding:2px 0 2px 15px;color:var(--muted);font-size:14.5px}
+.memo .eyebrow{margin-bottom:5px;color:var(--accent)}
 
-/* ---------- pannello impostazioni ---------- */
-.sheet{position:fixed;inset:0;background:rgba(10,14,19,.5);display:grid;place-items:center;padding:20px;z-index:20}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
-  width:min(560px,100%);max-height:min(86vh,760px);overflow:auto}
-.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;
-  border-bottom:1px solid var(--line-soft);position:sticky;top:0;background:var(--surface)}
-.panel-title{font-size:16px;font-weight:600}
-.panel-body{padding:16px 20px 20px;display:grid;gap:14px}
-.field{display:grid;gap:5px}
-.field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
-.field input,.field select,.field textarea{background:var(--surface-2);border:1px solid var(--line);
-  border-radius:var(--radius);padding:8px 10px;width:100%;font-size:13.5px}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);background:var(--surface)}
-.field .note{font-size:12px;color:var(--muted)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.panel-foot{display:flex;gap:8px;justify-content:flex-end;padding:0 20px 20px}
-.probe{font-family:var(--mono);font-size:11.5px;background:var(--sunken);border-radius:4px;padding:9px 11px;
-  white-space:pre-wrap;word-break:break-word;max-height:190px;overflow:auto}
+/* errore: l'unico blocco che resta riconoscibile a colpo d'occhio */
+.alert{border-left:2px solid var(--crit);padding:2px 0 2px 15px}
+.alert-title{font-weight:600;font-size:14px;color:var(--crit);margin-bottom:3px}
+.alert-note{color:var(--muted);font-size:14px}
+.alert-raw{font-family:var(--mono);font-size:11.5px;background:var(--sunken);border-radius:4px;
+  padding:8px 10px;margin:9px 0;word-break:break-word;max-height:150px;overflow:auto}
+.alert-fix{font-size:13.5px;color:var(--muted)}
 
-@media (max-width:860px){
+/* ───────────── composer ───────────── */
+.composer{flex:none;padding:12px 26px 20px}
+.composer-box{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;
+  background:var(--raised);border:1px solid var(--line-strong);border-radius:8px;padding:6px 6px 6px 14px;
+  transition:border-color .14s}
+.composer-box:focus-within{border-color:var(--accent)}
+.field-input{flex:1;background:none;border:none;resize:none;padding:9px 0;max-height:200px;
+  min-height:38px;line-height:1.55}
+.field-input:focus{outline:none}
+.field-input::placeholder{color:var(--faint)}
+.go{background:var(--solid);color:var(--on-solid);border-radius:6px;padding:8px 15px;
+  font-size:13.5px;font-weight:500;flex:none;transition:filter .12s}
+.go:hover{filter:brightness(1.1)}
+.go:disabled{opacity:.45;cursor:default}
+.halt{border:1px solid var(--line-strong);border-radius:6px;padding:8px 13px;font-size:13.5px;flex:none}
+.tips{max-width:720px;margin:8px auto 0;display:flex;gap:16px;font-family:var(--mono);
+  font-size:10.5px;color:var(--faint)}
+
+/* ───────────── impostazioni ───────────── */
+.veil{position:fixed;inset:0;background:rgba(8,11,14,.45);display:grid;place-items:center;padding:22px;z-index:20}
+.dialog{background:var(--page);border:1px solid var(--line-strong);border-radius:10px;
+  width:min(540px,100%);max-height:min(88vh,780px);overflow:auto;
+  box-shadow:0 20px 50px rgba(8,11,14,.22)}
+.dialog-top{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 14px;
+  position:sticky;top:0;background:var(--page);border-bottom:1px solid var(--line);z-index:1}
+.dialog-title{font-size:15.5px;font-weight:600}
+.dialog-body{padding:20px 24px 22px;display:grid;gap:16px}
+.f{display:grid;gap:6px}
+.f input,.f select,.f textarea{background:var(--raised);border:1px solid var(--line-strong);
+  border-radius:5px;padding:8px 10px;width:100%;font-size:13.5px}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--accent)}
+.f small{font-size:12px;color:var(--muted);line-height:1.5}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dialog-end{display:flex;gap:10px;justify-content:flex-end;padding:0 24px 22px;align-items:center}
+.ghost{border:1px solid var(--line-strong);border-radius:6px;padding:8px 14px;font-size:13.5px}
+.ghost:hover{border-color:var(--muted)}
+.report{font-family:var(--mono);font-size:11.5px;background:var(--sunken);border-radius:5px;
+  padding:10px 12px;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto;line-height:1.55}
+
+@media (max-width:880px){
   .app{grid-template-columns:1fr}
-  .rail{position:fixed;inset:0 auto 0 0;width:264px;z-index:15;transform:translateX(-100%);transition:transform .18s}
+  .rail{position:fixed;inset:0 auto 0 0;width:252px;z-index:15;transform:translateX(-100%);
+    transition:transform .2s}
   .rail[data-open="true"]{transform:none}
-  .msg,.event{grid-template-columns:1fr;gap:5px}
-  .msg-role{text-align:left;padding-top:0}
-  .grid2{grid-template-columns:1fr}
+  .top,.thread,.composer,.mismatch{padding-left:18px;padding-right:18px}
+  .pair{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="rail" id="rail">
-    <div class="brand">
-      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="2.5" y="6" width="19" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/>
-        <rect x="5" y="9" width="8" height="6" rx="1" fill="currentColor" opacity=".8"/>
-        <line x1="16" y1="6" x2="16" y2="18" stroke="currentColor" stroke-width="1.6"/>
+    <div class="rail-top">
+      <svg class="mark" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M2 14.5 A8 8 0 0 1 18 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <line x1="10" y1="14.5" x2="14.4" y2="8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <circle cx="10" cy="14.5" r="1.5" fill="currentColor"/>
       </svg>
-      <span class="brand-name">Quadro Contesto</span>
+      <span class="wordmark">Quadro Contesto</span>
     </div>
-    <div class="rail-head">
-      <button class="btn btn-primary btn-wide" id="newChat">Nuova chat</button>
-      <button class="btn btn-icon" id="openSettings" title="Impostazioni" aria-label="Impostazioni">⚙</button>
-    </div>
-    <div class="rail-label">Conversazioni</div>
-    <div class="convs" id="convs"></div>
-    <div class="rail-foot">
-      <button class="btn btn-icon" id="exportBtn">Esporta</button>
-      <button class="btn btn-icon" id="importBtn">Importa</button>
-      <button class="btn btn-icon" id="themeBtn">Tema</button>
+    <button class="new" id="newChat">Nuova chat</button>
+    <div class="rail-section eyebrow">Conversazioni</div>
+    <div class="list" id="list"></div>
+    <div class="rail-end">
+      <button class="link" id="exportBtn">Esporta</button>
+      <button class="link" id="importBtn">Importa</button>
+      <button class="link" id="themeBtn">Tema</button>
       <input type="file" id="importFile" accept="application/json" hidden>
     </div>
   </aside>
 
   <main class="main">
-    <div class="status" id="status"></div>
-
-    <section class="gauge" aria-label="Occupazione del contesto">
-      <div class="gauge-head">
-        <span class="gauge-title">Finestra di contesto</span>
-        <span class="gauge-read" id="gaugeRead"></span>
+    <header class="top">
+      <span class="top-title" id="topTitle"></span>
+      <div class="top-right">
+        <div class="readout" id="readout"></div>
+        <div class="host" id="host"></div>
+        <button class="gear" id="openSettings" aria-label="Impostazioni" title="Impostazioni">⚙</button>
       </div>
-      <div class="track" id="track">
-        <div class="fill" id="fill"></div>
-        <div class="tick" id="tick" data-label="compattazione"></div>
-      </div>
-      <div class="gauge-scale"><span>0</span><span id="scaleMax"></span></div>
-    </section>
+    </header>
+    <div class="meter" role="img" id="meter" aria-label="Occupazione della finestra di contesto">
+      <div class="meter-fill" id="meterFill"></div>
+      <div class="meter-tick" id="meterTick" title="soglia di compattazione"></div>
+    </div>
+    <div class="mismatch" id="mismatch" hidden></div>
 
     <div class="scroll" id="scroll"><div class="thread" id="thread"></div></div>
 
     <div class="composer">
-      <div class="composer-inner">
-        <textarea class="input" id="input" rows="1" placeholder="Scrivi un messaggio…"></textarea>
-        <button class="btn btn-primary" id="send">Invia</button>
-        <button class="btn" id="stop" hidden>Ferma</button>
+      <div class="composer-box">
+        <textarea class="field-input" id="input" rows="1" placeholder="Scrivi un messaggio…"></textarea>
+        <button class="halt" id="stop" hidden>Ferma</button>
+        <button class="go" id="send">Invia</button>
       </div>
-      <div class="composer-hint">
+      <div class="tips">
         <span>Invio per inviare · Maiusc+Invio per andare a capo</span>
         <span id="draftTok"></span>
       </div>
@@ -236,25 +251,25 @@ button{cursor:pointer;background:none;border:none}
   </main>
 </div>
 
-<div class="sheet" id="sheet" hidden>
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
-    <div class="panel-head">
-      <span class="panel-title" id="panelTitle">Impostazioni</span>
-      <button class="btn btn-icon" id="closeSettings" aria-label="Chiudi">✕</button>
+<div class="veil" id="veil" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div class="dialog-top">
+      <span class="dialog-title" id="dlgTitle">Impostazioni</span>
+      <button class="gear" id="closeSettings" aria-label="Chiudi">✕</button>
     </div>
-    <div class="panel-body">
-      <div class="field">
-        <label for="sUrl">Indirizzo del server</label>
+    <div class="dialog-body">
+      <div class="f">
+        <label class="eyebrow" for="sUrl">Indirizzo del server</label>
         <input id="sUrl" placeholder="http://127.0.0.1:5001" spellcheck="false">
-        <span class="note">Lascialo vuoto per la modalità dimostrativa, senza server.</span>
+        <small>Vuoto: modalità dimostrativa, senza server.</small>
       </div>
-      <div class="grid2">
-        <div class="field">
-          <label for="sKey">Chiave API</label>
+      <div class="pair">
+        <div class="f">
+          <label class="eyebrow" for="sKey">Chiave API</label>
           <input id="sKey" type="password" placeholder="facoltativa" spellcheck="false">
         </div>
-        <div class="field">
-          <label for="sApi">Tipo di API</label>
+        <div class="f">
+          <label class="eyebrow" for="sApi">Tipo di API</label>
           <select id="sApi">
             <option value="auto">rilevamento automatico</option>
             <option value="openai">OpenAI-compatible</option>
@@ -262,84 +277,76 @@ button{cursor:pointer;background:none;border:none}
           </select>
         </div>
       </div>
-      <div class="field">
-        <label for="sModel">Modello</label>
+      <div class="f">
+        <label class="eyebrow" for="sModel">Modello</label>
         <input id="sModel" placeholder="rilevato dal server" spellcheck="false">
       </div>
-      <div class="grid2">
-        <div class="field">
-          <label for="sCtx">Finestra di contesto</label>
+      <div class="pair">
+        <div class="f">
+          <label class="eyebrow" for="sCtx">Finestra di contesto</label>
           <input id="sCtx" type="number" min="512" step="512">
-          <span class="note" id="ctxNote"></span>
+          <small id="ctxNote">Deve combaciare con l'avvio del motore.</small>
         </div>
-        <div class="field">
-          <label for="sOut">Token in risposta</label>
+        <div class="f">
+          <label class="eyebrow" for="sOut">Token in risposta</label>
           <input id="sOut" type="number" min="64" step="64">
         </div>
       </div>
-      <div class="grid2">
-        <div class="field">
-          <label for="sTemp">Temperatura</label>
+      <div class="pair">
+        <div class="f">
+          <label class="eyebrow" for="sTemp">Temperatura</label>
           <input id="sTemp" type="number" min="0" max="2" step="0.05">
         </div>
-        <div class="field">
-          <label for="sKeep">Messaggi tenuti interi</label>
+        <div class="f">
+          <label class="eyebrow" for="sKeep">Messaggi tenuti interi</label>
           <input id="sKeep" type="number" min="2" step="1">
-          <span class="note">Non vengono mai compattati.</span>
+          <small>Mai compattati.</small>
         </div>
       </div>
-      <div class="field">
-        <label for="sSys">Istruzioni di sistema</label>
+      <div class="f">
+        <label class="eyebrow" for="sSys">Istruzioni di sistema</label>
         <textarea id="sSys" rows="3" spellcheck="false"></textarea>
       </div>
-      <div class="field">
-        <label>Verifica del server</label>
-        <div style="display:flex;gap:8px"><button class="btn" id="probeBtn">Interroga il server</button></div>
-        <div class="probe" id="probeOut" hidden></div>
+      <div class="f">
+        <label class="eyebrow">Verifica del server</label>
+        <div><button class="ghost" id="probeBtn">Interroga il server</button></div>
+        <div class="report" id="probeOut" hidden></div>
       </div>
     </div>
-    <div class="panel-foot">
-      <button class="btn" id="cancelSettings">Annulla</button>
-      <button class="btn btn-primary" id="saveSettings">Salva</button>
+    <div class="dialog-end">
+      <button class="ghost" id="cancelSettings">Annulla</button>
+      <button class="go" id="saveSettings">Salva</button>
     </div>
   </div>
 </div>
 
 <script>
 "use strict";
-/* ------------------------------------------------------------------ stato */
 const LS = "quadro-contesto-v1";
-const DEFAULTS = {
-  url:"", key:"", api:"auto", model:"", ctx:8192, out:512, temp:0.7, keep:6,
-  sys:"Sei un assistente di ricerca conciso e preciso. Rispondi in italiano."
-};
+const DEFAULTS = {url:"",key:"",api:"auto",model:"",ctx:8192,out:512,temp:0.7,keep:6,
+  sys:"Sei un assistente di ricerca conciso e preciso. Rispondi in italiano."};
 const TRIGGER = 0.75, TARGET = 0.45;
-
 let S = {...DEFAULTS}, convs = [], activeId = null, streaming = null, probed = null;
 
-function store(){
-  try{ localStorage.setItem(LS, JSON.stringify({S, convs, activeId})); }catch(e){}
-}
+const $ = id => document.getElementById(id);
+const uid = () => Math.random().toString(36).slice(2,10);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num = n => Number(n||0).toLocaleString("it");
+
+function store(){ try{ localStorage.setItem(LS, JSON.stringify({S,convs,activeId})); }catch(e){} }
 function load(){
   try{
-    const raw = localStorage.getItem(LS);
-    if(!raw) return false;
-    const d = JSON.parse(raw);
+    const d = JSON.parse(localStorage.getItem(LS)||"null");
+    if(!d) return false;
     S = {...DEFAULTS, ...(d.S||{})}; convs = d.convs||[]; activeId = d.activeId;
     return convs.length > 0;
   }catch(e){ return false; }
 }
 
-/* stima token: volutamente prudente. Il conteggio esatto lo fa il server,
-   qui serve a decidere QUANDO compattare, e sbagliare per eccesso e' meglio. */
-function tok(t){ if(!t) return 0; return Math.ceil(Math.max(t.length/3.0, t.split(" ").length)) + 8; }
-function ctxTokens(c){
-  return tok(S.sys) + c.messages.filter(m=>!m.archived).reduce((n,m)=>n+tok(m.content),0) + 8;
-}
-const uid = () => Math.random().toString(36).slice(2,10);
-const esc = s => s.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+/* stima prudente: serve a decidere QUANDO compattare, non a essere esatta */
+function tok(t){ return t ? Math.ceil(Math.max(t.length/3.0, t.split(" ").length)) + 8 : 0; }
+function ctxTokens(c){ return tok(S.sys) + c.messages.filter(m=>!m.archived).reduce((n,m)=>n+tok(m.content),0) + 8; }
 
-/* ------------------------------------------------------- conversazioni */
 function nuova(seed){
   const c = {id:uid(), title:"Nuova chat", messages:[], created:Date.now()};
   if(seed) Object.assign(c, seed);
@@ -348,27 +355,28 @@ function nuova(seed){
 const attiva = () => convs.find(c=>c.id===activeId) || convs[0];
 
 function esempio(){
-  const c = nuova({title:"Esempio — come si legge", messages:[
-    {id:uid(), role:"user", content:"Il mio codice cliente è ZX-7741. Analizziamo i log del server di ieri sera."},
-    {id:uid(), role:"assistant", content:"Annotato il codice ZX-7741. Ho letto i log: tre picchi di latenza tra le 21:40 e le 22:05, tutti su richieste con contesto sopra i 6.000 token.", archived:true},
+  return nuova({title:"Esempio — come si legge", messages:[
+    {id:uid(), role:"user", content:"Il mio codice cliente è ZX-7741. Analizziamo i log di ieri sera."},
+    {id:uid(), role:"assistant", content:"Annotato ZX-7741. Tre picchi di latenza fra le 21:40 e le 22:05, tutti su richieste sopra i 6.000 token.", archived:true},
     {id:uid(), role:"user", content:"E gli errori 400?", archived:true},
-    {id:uid(), role:"assistant", content:"Sono 47, tutti con lo stesso messaggio del motore sul superamento della finestra di contesto.", archived:true},
-    {id:uid(), role:"system", kind:"summary", content:"• Codice cliente dell'utente: ZX-7741.\n• Analisi dei log di ieri sera: tre picchi di latenza fra 21:40 e 22:05, tutti su richieste sopra i 6.000 token.\n• 47 errori 400 dal motore, tutti per superamento della finestra di contesto.\n• Questione aperta: capire se la soglia di compattazione è troppo alta.", compaction:{absorbed:3, before:7840, after:2110}},
+    {id:uid(), role:"assistant", content:"Quarantasette, tutti con lo stesso messaggio sul superamento della finestra di contesto.", archived:true},
+    {id:uid(), role:"system", kind:"summary", compaction:{absorbed:3, before:7840, after:2110},
+     content:"• Codice cliente: ZX-7741.\n• Log di ieri sera: tre picchi di latenza fra 21:40 e 22:05, tutti sopra i 6.000 token.\n• 47 errori 400, tutti per superamento della finestra.\n• Aperto: capire se la soglia di compattazione è troppo alta."},
     {id:uid(), role:"user", content:"Ti ricordi il mio codice cliente?"},
     {id:uid(), role:"assistant", content:"Sì: **ZX-7741**. È sopravvissuto alla compattazione perché il riassunto conserva i dati concreti invece di scartare i messaggi vecchi."},
-    {id:uid(), role:"error", content:"400 · This model's maximum context length is 8192 tokens, however you requested 9314 tokens.", hint:"Il contesto non è stato ridotto prima dell'invio. Con la soglia impostata al 75% questa richiesta sarebbe stata compattata prima di partire."}
+    {id:uid(), role:"error", content:"400 · This model's maximum context length is 8192 tokens, however you requested 9314 tokens.",
+     hint:"Il contesto non è stato ridotto prima dell'invio. Con la soglia al 75% questa richiesta sarebbe stata compattata prima di partire."}
   ]});
-  return c;
 }
 
-/* -------------------------------------------------------------- rete */
+/* ───────── rete ───────── */
 function headers(){
   const h = {"Content-Type":"application/json"};
-  if(S.key){ h["Authorization"] = "Bearer " + S.key; h["X-API-Key"] = S.key; }
+  if(S.key){ h.Authorization = "Bearer " + S.key; h["X-API-Key"] = S.key; }
   return h;
 }
 async function get(path, ms=8000){
-  const ac = new AbortController(); const t = setTimeout(()=>ac.abort(), ms);
+  const ac = new AbortController(), t = setTimeout(()=>ac.abort(), ms);
   try{
     const r = await fetch(S.url.replace(/\/$/,"") + path, {headers:headers(), signal:ac.signal});
     const txt = await r.text();
@@ -377,25 +385,32 @@ async function get(path, ms=8000){
   }catch(e){ return {ok:false, status:0, body:String(e)}; }
   finally{ clearTimeout(t); }
 }
-
 async function interroga(){
   if(!S.url) return null;
   const out = {api:null, model:null, vera:null, righe:[]};
   const oa = await get("/v1/models");
-  if(oa.ok){ out.api="openai"; out.righe.push("/v1/models → " + oa.status);
+  if(oa.ok){ out.api="openai"; out.righe.push("/v1/models → "+oa.status);
     try{ out.model = oa.body.data[0].id; }catch(e){} }
   if(!out.api){
     const kb = await get("/api/v1/model");
-    if(kb.ok){ out.api="kobold"; out.righe.push("/api/v1/model → " + kb.status);
+    if(kb.ok){ out.api="kobold"; out.righe.push("/api/v1/model → "+kb.status);
       try{ out.model = kb.body.result; }catch(e){} }
   }
-  const vera = await get("/api/extra/true_max_context_length");
-  if(vera.ok && vera.body && typeof vera.body.value === "number"){
-    out.vera = vera.body.value;
-    out.righe.push("true_max_context_length → " + out.vera);
+  const v = await get("/api/extra/true_max_context_length");
+  if(v.ok && v.body && typeof v.body.value === "number"){
+    out.vera = v.body.value; out.righe.push("true_max_context_length → "+out.vera);
   }
   probed = out; return out;
 }
+class ServerError extends Error{
+  constructor(status, raw){
+    super(status + " · " + String(raw||"").slice(0,500));
+    this.status = status; this.raw = String(raw||"");
+    this.contesto = /context length|maximum context|too long|exceed|max_model_len/i.test(this.raw);
+  }
+}
+/* i modelli Qwen emettono il ragionamento nel contenuto: non va mostrato */
+const senzaThink = t => String(t||"").replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/^\s+/, "");
 
 async function completa(messaggi, maxTok, onDelta, segnale){
   if(!S.url) return demo(messaggi, onDelta);
@@ -403,25 +418,25 @@ async function completa(messaggi, maxTok, onDelta, segnale){
   const api = S.api === "auto" ? ((probed && probed.api) || "openai") : S.api;
 
   if(api === "kobold"){
-    const prompt = messaggi.map(m =>
-      (m.role==="assistant" ? "### Risposta:\n" : "### Istruzione:\n") + m.content + "\n\n").join("") + "### Risposta:\n";
+    const prompt = messaggi.map(m => (m.role==="assistant" ? "### Risposta:\n" : "### Istruzione:\n")
+      + m.content + "\n\n").join("") + "### Risposta:\n";
     const r = await fetch(base + "/api/v1/generate", {method:"POST", headers:headers(), signal:segnale,
       body:JSON.stringify({prompt, max_length:maxTok, temperature:S.temp})});
     const txt = await r.text();
     if(!r.ok) throw new ServerError(r.status, txt);
-    let out = ""; try{ out = JSON.parse(txt).results[0].text; }catch(e){ throw new ServerError(r.status, txt); }
-    onDelta && onDelta(out);
-    return out;
+    let out = ""; try{ out = senzaThink(JSON.parse(txt).results[0].text); }
+    catch(e){ throw new ServerError(r.status, txt); }
+    onDelta && onDelta(out); return out;
   }
 
   const r = await fetch(base + "/v1/chat/completions", {method:"POST", headers:headers(), signal:segnale,
     body:JSON.stringify({model:S.model||undefined, messages:messaggi, max_tokens:maxTok,
-                         temperature:S.temp, stream:true})});
+      temperature:S.temp, stream:true})});
   if(!r.ok) throw new ServerError(r.status, await r.text());
-  if(!r.body){ const j = await r.json(); const t = j.choices[0].message.content||""; onDelta&&onDelta(t); return t; }
+  if(!r.body){ const j = await r.json(); const t = senzaThink(j.choices[0].message.content); onDelta&&onDelta(t); return t; }
 
   const reader = r.body.getReader(), dec = new TextDecoder();
-  let buf = "", acc = "";
+  let buf = "", acc = "", dentroThink = false;
   while(true){
     const {done, value} = await reader.read();
     if(done) break;
@@ -431,207 +446,176 @@ async function completa(messaggi, maxTok, onDelta, segnale){
       if(!riga.startsWith("data:")) continue;
       const d = riga.slice(5).trim();
       if(d === "[DONE]") continue;
-      try{
-        const j = JSON.parse(d);
-        const delta = (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || "";
-        if(delta){ acc += delta; onDelta && onDelta(delta); }
-      }catch(e){ /* frame spezzato: si ignora, arriva completo al giro dopo */ }
+      let delta = "";
+      try{ delta = (((JSON.parse(d).choices||[{}])[0].delta)||{}).content || ""; }
+      catch(e){ continue; }
+      if(!delta) continue;
+      if(/<think>/i.test(delta)) dentroThink = true;
+      const chiude = /<\/think>/i.test(delta);
+      if(dentroThink){ if(chiude){ dentroThink = false; delta = delta.split(/<\/think>/i).pop(); } else continue; }
+      if(!delta) continue;
+      acc += delta; onDelta && onDelta(delta);
     }
   }
   return acc;
 }
-
-class ServerError extends Error{
-  constructor(status, raw){
-    super(status + " · " + (raw||"").slice(0,500));
-    this.status = status; this.raw = raw||"";
-    this.contesto = /context length|maximum context|too long|exceed|max_model_len/i.test(this.raw);
-  }
-}
-
 async function demo(messaggi, onDelta){
   const ultimo = (messaggi[messaggi.length-1]||{}).content || "";
   const testo = /zx-?7741/i.test(JSON.stringify(messaggi))
-    ? "Il tuo codice cliente è ZX-7741. (Modalità dimostrativa: nessun server collegato — impostane uno da ⚙ per usare il modello vero.)"
-    : "Modalità dimostrativa: non c'è nessun server collegato, quindi questa risposta è finta. "
-      + "Apri le impostazioni e inserisci l'indirizzo del tuo server per parlare con il modello. "
-      + "Hai scritto: " + JSON.stringify(ultimo.slice(0,120));
-  for(const p of testo.split(" ")){
-    await new Promise(r=>setTimeout(r,18));
-    onDelta && onDelta(p + " ");
-  }
+    ? "Il tuo codice cliente è ZX-7741. (Modalità dimostrativa: nessun server collegato — impostane uno da ⚙.)"
+    : "Modalità dimostrativa: non c'è nessun server collegato, quindi questa risposta è finta. Apri le impostazioni e inserisci l'indirizzo del tuo server. Hai scritto: " + JSON.stringify(ultimo.slice(0,110));
+  for(const p of testo.split(" ")){ await new Promise(r=>setTimeout(r,16)); onDelta && onDelta(p+" "); }
   return testo;
 }
 
-/* ------------------------------------------------------- compattazione */
+/* ───────── compattazione ───────── */
 function daCompattare(c){
   const attivi = c.messages.filter(m=>!m.archived);
-  const utili = attivi.slice(0, Math.max(0, attivi.length - S.keep));
-  // il taglio non deve mai cadere dentro un gruppo di strumenti
-  while(utili.length && attivi[utili.length] && attivi[utili.length].role === "tool") utili.pop();
-  return utili;
+  const blocco = attivi.slice(0, Math.max(0, attivi.length - S.keep));
+  while(blocco.length && attivi[blocco.length] && attivi[blocco.length].role === "tool") blocco.pop();
+  return blocco;
 }
-
 async function compatta(c){
   const blocco = daCompattare(c);
-  if(blocco.length < 2) return {stato:"noop", motivo:"troppo pochi messaggi da compattare"};
+  if(blocco.length < 2) return {stato:"noop"};
   const testo = blocco.map(m => (m.kind==="summary" ? "RIASSUNTO PRECEDENTE" : m.role.toUpperCase()) + ": " + m.content).join("\n\n");
-  const richiesta = [
-    {role:"system", content:"Comprimi la conversazione conservando TUTTO ciò che serve a proseguirla: obiettivi, decisioni, fatti, nomi, identificativi esatti, URL, numeri, questioni aperte. Punti elenco densi, in italiano. Niente commenti."},
-    {role:"user", content:"Riassumi:\n\n" + testo.slice(0, S.ctx*2)}
-  ];
   let riassunto = "";
-  try{ riassunto = await completa(richiesta, Math.min(700, S.out*2), null, null); }
-  catch(e){ return {stato:"errore", motivo:e.message}; }
-  if(!riassunto.trim()) return {stato:"errore", motivo:"il modello non ha prodotto un riassunto"};
+  try{
+    riassunto = await completa([
+      {role:"system", content:"Comprimi la conversazione conservando TUTTO ciò che serve a proseguirla: obiettivi, decisioni, fatti, nomi, identificativi esatti, URL, numeri, questioni aperte. Punti elenco densi, in italiano. Nessun commento."},
+      {role:"user", content:"Riassumi:\n\n" + testo.slice(0, S.ctx*2)}
+    ], Math.min(700, S.out*2), null, null);
+  }catch(e){ return {stato:"errore", motivo:e.message}; }
+  if(!riassunto.trim()) return {stato:"errore", motivo:"riassunto vuoto"};
 
-  // Solo ORA si archivia: se il riassunto fosse fallito, la chat resta intatta.
+  /* si archivia SOLO ora: se il riassunto fallisce, la chat resta intatta */
   const prima = ctxTokens(c);
   const ids = new Set(blocco.map(m=>m.id));
   const pos = c.messages.findIndex(m => m.id === blocco[blocco.length-1].id);
   c.messages.forEach(m => { if(ids.has(m.id)) m.archived = true; });
-  c.messages.splice(pos+1, 0, {id:uid(), role:"system", kind:"summary", content:riassunto.trim(),
-    compaction:{absorbed:blocco.length, before:prima, after:0}});
-  const m = c.messages.find(x => x.kind==="summary" && x.compaction && x.compaction.after===0);
-  if(m) m.compaction.after = ctxTokens(c);
+  const sommario = {id:uid(), role:"system", kind:"summary", content:riassunto.trim(),
+    compaction:{absorbed:blocco.length, before:prima, after:0}};
+  c.messages.splice(pos+1, 0, sommario);
+  sommario.compaction.after = ctxTokens(c);
   store();
-  return {stato:"ok", assorbiti:blocco.length};
+  return {stato:"ok"};
 }
 
-/* -------------------------------------------------------------- invio */
+/* ───────── invio ───────── */
 async function invia(testo){
   const c = attiva() || nuova();
   c.messages.push({id:uid(), role:"user", content:testo});
-  if(c.title === "Nuova chat") c.title = testo.slice(0,42) + (testo.length>42 ? "…" : "");
+  if(c.title === "Nuova chat") c.title = testo.slice(0,44) + (testo.length>44 ? "…" : "");
   render(); store();
 
   const soglia = (S.ctx - S.out) * TRIGGER;
-  let giri = 0;
-  while(ctxTokens(c) > soglia && giri < 3){
-    giri++;
-    const r = await compatta(c);
-    render();
-    if(r.stato !== "ok") break;
-    if(ctxTokens(c) <= (S.ctx - S.out) * TARGET) break;
+  for(let g=0; g<3 && ctxTokens(c) > soglia; g++){
+    const r = await compatta(c); render();
+    if(r.stato !== "ok" || ctxTokens(c) <= (S.ctx - S.out) * TARGET) break;
   }
 
   const bozza = {id:uid(), role:"assistant", content:"", streaming:true};
   c.messages.push(bozza); render();
-
   const ac = new AbortController(); streaming = ac;
-  document.getElementById("stop").hidden = false;
-  document.getElementById("send").disabled = true;
+  $("stop").hidden = false; $("send").disabled = true;
 
   const payload = [{role:"system", content:S.sys}].concat(
     c.messages.filter(m=>!m.archived && !m.streaming && m.role!=="error")
-              .map(m => ({role: m.kind==="summary" ? "system" : m.role, content:m.content})));
-
+      .map(m => ({role: m.kind==="summary" ? "system" : m.role, content:m.content})));
   try{
     await completa(payload, S.out, d => { bozza.content += d; renderStream(bozza); }, ac.signal);
     delete bozza.streaming;
   }catch(e){
     delete bozza.streaming;
     if(!bozza.content) c.messages.pop();
-    const err = e instanceof ServerError ? e : new ServerError(0, String(e && e.message || e));
-    c.messages.push({id:uid(), role:"error", content:err.message,
-      hint: err.contesto
-        ? "Il server dice che il contesto è troppo lungo. Abbassa «Finestra di contesto» nelle impostazioni finché non combacia con il valore con cui è avviato il motore: se qui è più alto del reale, la compattazione parte troppo tardi."
-        : "Controlla che il server sia raggiungibile all'indirizzo impostato e che la chiave API sia corretta."});
+    const err = e instanceof ServerError ? e : new ServerError(0, (e && e.message) || e);
+    c.messages.push({id:uid(), role:"error", content:err.message, hint: err.contesto
+      ? "Il server dice che il contesto è troppo lungo. Abbassa «Finestra di contesto» finché non combacia con il valore di avvio del motore: se qui è più alto del reale, la compattazione parte troppo tardi."
+      : "Controlla che il server risponda all'indirizzo impostato e che la chiave API sia corretta."});
   }finally{
-    streaming = null;
-    document.getElementById("stop").hidden = true;
-    document.getElementById("send").disabled = false;
-    render(); store();
+    streaming = null; $("stop").hidden = true; $("send").disabled = false; render(); store();
   }
 }
 
-/* ----------------------------------------------------------- rendering */
+/* ───────── rendering ───────── */
 function md(t){
   let h = esc(t);
   h = h.replace(/```([\s\S]*?)```/g, (m,c)=>"<pre><code>"+c.replace(/^\n/,"")+"</code></pre>");
   h = h.replace(/`([^`\n]+)`/g, "<code>$1</code>");
   h = h.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
-  return h.split(/\n{2,}/).map(p=>"<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");
+  return h.split(/\n{2,}/).map(p => "<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");
 }
 
 function render(){
   const c = attiva();
-  // rail
-  const rail = document.getElementById("convs");
-  rail.innerHTML = convs.map(x => `<button class="conv" data-id="${x.id}" aria-current="${x.id===activeId}">
-      <span class="conv-title">${esc(x.title)}</span>
-      <span class="conv-meta">${x.messages.filter(m=>!m.archived&&m.role!=="error").length}</span></button>`).join("");
-  rail.querySelectorAll(".conv").forEach(b => b.onclick = () => { activeId = b.dataset.id; render(); store(); });
 
-  // stato
-  const st = document.getElementById("status");
+  $("list").innerHTML = convs.map(x => `<button class="item" data-id="${x.id}" aria-current="${x.id===activeId}">
+      <span class="item-name">${esc(x.title)}</span>
+      <span class="item-n">${x.messages.filter(m=>!m.archived && m.role!=="error").length}</span></button>`).join("");
+  $("list").querySelectorAll(".item").forEach(b => b.onclick = () => { activeId = b.dataset.id; render(); store(); });
+
+  $("topTitle").textContent = c ? c.title : "";
   const collegato = !!S.url;
-  const chips = [];
-  chips.push(`<span class="chip ${collegato?"ok":""}"><span class="dot"></span>${collegato ? esc(S.url) : "modalità dimostrativa"}</span>`);
-  chips.push(`<span class="chip">modello <b>${esc((probed&&probed.model)||S.model||"non rilevato")}</b></span>`);
+  $("host").innerHTML = `<span class="led ${collegato?"on":""}"></span>`
+    + esc(collegato ? S.url.replace(/^https?:\/\//,"") : "modalità dimostrativa");
+
+  const usati = c ? ctxTokens(c) : 0, budget = Math.max(1, S.ctx - S.out), q = Math.min(1, usati/budget);
+  const livello = q >= 0.9 ? "crit" : q >= TRIGGER ? "warn" : "";
+  $("readout").innerHTML = `<span class="pct ${livello}">${Math.round(q*100)}%</span>`
+    + `<span>${num(usati)} / ${num(budget)} token</span>`;
+  const f = $("meterFill");
+  f.style.width = (q*100).toFixed(1)+"%";
+  f.className = "meter-fill" + (livello ? " "+livello : "");
+  $("meterTick").style.left = (TRIGGER*100)+"%";
+  $("meter").setAttribute("aria-label",
+    `Contesto al ${Math.round(q*100)} per cento, ${num(usati)} di ${num(budget)} token`);
+
+  const mm = $("mismatch");
   if(probed && probed.vera && S.ctx > probed.vera){
-    chips.push(`<span class="chip crit"><span class="dot"></span>finestra dichiarata ${S.ctx} &gt; reale ${probed.vera}</span>`);
-  }
-  chips.push(`<span class="chip">temp <b>${S.temp}</b></span>`);
-  st.innerHTML = chips.join("") + '<span class="status-spacer"></span>';
+    mm.hidden = false;
+    mm.innerHTML = `<b>Finestra disallineata</b><span>Qui è impostata a ${num(S.ctx)} token ma il motore ne serve ${num(probed.vera)}: oltre quel limite taglia da sé, in silenzio, partendo dai messaggi più vecchi. Portala a ${num(probed.vera)}.</span>`;
+  } else mm.hidden = true;
 
-  // misuratore
-  const usati = c ? ctxTokens(c) : 0, budget = Math.max(1, S.ctx - S.out);
-  const q = Math.min(1, usati/budget);
-  const fill = document.getElementById("fill");
-  fill.style.width = (q*100).toFixed(1) + "%";
-  fill.className = "fill" + (q >= 0.9 ? " crit" : q >= TRIGGER ? " warn" : "");
-  document.getElementById("tick").style.left = (TRIGGER*100) + "%";
-  document.getElementById("gaugeRead").innerHTML =
-    `<b>${usati.toLocaleString("it")}</b> / ${budget.toLocaleString("it")} token · ${Math.round(q*100)}%`;
-  document.getElementById("scaleMax").textContent = budget.toLocaleString("it") + " token utili";
-
-  // trascrizione
-  const th = document.getElementById("thread");
+  const th = $("thread");
   if(!c){ th.innerHTML = ""; return; }
   th.innerHTML = c.messages.filter(m=>!m.archived).map(m => {
-    if(m.role === "error") return `<div class="event"><div></div><div class="errbox">
-        <div class="errbox-head">Il server ha rifiutato la richiesta</div>
-        <div>La conversazione è salva: nessun messaggio è stato perso.</div>
-        <div class="errbox-detail">${esc(m.content)}</div>
-        <div class="errbox-hint">${esc(m.hint||"")}</div></div></div>`;
+    if(m.role === "error") return `<div class="alert">
+        <div class="alert-title">Il server ha rifiutato la richiesta</div>
+        <div class="alert-note">La conversazione è salva: nessun messaggio è stato perso.</div>
+        <div class="alert-raw">${esc(m.content)}</div>
+        <div class="alert-fix">${esc(m.hint||"")}</div></div>`;
     if(m.kind === "summary"){
       const k = m.compaction||{};
-      return `<div class="event"><div></div><div class="event-body">
-          <span class="event-tag">contesto compattato · <b>${k.absorbed||0}</b> messaggi assorbiti · <b>${(k.before||0).toLocaleString("it")}</b> → <b>${(k.after||0).toLocaleString("it")}</b> token</span>
-        </div></div>
-        <div class="msg"><div class="msg-role">riassunto</div><div class="summary">
-          <div class="summary-head">Memoria conservata</div>${md(m.content)}</div></div>`;
+      return `<div class="rule"><span>contesto compattato · <b>${k.absorbed||0}</b> messaggi · <b>${num(k.before)}</b> → <b>${num(k.after)}</b> token</span></div>
+        <div class="memo"><div class="eyebrow">Memoria conservata</div>${md(m.content)}</div>`;
     }
-    return `<div class="msg ${m.role}"><div class="msg-role">${m.role==="user"?"tu":"modello"}</div>
-      <div><div class="bubble" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="cursor"></span>':""}</div>
-      <div class="msg-foot"><span class="msg-tok">${tok(m.content)} token</span>
-      <button class="msg-act" data-copy="${m.id}">copia</button></div></div></div>`;
+    return `<article class="turn ${m.role}">
+      <div class="turn-label">${m.role==="user" ? "tu" : "modello"}</div>
+      <div class="turn-body" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="caret"></span>':""}</div>
+      <div class="turn-meta"><span>${tok(m.content)} token</span>
+        <button data-copy="${m.id}">copia</button></div></article>`;
   }).join("");
 
   th.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
-    const msg = c.messages.find(m=>m.id===b.dataset.copy);
-    navigator.clipboard && navigator.clipboard.writeText(msg.content);
+    const m = c.messages.find(x => x.id === b.dataset.copy);
+    navigator.clipboard && navigator.clipboard.writeText(m.content);
     b.textContent = "copiato"; setTimeout(()=>b.textContent="copia", 1200);
   });
-  const sc = document.getElementById("scroll");
-  sc.scrollTop = sc.scrollHeight;
+  $("scroll").scrollTop = $("scroll").scrollHeight;
 }
 
 function renderStream(m){
-  const el = document.querySelector(`.bubble[data-id="${m.id}"]`);
+  const el = document.querySelector(`.turn-body[data-id="${m.id}"]`);
   if(!el){ render(); return; }
-  el.innerHTML = md(m.content) + '<span class="cursor"></span>';
-  const sc = document.getElementById("scroll");
-  if(sc.scrollHeight - sc.scrollTop - sc.clientHeight < 120) sc.scrollTop = sc.scrollHeight;
+  el.innerHTML = md(m.content) + '<span class="caret"></span>';
+  const sc = $("scroll");
+  if(sc.scrollHeight - sc.scrollTop - sc.clientHeight < 130) sc.scrollTop = sc.scrollHeight;
 }
 
-/* ------------------------------------------------------------- eventi */
-const $ = id => document.getElementById(id);
-
+/* ───────── eventi ───────── */
 $("input").addEventListener("input", e => {
   e.target.style.height = "auto";
-  e.target.style.height = Math.min(e.target.scrollHeight, 210) + "px";
+  e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
   $("draftTok").textContent = e.target.value ? tok(e.target.value) + " token nella bozza" : "";
 });
 $("input").addEventListener("keydown", e => {
@@ -645,7 +629,6 @@ function manda(){
   $("input").value = ""; $("input").style.height = "auto"; $("draftTok").textContent = "";
   invia(t);
 }
-
 $("newChat").onclick = () => { nuova(); render(); store(); $("input").focus(); };
 $("themeBtn").onclick = () => {
   const cur = document.documentElement.getAttribute("data-theme");
@@ -671,26 +654,25 @@ $("importFile").onchange = async e => {
   e.target.value = "";
 };
 
-/* impostazioni */
-function apriImpostazioni(){
+function apri(){
   $("sUrl").value = S.url; $("sKey").value = S.key; $("sApi").value = S.api;
-  $("sModel").value = S.model; $("sCtx").value = S.ctx; $("sOut").value = S.out;
-  $("sTemp").value = S.temp; $("sKeep").value = S.keep; $("sSys").value = S.sys;
+  $("sModel").value = probed && probed.model ? probed.model : S.model;
+  $("sCtx").value = S.ctx; $("sOut").value = S.out; $("sTemp").value = S.temp;
+  $("sKeep").value = S.keep; $("sSys").value = S.sys;
   $("ctxNote").textContent = probed && probed.vera
-    ? "Il motore ne serve " + probed.vera : "Deve combaciare con il valore di avvio del motore.";
-  $("sheet").hidden = false; $("sUrl").focus();
+    ? "Il motore ne serve " + num(probed.vera) + "." : "Deve combaciare con l'avvio del motore.";
+  $("veil").hidden = false; $("sUrl").focus();
 }
-$("openSettings").onclick = apriImpostazioni;
-$("closeSettings").onclick = $("cancelSettings").onclick = () => { $("sheet").hidden = true; };
-$("sheet").addEventListener("click", e => { if(e.target === $("sheet")) $("sheet").hidden = true; });
-document.addEventListener("keydown", e => { if(e.key === "Escape") $("sheet").hidden = true; });
-
+$("openSettings").onclick = apri;
+$("closeSettings").onclick = $("cancelSettings").onclick = () => { $("veil").hidden = true; };
+$("veil").addEventListener("click", e => { if(e.target === $("veil")) $("veil").hidden = true; });
+document.addEventListener("keydown", e => { if(e.key === "Escape") $("veil").hidden = true; });
 $("saveSettings").onclick = async () => {
   S.url = $("sUrl").value.trim(); S.key = $("sKey").value; S.api = $("sApi").value;
   S.model = $("sModel").value.trim(); S.ctx = +$("sCtx").value || DEFAULTS.ctx;
   S.out = +$("sOut").value || DEFAULTS.out; S.temp = +$("sTemp").value;
   S.keep = Math.max(2, +$("sKeep").value || DEFAULTS.keep); S.sys = $("sSys").value;
-  $("sheet").hidden = true; store(); render();
+  $("veil").hidden = true; store(); render();
   if(S.url){ await interroga(); render(); }
 };
 $("probeBtn").onclick = async () => {
@@ -699,25 +681,21 @@ $("probeBtn").onclick = async () => {
   if(!S.url){ out.textContent = "Nessun indirizzo impostato."; return; }
   const r = await interroga();
   if(!r || !r.api){ out.textContent = "Nessuna API riconosciuta a questo indirizzo.\nVerifica indirizzo, porta e che il server risponda."; return; }
-  let t = "API: " + r.api + "\nmodello: " + (r.model||"non dichiarato") + "\n" + r.righe.join("\n");
+  let t = "API: " + r.api + "\nmodello: " + (r.model || "non dichiarato") + "\n" + r.righe.join("\n");
+  if(r.model) $("sModel").value = r.model;
   if(r.vera){
-    t += "\n\nfinestra reale del motore: " + r.vera;
     const q = +$("sCtx").value;
+    t += "\n\nfinestra reale del motore: " + num(r.vera);
     t += q > r.vera
-      ? "\n\n⚠ Qui è impostato " + q + ", più del reale: il motore taglierà da solo, in silenzio.\n   Porta la finestra a " + r.vera + "."
+      ? "\n\n⚠ Qui è impostata a " + num(q) + ", più del reale.\n   Il motore taglierebbe da sé, in silenzio. Corretta a " + num(r.vera) + "."
       : "\n\n✓ La finestra impostata sta dentro quella reale.";
     if(!q || q > r.vera) $("sCtx").value = r.vera;
   }
   out.textContent = t;
 };
 
-/* ---------------------------------------------------------- avvio */
-try{
-  const t = localStorage.getItem(LS+"-theme");
-  if(t) document.documentElement.setAttribute("data-theme", t);
-}catch(e){}
-
-if(!load() || convs.length === 0) esempio();
+try{ const t = localStorage.getItem(LS+"-theme"); if(t) document.documentElement.setAttribute("data-theme", t); }catch(e){}
+if(!load() || !convs.length) esempio();
 render();
 if(S.url) interroga().then(render);
 </script>
