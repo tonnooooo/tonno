@@ -6,33 +6,33 @@
 <title>Quadro Contesto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600&family=Newsreader:opsz,wght@6..72,380;6..72,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600&family=Newsreader:ital,opsz,wght@0,6..72,380;0,6..72,500;1,6..72,380&display=swap">
 <style>
 :root{
-  --paper:#fcfcfd; --rail:#f4f6f8; --raised:#ffffff; --sunken:#eceff3;
-  --ink:#14181d; --prose:#1c2229; --said:#48525d; --muted:#646d78; --faint:#98a1ab;
-  --line:#e7eaef; --line-strong:#c9d0d8;
-  --accent:#2a5f8f; --solid:#2a5f8f; --on-solid:#ffffff;
-  --ok:#2f7d59; --warn:#9d7318; --crit:#b0413a; --crit-wash:#fbf1f0;
+  --paper:#fbfcfd; --rail:#f2f4f7; --raised:#ffffff; --sunken:#ebeef2;
+  --ink:#11161b; --prose:#1a212a; --said:#4a545f; --muted:#636d77; --faint:#98a1aa;
+  --line:#e6eaef; --line-strong:#c6ced7; --tick:#b6c0ca;
+  --accent:#23577f; --solid:#23577f; --on-solid:#ffffff;
+  --ok:#2c7355; --warn:#966c14; --crit:#a83c34; --crit-wash:#fbf0ef;
   --ui:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
   --read:"Newsreader",Georgia,"Times New Roman",serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --paper:#101317; --rail:#0b0e11; --raised:#171b20; --sunken:#090b0e;
-    --ink:#e5e9ee; --prose:#dde3ea; --said:#a8b2bd; --muted:#8f99a4; --faint:#69727c;
-    --line:#20262d; --line-strong:#333c46;
-    --accent:#86b8e4; --solid:#2d6699; --on-solid:#f3f7fb;
-    --ok:#5cbb90; --warn:#cf9f45; --crit:#df746a; --crit-wash:#221818;
+    --paper:#0f1216; --rail:#0a0d10; --raised:#161a1f; --sunken:#080a0d;
+    --ink:#e8edf3; --prose:#dfe6ee; --said:#aab4bf; --muted:#8d97a2; --faint:#68717b;
+    --line:#1e242a; --line-strong:#323b44; --tick:#3d4753;
+    --accent:#84b7e5; --solid:#2b6396; --on-solid:#f4f8fc;
+    --ok:#52b489; --warn:#c9993f; --crit:#d96b61; --crit-wash:#211716;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#101317; --rail:#0b0e11; --raised:#171b20; --sunken:#090b0e;
-  --ink:#e5e9ee; --prose:#dde3ea; --said:#a8b2bd; --muted:#8f99a4; --faint:#69727c;
-  --line:#20262d; --line-strong:#333c46;
-  --accent:#86b8e4; --solid:#2d6699; --on-solid:#f3f7fb;
-  --ok:#5cbb90; --warn:#cf9f45; --crit:#df746a; --crit-wash:#221818;
+  --paper:#0f1216; --rail:#0a0d10; --raised:#161a1f; --sunken:#080a0d;
+  --ink:#e8edf3; --prose:#dfe6ee; --said:#aab4bf; --muted:#8d97a2; --faint:#68717b;
+  --line:#1e242a; --line-strong:#323b44; --tick:#3d4753;
+  --accent:#84b7e5; --solid:#2b6396; --on-solid:#f4f8fc;
+  --ok:#52b489; --warn:#c9993f; --crit:#d96b61; --crit-wash:#211716;
 }
 
 *{box-sizing:border-box}
@@ -79,10 +79,21 @@ button{cursor:pointer;background:none;border:none;padding:0}
 .head-title{font-size:13.5px;font-weight:500;color:var(--muted);overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .head-right{margin-left:auto;display:flex;align-items:center;gap:22px;flex:none}
-.read{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:11px;
-  color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
-.read b{font-size:13px;font-weight:500;color:var(--muted)}
-.read b.warn{color:var(--warn)} .read b.crit{color:var(--crit)}
+/* strumento: percentuale incisa, scala graduata, lettura assoluta.
+   E' la ragione d'essere del prodotto, quindi e' l'unica cosa disegnata. */
+.instr{display:flex;align-items:center;gap:13px;white-space:nowrap}
+.instr-pct{font-family:var(--mono);font-size:19px;font-weight:500;letter-spacing:-.02em;
+  color:var(--muted);font-variant-numeric:tabular-nums;transition:color .35s ease}
+.instr-pct.warn{color:var(--warn)} .instr-pct.crit{color:var(--crit)}
+.scale{width:188px;height:24px;display:block;flex:none}
+.scale .grad{stroke:var(--tick);stroke-width:1}
+.scale .grad.maj{stroke:var(--line-strong)}
+.scale .bed{fill:var(--sunken)}
+.scale .lvl{fill:var(--ok);transition:width .45s cubic-bezier(.32,.72,0,1),fill .45s ease}
+.scale .lvl.warn{fill:var(--warn)} .scale .lvl.crit{fill:var(--crit)}
+.scale .thr{stroke:var(--ink);stroke-width:1.2;opacity:.5}
+.instr-read{font-family:var(--mono);font-size:10.5px;color:var(--faint);
+  font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .host{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--faint);
   max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .led{width:5px;height:5px;border-radius:50%;background:var(--faint);flex:none}
@@ -97,7 +108,9 @@ button{cursor:pointer;background:none;border:none;padding:0}
 /* ───────── trascrizione: la linea del tempo e' la spina dorsale ───────── */
 .scroll{flex:1;overflow-y:auto;min-height:0}
 .thread{position:relative;max-width:700px;margin:0 auto;padding:26px 34px 16px 68px}
-.thread::before{content:"";position:absolute;left:40px;top:34px;bottom:24px;width:1px;background:var(--line)}
+.thread::before{content:"";position:absolute;left:40px;top:20px;bottom:14px;width:1px;background:var(--line-strong);
+  -webkit-mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 26px),transparent);
+  mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 26px),transparent)}
 .thread > *{position:relative;margin-bottom:30px}
 .thread > *:last-child{margin-bottom:0}
 
@@ -109,7 +122,8 @@ button{cursor:pointer;background:none;border:none;padding:0}
 /* le tue parole in lineare, quelle del modello in tondo: chi parla si legge
    dal carattere, quindi le etichette di ruolo non servono */
 .turn.user{font-size:14.5px;color:var(--said);font-weight:450}
-.turn.assistant{font-family:var(--read);font-size:17.5px;line-height:1.62;color:var(--prose)}
+.turn.assistant{font-family:var(--read);font-size:17.5px;line-height:1.66;color:var(--prose);
+  letter-spacing:.002em;text-wrap:pretty;hyphens:auto}
 .turn p{margin:0 0 .62em}
 .turn p:last-child{margin-bottom:0}
 .turn strong{font-weight:500;color:var(--ink)}
@@ -125,6 +139,23 @@ button{cursor:pointer;background:none;border:none;padding:0}
 .caret{display:inline-block;width:2px;height:1em;background:var(--accent);vertical-align:-2px;
   margin-left:1px;animation:blink 1.1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.fresh{animation:rise .26s cubic-bezier(.32,.72,0,1) both}
+.turn.live::before{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* schermata iniziale: la targa dello strumento */
+.thread.empty{padding-left:34px}
+.thread.empty::before{display:none}
+.plate{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;min-height:min(58vh,460px);text-align:center}
+.plate svg{width:34px;height:34px;color:var(--line-strong)}
+.plate-name{font-family:var(--read);font-size:20px;color:var(--muted);letter-spacing:.01em}
+.plate-specs{display:flex;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.plate-specs div{padding:11px 22px;display:flex;flex-direction:column;gap:5px;align-items:center}
+.plate-specs div + div{border-left:1px solid var(--line)}
+.plate-specs b{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--said);
+  font-variant-numeric:tabular-nums}
 
 /* evento di compattazione: un rombo sulla linea e una riga di numeri */
 .mark-ev::before{content:"";position:absolute;left:-30.5px;top:.35em;width:6px;height:6px;
@@ -132,7 +163,8 @@ button{cursor:pointer;background:none;border:none;padding:0}
 .ev{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.04em;
   font-variant-numeric:tabular-nums;margin-bottom:10px!important}
 .ev b{color:var(--muted);font-weight:500}
-.memo{color:var(--muted);font-size:14px;line-height:1.58;padding-left:1px}
+.memo{font-family:var(--read);font-style:italic;color:var(--muted);font-size:15.5px;
+  line-height:1.6;padding-left:1px;text-wrap:pretty}
 .memo .tag{display:block;margin-bottom:6px;color:var(--accent)}
 .memo p{margin:0 0 .5em}
 
@@ -218,7 +250,16 @@ button{cursor:pointer;background:none;border:none;padding:0}
     <header class="head">
       <span class="head-title" id="headTitle"></span>
       <div class="head-right">
-        <div class="read" id="read"></div>
+        <div class="instr">
+          <span class="instr-pct" id="iPct">0%</span>
+          <svg class="scale" viewBox="0 0 188 24" aria-hidden="true">
+            <g transform="translate(0,2)"><line class="grad maj" x1="0.0" y1="0" x2="0.0" y2="5"/><line class="grad" x1="18.8" y1="0" x2="18.8" y2="3"/><line class="grad" x1="37.6" y1="0" x2="37.6" y2="3"/><line class="grad" x1="56.4" y1="0" x2="56.4" y2="3"/><line class="grad" x1="75.2" y1="0" x2="75.2" y2="3"/><line class="grad maj" x1="94.0" y1="0" x2="94.0" y2="5"/><line class="grad" x1="112.8" y1="0" x2="112.8" y2="3"/><line class="grad" x1="131.6" y1="0" x2="131.6" y2="3"/><line class="grad" x1="150.4" y1="0" x2="150.4" y2="3"/><line class="grad" x1="169.2" y1="0" x2="169.2" y2="3"/><line class="grad maj" x1="188.0" y1="0" x2="188.0" y2="5"/></g>
+            <rect class="bed" x="0" y="11" width="188" height="7" rx="1.5"/>
+            <rect class="lvl" id="iLvl" x="0" y="11" width="0" height="7" rx="1.5"/>
+            <line class="thr" x1="141" y1="8.5" x2="141" y2="20.5"/>
+          </svg>
+          <span class="instr-read" id="iRead"></span>
+        </div>
         <div class="host" id="host"></div>
         <button class="gear" id="openSettings" aria-label="Impostazioni" title="Impostazioni">⚙</button>
       </div>
@@ -312,7 +353,12 @@ const uid = () => Math.random().toString(36).slice(2,10);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const num = n => Number(n||0).toLocaleString("it");
 
-function store(){ try{ localStorage.setItem(LS, JSON.stringify({S,convs,activeId})); }catch(e){} }
+function store(){
+  try{
+    const puliti = convs.map(c => { const {_visti, ...resto} = c; return resto; });
+    localStorage.setItem(LS, JSON.stringify({S, convs:puliti, activeId}));
+  }catch(e){}
+}
 function load(){
   try{
     const d = JSON.parse(localStorage.getItem(LS)||"null"); if(!d) return false;
@@ -538,7 +584,12 @@ function render(){
 
   const usati = c ? ctxTokens(c) : 0, budget = Math.max(1, S.ctx - S.out), q = Math.min(1, usati/budget);
   const liv = q >= 0.9 ? "crit" : q >= TRIGGER ? "warn" : "";
-  $("read").innerHTML = `<b class="${liv}">${Math.round(q*100)}%</b><span>${num(usati)} / ${num(budget)}</span>`;
+  $("iPct").textContent = Math.round(q*100) + "%";
+  $("iPct").className = "instr-pct" + (liv ? " "+liv : "");
+  const lvl = $("iLvl");
+  lvl.setAttribute("width", (q*188).toFixed(1));
+  lvl.setAttribute("class", "lvl" + (liv ? " "+liv : ""));
+  $("iRead").textContent = num(usati) + " / " + num(budget);
   const f = $("gFill");
   f.style.width = (q*100).toFixed(1)+"%";
   f.className = liv;
@@ -552,6 +603,21 @@ function render(){
 
   const th = $("thread");
   if(!c){ th.innerHTML = ""; return; }
+  th.classList.toggle("empty", !c.messages.length);
+  if(!c.messages.length){
+    th.innerHTML = `<div class="plate">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M1.5 11.5 A6.5 6.5 0 0 1 14.5 11.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+        <line x1="8" y1="11.5" x2="11.6" y2="6.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+      <div class="plate-name">${esc((probed && probed.model) || S.model || "nessun modello collegato")}</div>
+      <div class="plate-specs">
+        <div><span class="tag">Finestra</span><b>${num(S.ctx)}</b></div>
+        <div><span class="tag">Compatta a</span><b>${Math.round(TRIGGER*100)}%</b></div>
+        <div><span class="tag">Risposta</span><b>${num(S.out)}</b></div>
+      </div></div>`;
+    return;
+  }
   th.innerHTML = c.messages.filter(m=>!m.archived).map(m => {
     if(m.role === "error") return `<div class="fail">
         <div class="fail-t">Il server ha rifiutato la richiesta</div>
@@ -563,9 +629,16 @@ function render(){
       return `<div class="ev mark-ev">contesto compattato · <b>${k.absorbed||0}</b> messaggi assorbiti · <b>${num(k.before)}</b> → <b>${num(k.after)}</b> token</div>
         <div class="memo"><span class="tag">Memoria conservata</span>${md(m.content)}</div>`;
     }
-    return `<article class="turn ${m.role}" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="caret"></span>':""}
+    return `<article class="turn ${m.role}${m.streaming?" live":""}" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="caret"></span>':""}
       <div class="meta"><span>${tok(m.content)} token</span><button data-copy="${m.id}">copia</button></div></article>`;
   }).join("");
+
+  // Solo gli elementi mai visti prima entrano in scena: senza questo, ogni
+  // ridisegno rianimerebbe l'intera trascrizione a ogni token in streaming.
+  const visti = c._visti || (c._visti = new Set());
+  th.querySelectorAll("[data-id]").forEach(el => {
+    if(!visti.has(el.dataset.id)){ visti.add(el.dataset.id); el.classList.add("fresh"); }
+  });
 
   th.querySelectorAll("[data-copy]").forEach(b => b.onclick = e => {
     e.stopPropagation();
