@@ -399,6 +399,11 @@ def main() -> int:
                          "motore, dove nessuna compattazione esiste. Per misurare il comportamento "
                          "REALE della chat va indicato l'endpoint della propria applicazione "
                          "(es. /agent, /api/chat).")
+    ap.add_argument("--fasi", default="0,1,2,3,4,5",
+                    help="fasi da eseguire, separate da virgola. Su un endpoint AGENTE "
+                         "(un ciclo che per ogni richiesta fa piu' passi ed esegue comandi) "
+                         "usare --fasi 0,1,3: la fase 2 manda sondaggi da 40.000 parole e la "
+                         "4 apre cinque cicli in parallelo, ore di lavoro per la GPU.")
     ap.add_argument("--sse", action="store_true",
                     help="l'endpoint risponde in streaming SSE invece che con un JSON unico")
     ap.add_argument("--timeout", type=float, default=180.0)
@@ -416,16 +421,26 @@ def main() -> int:
               "            compattazione dell'applicazione: la Fase 3 misurera' il\n"
               "            comportamento del motore nudo, non quello della chat reale.\n"
               "            Per la chat reale: --chat-path /tuo/endpoint [--sse]")
+    elif a.fasi == "0,1,2,3,4,5":
+        print("ATTENZIONE: endpoint non standard con tutte le fasi attive. Se e' un ciclo\n"
+              "            agente, le fasi 2 e 4 possono richiedere ore. Valuta --fasi 0,1,3,\n"
+              "            oppure usa prova_canarino.py, che fa la stessa verifica in una\n"
+              "            sola richiesta.")
     scoperta = fase0_scoperta(c)
     if scoperta["api"] is None:
         print("\nImpossibile proseguire: il servizio non espone un'API riconosciuta.")
         return 2
 
-    fase1_contesto(c, scoperta)
-    limite = fase2_limite(c, scoperta["api"], scoperta["modello"])
-    fase3_compattazione(c, scoperta["api"], scoperta["modello"], limite, a.giri)
-    fase4_concorrenza(c, scoperta["api"], scoperta["modello"])
-    fase5_persistenza(c, scoperta)
+    fasi = {f.strip() for f in a.fasi.split(",")}
+    if "1" in fasi:
+        fase1_contesto(c, scoperta)
+    limite = fase2_limite(c, scoperta["api"], scoperta["modello"]) if "2" in fasi else 0
+    if "3" in fasi:
+        fase3_compattazione(c, scoperta["api"], scoperta["modello"], limite, a.giri)
+    if "4" in fasi:
+        fase4_concorrenza(c, scoperta["api"], scoperta["modello"])
+    if "5" in fasi:
+        fase5_persistenza(c, scoperta)
 
     print("\n" + "=" * 72)
     print("RAPPORTO FINALE")
