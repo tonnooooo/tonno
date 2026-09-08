@@ -6,245 +6,235 @@
 <title>Quadro Contesto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600&family=Newsreader:opsz,wght@6..72,380;6..72,500&display=swap">
 <style>
 :root{
-  --page:#fcfcfd; --rail:#f1f3f6; --raised:#ffffff; --sunken:#e8ebf0;
-  --ink:#161c23; --muted:#5d6875; --faint:#939ead;
-  --line:#e4e8ee; --line-strong:#d2d8e0;
-  --accent:#2a5f8f; --accent-ink:#ffffff; --accent-wash:#eaf1f8;
-  --solid:#2a5f8f; --on-solid:#ffffff;
-  --ok:#2f7d59; --warn:#a1761c; --crit:#b34239; --crit-wash:#fbf0ef;
-  --you:#eef1f5;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --paper:#fcfcfd; --rail:#f4f6f8; --raised:#ffffff; --sunken:#eceff3;
+  --ink:#14181d; --prose:#1c2229; --said:#48525d; --muted:#646d78; --faint:#98a1ab;
+  --line:#e7eaef; --line-strong:#c9d0d8;
+  --accent:#2a5f8f; --solid:#2a5f8f; --on-solid:#ffffff;
+  --ok:#2f7d59; --warn:#9d7318; --crit:#b0413a; --crit-wash:#fbf1f0;
+  --ui:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --read:"Newsreader",Georgia,"Times New Roman",serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --page:#111519; --rail:#0c1013; --raised:#181d23; --sunken:#0a0d10;
-    --ink:#e2e7ed; --muted:#95a1af; --faint:#6c7885;
-    --line:#232a32; --line-strong:#2f3843;
-    --accent:#83b6e2; --accent-ink:#111519; --accent-wash:#182430;
-    --solid:#2d6699; --on-solid:#f2f7fb;
-    --ok:#5fbd92; --warn:#d3a44a; --crit:#e2776d; --crit-wash:#241a19;
-    --you:#1a2028;
+    --paper:#101317; --rail:#0b0e11; --raised:#171b20; --sunken:#090b0e;
+    --ink:#e5e9ee; --prose:#dde3ea; --said:#a8b2bd; --muted:#8f99a4; --faint:#69727c;
+    --line:#20262d; --line-strong:#333c46;
+    --accent:#86b8e4; --solid:#2d6699; --on-solid:#f3f7fb;
+    --ok:#5cbb90; --warn:#cf9f45; --crit:#df746a; --crit-wash:#221818;
   }
 }
 :root[data-theme="dark"]{
-  --page:#111519; --rail:#0c1013; --raised:#181d23; --sunken:#0a0d10;
-  --ink:#e2e7ed; --muted:#95a1af; --faint:#6c7885;
-  --line:#232a32; --line-strong:#2f3843;
-  --accent:#83b6e2; --accent-ink:#111519; --accent-wash:#182430;
-  --solid:#2d6699; --on-solid:#f2f7fb;
-  --ok:#5fbd92; --warn:#d3a44a; --crit:#e2776d; --crit-wash:#241a19;
-  --you:#1a2028;
+  --paper:#101317; --rail:#0b0e11; --raised:#171b20; --sunken:#090b0e;
+  --ink:#e5e9ee; --prose:#dde3ea; --said:#a8b2bd; --muted:#8f99a4; --faint:#69727c;
+  --line:#20262d; --line-strong:#333c46;
+  --accent:#86b8e4; --solid:#2d6699; --on-solid:#f3f7fb;
+  --ok:#5cbb90; --warn:#cf9f45; --crit:#df746a; --crit-wash:#221818;
 }
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);
-  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:14.5px;
+  line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none;padding:0}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+:focus-visible{outline:1.5px solid var(--accent);outline-offset:3px;border-radius:2px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint)}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
-.app{display:grid;grid-template-columns:252px minmax(0,1fr);height:100dvh}
+/* il misuratore incornicia l'intera finestra: e' il telaio, non un componente */
+.gauge{position:fixed;top:0;left:0;right:0;height:2px;background:var(--sunken);z-index:30}
+.gauge i{display:block;height:100%;width:0;background:var(--ok);
+  transition:width .4s cubic-bezier(.4,0,.2,1),background .4s ease}
+.gauge i.warn{background:var(--warn)} .gauge i.crit{background:var(--crit)}
+.gauge u{position:absolute;top:0;height:100%;width:1px;background:var(--line-strong);opacity:.9}
 
-/* ───────────── colonna sinistra ───────────── */
-.rail{background:var(--rail);display:flex;flex-direction:column;min-height:0;
-  border-right:1px solid var(--line)}
-.rail-top{display:flex;align-items:center;gap:9px;padding:16px 16px 14px}
-.mark{width:20px;height:20px;flex:none;color:var(--accent)}
-.wordmark{font-size:13.5px;font-weight:600;letter-spacing:-.005em}
-.new{margin:0 12px 16px;padding:8px 12px;border-radius:5px;background:var(--solid);
-  color:var(--on-solid);font-size:13.5px;font-weight:500;text-align:center;
-  transition:filter .12s}
-.new:hover{filter:brightness(1.1)}
-.rail-section{padding:0 16px 6px}
-.list{flex:1;overflow-y:auto;padding:0 8px 12px;min-height:0}
-.item{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;
-  padding:6px 8px 6px 10px;border-radius:4px;color:var(--muted);font-size:13.5px;
-  border-left:2px solid transparent;transition:color .12s}
+.app{display:grid;grid-template-columns:214px minmax(0,1fr);height:100dvh;padding-top:2px}
+
+/* ───────── indice ───────── */
+.rail{background:var(--rail);display:flex;flex-direction:column;min-height:0}
+.rail-top{display:flex;align-items:center;gap:8px;padding:20px 20px 18px}
+.mark{width:15px;height:15px;flex:none;color:var(--accent)}
+.wordmark{font-size:12.5px;font-weight:600;letter-spacing:.005em}
+.new{margin:0 14px 20px;padding:7px 12px;border-radius:4px;border:1px solid var(--line-strong);
+  font-size:13px;font-weight:450;color:var(--muted);text-align:center;transition:color .14s,border-color .14s}
+.new:hover{color:var(--ink);border-color:var(--muted)}
+.rail-tag{padding:0 20px 8px}
+.list{flex:1;overflow-y:auto;padding:0 12px 16px;min-height:0;display:flex;flex-direction:column;gap:1px}
+.item{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;padding:5px 8px;
+  border-radius:3px;color:var(--muted);font-size:13px;transition:color .14s,background .14s}
 .item:hover{color:var(--ink)}
-.item[aria-current="true"]{color:var(--ink);font-weight:500;border-left-color:var(--accent);
-  background:var(--raised)}
+.item[aria-current="true"]{color:var(--ink);font-weight:500;background:var(--raised)}
 .item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item-n{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-.rail-end{padding:12px 16px 16px;display:flex;gap:16px;border-top:1px solid var(--line)}
-.link{font-size:12.5px;color:var(--muted);transition:color .12s}
-.link:hover{color:var(--accent)}
+.item-n{font-family:var(--mono);font-size:10px;color:var(--faint);font-variant-numeric:tabular-nums}
 
-/* ───────────── testata unica: titolo + lettura del contesto ───────────── */
+/* ───────── testata ───────── */
 .main{display:flex;flex-direction:column;min-width:0;min-height:0}
-.top{display:flex;align-items:center;gap:16px;padding:0 26px;height:52px;flex:none}
-.top-title{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap;min-width:0}
-.top-right{margin-left:auto;display:flex;align-items:center;gap:18px;flex:none}
-.readout{display:flex;align-items:baseline;gap:7px;font-family:var(--mono);font-size:12px;
-  color:var(--muted);font-variant-numeric:tabular-nums}
-.readout .pct{font-size:14px;font-weight:500;color:var(--ink)}
-.readout .pct.warn{color:var(--warn)} .readout .pct.crit{color:var(--crit)}
-.host{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;color:var(--muted);
-  max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.led{width:6px;height:6px;border-radius:50%;background:var(--faint);flex:none}
+.head{display:flex;align-items:center;gap:20px;padding:0 34px;height:56px;flex:none}
+.head-title{font-size:13.5px;font-weight:500;color:var(--muted);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.head-right{margin-left:auto;display:flex;align-items:center;gap:22px;flex:none}
+.read{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:11px;
+  color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+.read b{font-size:13px;font-weight:500;color:var(--muted)}
+.read b.warn{color:var(--warn)} .read b.crit{color:var(--crit)}
+.host{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--faint);
+  max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.led{width:5px;height:5px;border-radius:50%;background:var(--faint);flex:none}
 .led.on{background:var(--ok)}
-.gear{color:var(--muted);font-size:15px;line-height:1}
+.gear{color:var(--faint);font-size:14px;line-height:1;transition:color .14s}
 .gear:hover{color:var(--ink)}
 
-/* misuratore: una sola linea sottile, integrata sotto la testata */
-.meter{position:relative;height:3px;background:var(--sunken);flex:none}
-.meter-fill{height:100%;width:0;background:var(--ok);transition:width .35s ease,background .35s ease}
-.meter-fill.warn{background:var(--warn)} .meter-fill.crit{background:var(--crit)}
-.meter-tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line-strong)}
-.meter-tick::after{content:"";position:absolute;top:-2px;left:-1px;width:3px;height:7px;
-  background:var(--line-strong);border-radius:1px}
+.alarm{margin:0 34px 4px;padding:11px 15px;background:var(--crit-wash);border-radius:5px;
+  font-size:13px;color:var(--muted);line-height:1.5}
+.alarm b{color:var(--crit);font-weight:600;font-family:var(--ui)}
 
-/* avviso di disallineamento: unico elemento che merita di gridare */
-.mismatch{display:flex;gap:10px;align-items:baseline;padding:10px 26px;background:var(--crit-wash);
-  border-bottom:1px solid var(--line);font-size:13px;color:var(--ink)}
-.mismatch b{color:var(--crit);font-weight:600}
-
-/* ───────────── trascrizione ───────────── */
+/* ───────── trascrizione: la linea del tempo e' la spina dorsale ───────── */
 .scroll{flex:1;overflow-y:auto;min-height:0}
-.thread{max-width:720px;margin:0 auto;padding:30px 26px 12px;display:flex;flex-direction:column;gap:26px}
-.turn{display:flex;flex-direction:column;gap:5px}
-.turn-label{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
-  color:var(--faint)}
-.turn-body{min-width:0}
-.turn.user .turn-body{background:var(--you);border-radius:6px;padding:11px 15px}
-.turn-body p{margin:0 0 .72em}
-.turn-body p:last-child{margin-bottom:0}
-.turn-body pre{background:var(--sunken);border-radius:5px;padding:12px 14px;overflow-x:auto;
-  font-family:var(--mono);font-size:12.5px;line-height:1.55;margin:.7em 0}
-.turn-body code{font-family:var(--mono);font-size:.88em;background:var(--sunken);padding:1px 4px;border-radius:3px}
-.turn-body pre code{background:none;padding:0}
-.turn-meta{display:flex;gap:12px;align-items:center;opacity:0;transition:opacity .14s}
-.turn:hover .turn-meta,.turn:focus-within .turn-meta{opacity:1}
-.turn-meta span{font-family:var(--mono);font-size:10px;color:var(--faint);font-variant-numeric:tabular-nums}
-.turn-meta button{font-size:11.5px;color:var(--muted)}
-.turn-meta button:hover{color:var(--accent)}
-.caret{display:inline-block;width:6px;height:1em;background:var(--accent);vertical-align:-2px;
-  animation:blink 1.1s steps(2) infinite}
+.thread{position:relative;max-width:700px;margin:0 auto;padding:26px 34px 16px 68px}
+.thread::before{content:"";position:absolute;left:40px;top:34px;bottom:24px;width:1px;background:var(--line)}
+.thread > *{position:relative;margin-bottom:30px}
+.thread > *:last-child{margin-bottom:0}
+
+/* segnaposto sulla linea: cavo = tu, pieno = modello, rombo = evento */
+.turn::before{content:"";position:absolute;left:-31px;top:.55em;width:7px;height:7px;border-radius:50%;
+  background:var(--paper);border:1px solid var(--line-strong);box-sizing:border-box}
+.turn.assistant::before{background:var(--line-strong)}
+
+/* le tue parole in lineare, quelle del modello in tondo: chi parla si legge
+   dal carattere, quindi le etichette di ruolo non servono */
+.turn.user{font-size:14.5px;color:var(--said);font-weight:450}
+.turn.assistant{font-family:var(--read);font-size:17.5px;line-height:1.62;color:var(--prose)}
+.turn p{margin:0 0 .62em}
+.turn p:last-child{margin-bottom:0}
+.turn strong{font-weight:500;color:var(--ink)}
+.turn pre{background:var(--sunken);border-radius:4px;padding:12px 14px;overflow-x:auto;
+  font-family:var(--mono);font-size:12.5px;line-height:1.55;margin:.65em 0;color:var(--ink)}
+.turn code{font-family:var(--mono);font-size:.82em;background:var(--sunken);padding:1px 4px;border-radius:3px}
+.turn pre code{background:none;padding:0;font-size:1em}
+.meta{display:flex;gap:14px;align-items:center;margin-top:7px;opacity:0;transition:opacity .16s}
+.turn:hover .meta,.turn:focus-within .meta{opacity:1}
+.meta span{font-family:var(--mono);font-size:9.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.meta button{font-family:var(--ui);font-size:11px;color:var(--faint);transition:color .14s}
+.meta button:hover{color:var(--accent)}
+.caret{display:inline-block;width:2px;height:1em;background:var(--accent);vertical-align:-2px;
+  margin-left:1px;animation:blink 1.1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
 
-/* eventi: una riga sottile, non un riquadro */
-.rule{display:flex;align-items:center;gap:12px;color:var(--faint)}
-.rule::before,.rule::after{content:"";height:1px;background:var(--line);flex:1}
-.rule span{font-family:var(--mono);font-size:10.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.rule b{color:var(--muted);font-weight:500}
+/* evento di compattazione: un rombo sulla linea e una riga di numeri */
+.mark-ev::before{content:"";position:absolute;left:-30.5px;top:.35em;width:6px;height:6px;
+  background:var(--paper);border:1px solid var(--line-strong);transform:rotate(45deg)}
+.ev{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;margin-bottom:10px!important}
+.ev b{color:var(--muted);font-weight:500}
+.memo{color:var(--muted);font-size:14px;line-height:1.58;padding-left:1px}
+.memo .tag{display:block;margin-bottom:6px;color:var(--accent)}
+.memo p{margin:0 0 .5em}
 
-/* memoria conservata: filetto a sinistra, niente scatola */
-.memo{border-left:2px solid var(--accent);padding:2px 0 2px 15px;color:var(--muted);font-size:14.5px}
-.memo .eyebrow{margin-bottom:5px;color:var(--accent)}
+/* errore: il rombo diventa rosso, il testo resta sobrio */
+.fail::before{content:"";position:absolute;left:-30.5px;top:.4em;width:6px;height:6px;
+  background:var(--crit);transform:rotate(45deg)}
+.fail-t{font-size:14px;font-weight:600;color:var(--crit);margin-bottom:2px}
+.fail-n{color:var(--muted);font-size:13.5px}
+.fail-raw{font-family:var(--mono);font-size:11px;background:var(--sunken);border-radius:4px;
+  padding:9px 11px;margin:9px 0;word-break:break-word;max-height:140px;overflow:auto;line-height:1.5}
+.fail-fix{font-size:13px;color:var(--muted);line-height:1.5}
 
-/* errore: l'unico blocco che resta riconoscibile a colpo d'occhio */
-.alert{border-left:2px solid var(--crit);padding:2px 0 2px 15px}
-.alert-title{font-weight:600;font-size:14px;color:var(--crit);margin-bottom:3px}
-.alert-note{color:var(--muted);font-size:14px}
-.alert-raw{font-family:var(--mono);font-size:11.5px;background:var(--sunken);border-radius:4px;
-  padding:8px 10px;margin:9px 0;word-break:break-word;max-height:150px;overflow:auto}
-.alert-fix{font-size:13.5px;color:var(--muted)}
+/* ───────── composer: nessuna scatola, solo un filetto ───────── */
+.compose{flex:none;border-top:1px solid var(--line);padding:14px 34px 18px}
+.compose-in{max-width:700px;margin:0 auto;padding:0 34px 0 68px;display:flex;align-items:flex-end;gap:14px}
+.write{flex:1;background:none;border:none;resize:none;padding:6px 0;max-height:190px;min-height:34px;
+  font-size:14.5px;line-height:1.55}
+.write:focus{outline:none}
+.write::placeholder{color:var(--faint)}
+.go{color:var(--faint);font-size:13px;font-weight:500;padding:6px 2px;flex:none;transition:color .14s}
+.go.armed{color:var(--accent)}
+.go:disabled{opacity:.4;cursor:default}
+.halt{color:var(--crit);font-size:13px;padding:6px 2px;flex:none}
+.tips{max-width:700px;margin:9px auto 0;padding:0 34px 0 68px;display:flex;gap:18px;font-family:var(--mono);
+  font-size:9.5px;color:var(--faint);letter-spacing:.04em}
 
-/* ───────────── composer ───────────── */
-.composer{flex:none;padding:12px 26px 20px}
-.composer-box{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;
-  background:var(--raised);border:1px solid var(--line-strong);border-radius:8px;padding:6px 6px 6px 14px;
-  transition:border-color .14s}
-.composer-box:focus-within{border-color:var(--accent)}
-.field-input{flex:1;background:none;border:none;resize:none;padding:9px 0;max-height:200px;
-  min-height:38px;line-height:1.55}
-.field-input:focus{outline:none}
-.field-input::placeholder{color:var(--faint)}
-.go{background:var(--solid);color:var(--on-solid);border-radius:6px;padding:8px 15px;
-  font-size:13.5px;font-weight:500;flex:none;transition:filter .12s}
-.go:hover{filter:brightness(1.1)}
-.go:disabled{opacity:.45;cursor:default}
-.halt{border:1px solid var(--line-strong);border-radius:6px;padding:8px 13px;font-size:13.5px;flex:none}
-.tips{max-width:720px;margin:8px auto 0;display:flex;gap:16px;font-family:var(--mono);
-  font-size:10.5px;color:var(--faint)}
-
-/* ───────────── impostazioni ───────────── */
-.veil{position:fixed;inset:0;background:rgba(8,11,14,.45);display:grid;place-items:center;padding:22px;z-index:20}
-.dialog{background:var(--page);border:1px solid var(--line-strong);border-radius:10px;
-  width:min(540px,100%);max-height:min(88vh,780px);overflow:auto;
-  box-shadow:0 20px 50px rgba(8,11,14,.22)}
-.dialog-top{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 14px;
-  position:sticky;top:0;background:var(--page);border-bottom:1px solid var(--line);z-index:1}
-.dialog-title{font-size:15.5px;font-weight:600}
-.dialog-body{padding:20px 24px 22px;display:grid;gap:16px}
+/* ───────── impostazioni ───────── */
+.veil{position:fixed;inset:0;background:rgba(6,9,12,.42);display:grid;place-items:center;padding:24px;z-index:40}
+.dlg{background:var(--paper);border-radius:8px;width:min(520px,100%);max-height:min(88vh,780px);
+  overflow:auto;box-shadow:0 24px 60px rgba(6,9,12,.26)}
+.dlg-top{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 16px;
+  position:sticky;top:0;background:var(--paper);z-index:1}
+.dlg-title{font-size:15px;font-weight:600}
+.dlg-body{padding:4px 26px 24px;display:grid;gap:18px}
 .f{display:grid;gap:6px}
-.f input,.f select,.f textarea{background:var(--raised);border:1px solid var(--line-strong);
-  border-radius:5px;padding:8px 10px;width:100%;font-size:13.5px}
-.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--accent)}
-.f small{font-size:12px;color:var(--muted);line-height:1.5}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.dialog-end{display:flex;gap:10px;justify-content:flex-end;padding:0 24px 22px;align-items:center}
-.ghost{border:1px solid var(--line-strong);border-radius:6px;padding:8px 14px;font-size:13.5px}
-.ghost:hover{border-color:var(--muted)}
-.report{font-family:var(--mono);font-size:11.5px;background:var(--sunken);border-radius:5px;
-  padding:10px 12px;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto;line-height:1.55}
+.f input,.f select,.f textarea{background:none;border:none;border-bottom:1px solid var(--line-strong);
+  border-radius:0;padding:6px 0;width:100%;font-size:13.5px;transition:border-color .14s}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-bottom-color:var(--accent)}
+.f textarea{border:1px solid var(--line-strong);border-radius:4px;padding:9px 11px;resize:vertical}
+.f small{font-size:11.5px;color:var(--faint);line-height:1.5}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.dlg-end{display:flex;gap:18px;justify-content:flex-end;padding:0 26px 24px;align-items:center}
+.txt{font-size:13px;color:var(--muted);transition:color .14s}
+.txt:hover{color:var(--ink)}
+.save{background:var(--solid);color:var(--on-solid);border-radius:4px;padding:7px 16px;
+  font-size:13px;font-weight:500;transition:filter .14s}
+.save:hover{filter:brightness(1.1)}
+.tools{display:flex;gap:18px;margin-right:auto}
+.report{font-family:var(--mono);font-size:11px;background:var(--sunken);border-radius:4px;padding:10px 12px;
+  white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto;line-height:1.55}
 
-@media (max-width:880px){
+@media (max-width:900px){
   .app{grid-template-columns:1fr}
-  .rail{position:fixed;inset:0 auto 0 0;width:252px;z-index:15;transform:translateX(-100%);
+  .rail{position:fixed;inset:2px auto 0 0;width:214px;z-index:20;transform:translateX(-100%);
     transition:transform .2s}
   .rail[data-open="true"]{transform:none}
-  .top,.thread,.composer,.mismatch{padding-left:18px;padding-right:18px}
+  .head,.compose,.alarm{padding-left:20px;padding-right:20px}
+  .thread{padding-left:52px;padding-right:20px}
+  .compose-in,.tips{padding-left:32px;padding-right:0}
+  .thread::before{left:26px}
   .pair{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
+<div class="gauge"><i id="gFill"></i><u id="gTick"></u></div>
+
 <div class="app">
   <aside class="rail" id="rail">
     <div class="rail-top">
-      <svg class="mark" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <path d="M2 14.5 A8 8 0 0 1 18 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-        <line x1="10" y1="14.5" x2="14.4" y2="8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-        <circle cx="10" cy="14.5" r="1.5" fill="currentColor"/>
+      <svg class="mark" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M1.5 11.5 A6.5 6.5 0 0 1 14.5 11.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <line x1="8" y1="11.5" x2="11.6" y2="6.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
       </svg>
       <span class="wordmark">Quadro Contesto</span>
     </div>
     <button class="new" id="newChat">Nuova chat</button>
-    <div class="rail-section eyebrow">Conversazioni</div>
+    <div class="rail-tag tag">Conversazioni</div>
     <div class="list" id="list"></div>
-    <div class="rail-end">
-      <button class="link" id="exportBtn">Esporta</button>
-      <button class="link" id="importBtn">Importa</button>
-      <button class="link" id="themeBtn">Tema</button>
-      <input type="file" id="importFile" accept="application/json" hidden>
-    </div>
   </aside>
 
   <main class="main">
-    <header class="top">
-      <span class="top-title" id="topTitle"></span>
-      <div class="top-right">
-        <div class="readout" id="readout"></div>
+    <header class="head">
+      <span class="head-title" id="headTitle"></span>
+      <div class="head-right">
+        <div class="read" id="read"></div>
         <div class="host" id="host"></div>
         <button class="gear" id="openSettings" aria-label="Impostazioni" title="Impostazioni">⚙</button>
       </div>
     </header>
-    <div class="meter" role="img" id="meter" aria-label="Occupazione della finestra di contesto">
-      <div class="meter-fill" id="meterFill"></div>
-      <div class="meter-tick" id="meterTick" title="soglia di compattazione"></div>
-    </div>
-    <div class="mismatch" id="mismatch" hidden></div>
+    <div class="alarm" id="alarm" hidden></div>
 
     <div class="scroll" id="scroll"><div class="thread" id="thread"></div></div>
 
-    <div class="composer">
-      <div class="composer-box">
-        <textarea class="field-input" id="input" rows="1" placeholder="Scrivi un messaggio…"></textarea>
+    <div class="compose">
+      <div class="compose-in">
+        <textarea class="write" id="input" rows="1" placeholder="Scrivi un messaggio…"></textarea>
         <button class="halt" id="stop" hidden>Ferma</button>
         <button class="go" id="send">Invia</button>
       </div>
       <div class="tips">
-        <span>Invio per inviare · Maiusc+Invio per andare a capo</span>
+        <span>Invio per inviare · Maiusc+Invio a capo</span>
         <span id="draftTok"></span>
       </div>
     </div>
@@ -252,70 +242,59 @@ button{cursor:pointer;background:none;border:none;padding:0}
 </div>
 
 <div class="veil" id="veil" hidden>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
-    <div class="dialog-top">
-      <span class="dialog-title" id="dlgTitle">Impostazioni</span>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div class="dlg-top">
+      <span class="dlg-title" id="dlgTitle">Impostazioni</span>
       <button class="gear" id="closeSettings" aria-label="Chiudi">✕</button>
     </div>
-    <div class="dialog-body">
+    <div class="dlg-body">
       <div class="f">
-        <label class="eyebrow" for="sUrl">Indirizzo del server</label>
+        <label class="tag" for="sUrl">Indirizzo del server</label>
         <input id="sUrl" placeholder="http://127.0.0.1:5001" spellcheck="false">
         <small>Vuoto: modalità dimostrativa, senza server.</small>
       </div>
       <div class="pair">
-        <div class="f">
-          <label class="eyebrow" for="sKey">Chiave API</label>
-          <input id="sKey" type="password" placeholder="facoltativa" spellcheck="false">
-        </div>
-        <div class="f">
-          <label class="eyebrow" for="sApi">Tipo di API</label>
+        <div class="f"><label class="tag" for="sKey">Chiave API</label>
+          <input id="sKey" type="password" placeholder="facoltativa" spellcheck="false"></div>
+        <div class="f"><label class="tag" for="sApi">Tipo di API</label>
           <select id="sApi">
             <option value="auto">rilevamento automatico</option>
             <option value="openai">OpenAI-compatible</option>
             <option value="kobold">KoboldCpp</option>
-          </select>
-        </div>
+          </select></div>
       </div>
-      <div class="f">
-        <label class="eyebrow" for="sModel">Modello</label>
-        <input id="sModel" placeholder="rilevato dal server" spellcheck="false">
-      </div>
+      <div class="f"><label class="tag" for="sModel">Modello</label>
+        <input id="sModel" placeholder="rilevato dal server" spellcheck="false"></div>
       <div class="pair">
-        <div class="f">
-          <label class="eyebrow" for="sCtx">Finestra di contesto</label>
+        <div class="f"><label class="tag" for="sCtx">Finestra di contesto</label>
           <input id="sCtx" type="number" min="512" step="512">
-          <small id="ctxNote">Deve combaciare con l'avvio del motore.</small>
-        </div>
-        <div class="f">
-          <label class="eyebrow" for="sOut">Token in risposta</label>
-          <input id="sOut" type="number" min="64" step="64">
-        </div>
+          <small id="ctxNote">Deve combaciare con l'avvio del motore.</small></div>
+        <div class="f"><label class="tag" for="sOut">Token in risposta</label>
+          <input id="sOut" type="number" min="64" step="64"></div>
       </div>
       <div class="pair">
-        <div class="f">
-          <label class="eyebrow" for="sTemp">Temperatura</label>
-          <input id="sTemp" type="number" min="0" max="2" step="0.05">
-        </div>
-        <div class="f">
-          <label class="eyebrow" for="sKeep">Messaggi tenuti interi</label>
-          <input id="sKeep" type="number" min="2" step="1">
-          <small>Mai compattati.</small>
-        </div>
+        <div class="f"><label class="tag" for="sTemp">Temperatura</label>
+          <input id="sTemp" type="number" min="0" max="2" step="0.05"></div>
+        <div class="f"><label class="tag" for="sKeep">Messaggi tenuti interi</label>
+          <input id="sKeep" type="number" min="2" step="1"><small>Mai compattati.</small></div>
       </div>
+      <div class="f"><label class="tag" for="sSys">Istruzioni di sistema</label>
+        <textarea id="sSys" rows="3" spellcheck="false"></textarea></div>
       <div class="f">
-        <label class="eyebrow" for="sSys">Istruzioni di sistema</label>
-        <textarea id="sSys" rows="3" spellcheck="false"></textarea>
-      </div>
-      <div class="f">
-        <label class="eyebrow">Verifica del server</label>
-        <div><button class="ghost" id="probeBtn">Interroga il server</button></div>
+        <label class="tag">Verifica del server</label>
+        <div><button class="txt" id="probeBtn" style="text-decoration:underline;text-underline-offset:3px">Interroga il server</button></div>
         <div class="report" id="probeOut" hidden></div>
       </div>
     </div>
-    <div class="dialog-end">
-      <button class="ghost" id="cancelSettings">Annulla</button>
-      <button class="go" id="saveSettings">Salva</button>
+    <div class="dlg-end">
+      <div class="tools">
+        <button class="txt" id="exportBtn">Esporta</button>
+        <button class="txt" id="importBtn">Importa</button>
+        <button class="txt" id="themeBtn">Tema</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </div>
+      <button class="txt" id="cancelSettings">Annulla</button>
+      <button class="save" id="saveSettings">Salva</button>
     </div>
   </div>
 </div>
@@ -336,14 +315,11 @@ const num = n => Number(n||0).toLocaleString("it");
 function store(){ try{ localStorage.setItem(LS, JSON.stringify({S,convs,activeId})); }catch(e){} }
 function load(){
   try{
-    const d = JSON.parse(localStorage.getItem(LS)||"null");
-    if(!d) return false;
+    const d = JSON.parse(localStorage.getItem(LS)||"null"); if(!d) return false;
     S = {...DEFAULTS, ...(d.S||{})}; convs = d.convs||[]; activeId = d.activeId;
     return convs.length > 0;
   }catch(e){ return false; }
 }
-
-/* stima prudente: serve a decidere QUANDO compattare, non a essere esatta */
 function tok(t){ return t ? Math.ceil(Math.max(t.length/3.0, t.split(" ").length)) + 8 : 0; }
 function ctxTokens(c){ return tok(S.sys) + c.messages.filter(m=>!m.archived).reduce((n,m)=>n+tok(m.content),0) + 8; }
 
@@ -361,7 +337,7 @@ function esempio(){
     {id:uid(), role:"user", content:"E gli errori 400?", archived:true},
     {id:uid(), role:"assistant", content:"Quarantasette, tutti con lo stesso messaggio sul superamento della finestra di contesto.", archived:true},
     {id:uid(), role:"system", kind:"summary", compaction:{absorbed:3, before:7840, after:2110},
-     content:"• Codice cliente: ZX-7741.\n• Log di ieri sera: tre picchi di latenza fra 21:40 e 22:05, tutti sopra i 6.000 token.\n• 47 errori 400, tutti per superamento della finestra.\n• Aperto: capire se la soglia di compattazione è troppo alta."},
+     content:"Codice cliente ZX-7741. Log di ieri sera: tre picchi di latenza fra 21:40 e 22:05, tutti sopra i 6.000 token. Quarantasette errori 400, tutti per superamento della finestra. Resta aperto se la soglia di compattazione sia troppo alta."},
     {id:uid(), role:"user", content:"Ti ricordi il mio codice cliente?"},
     {id:uid(), role:"assistant", content:"Sì: **ZX-7741**. È sopravvissuto alla compattazione perché il riassunto conserva i dati concreti invece di scartare i messaggi vecchi."},
     {id:uid(), role:"error", content:"400 · This model's maximum context length is 8192 tokens, however you requested 9314 tokens.",
@@ -409,8 +385,7 @@ class ServerError extends Error{
     this.contesto = /context length|maximum context|too long|exceed|max_model_len/i.test(this.raw);
   }
 }
-/* i modelli Qwen emettono il ragionamento nel contenuto: non va mostrato */
-const senzaThink = t => String(t||"").replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/^\s+/, "");
+const senzaThink = t => String(t||"").replace(/<think>[\s\S]*?<\/think>/gi,"").replace(/^\s+/,"");
 
 async function completa(messaggi, maxTok, onDelta, segnale){
   if(!S.url) return demo(messaggi, onDelta);
@@ -436,7 +411,7 @@ async function completa(messaggi, maxTok, onDelta, segnale){
   if(!r.body){ const j = await r.json(); const t = senzaThink(j.choices[0].message.content); onDelta&&onDelta(t); return t; }
 
   const reader = r.body.getReader(), dec = new TextDecoder();
-  let buf = "", acc = "", dentroThink = false;
+  let buf = "", acc = "", inThink = false;
   while(true){
     const {done, value} = await reader.read();
     if(done) break;
@@ -447,12 +422,13 @@ async function completa(messaggi, maxTok, onDelta, segnale){
       const d = riga.slice(5).trim();
       if(d === "[DONE]") continue;
       let delta = "";
-      try{ delta = (((JSON.parse(d).choices||[{}])[0].delta)||{}).content || ""; }
-      catch(e){ continue; }
+      try{ delta = (((JSON.parse(d).choices||[{}])[0].delta)||{}).content || ""; }catch(e){ continue; }
       if(!delta) continue;
-      if(/<think>/i.test(delta)) dentroThink = true;
-      const chiude = /<\/think>/i.test(delta);
-      if(dentroThink){ if(chiude){ dentroThink = false; delta = delta.split(/<\/think>/i).pop(); } else continue; }
+      if(/<think>/i.test(delta)) inThink = true;
+      if(inThink){
+        if(/<\/think>/i.test(delta)){ inThink = false; delta = delta.split(/<\/think>/i).pop(); }
+        else continue;
+      }
       if(!delta) continue;
       acc += delta; onDelta && onDelta(delta);
     }
@@ -482,7 +458,7 @@ async function compatta(c){
   let riassunto = "";
   try{
     riassunto = await completa([
-      {role:"system", content:"Comprimi la conversazione conservando TUTTO ciò che serve a proseguirla: obiettivi, decisioni, fatti, nomi, identificativi esatti, URL, numeri, questioni aperte. Punti elenco densi, in italiano. Nessun commento."},
+      {role:"system", content:"Comprimi la conversazione conservando TUTTO ciò che serve a proseguirla: obiettivi, decisioni, fatti, nomi, identificativi esatti, URL, numeri, questioni aperte. Denso, in italiano. Nessun commento."},
       {role:"user", content:"Riassumi:\n\n" + testo.slice(0, S.ctx*2)}
     ], Math.min(700, S.out*2), null, null);
   }catch(e){ return {stato:"errore", motivo:e.message}; }
@@ -543,6 +519,7 @@ function md(t){
   h = h.replace(/```([\s\S]*?)```/g, (m,c)=>"<pre><code>"+c.replace(/^\n/,"")+"</code></pre>");
   h = h.replace(/`([^`\n]+)`/g, "<code>$1</code>");
   h = h.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  h = h.replace(/^[•\-*]\s+/gm, "· ");
   return h.split(/\n{2,}/).map(p => "<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");
 }
 
@@ -554,49 +531,44 @@ function render(){
       <span class="item-n">${x.messages.filter(m=>!m.archived && m.role!=="error").length}</span></button>`).join("");
   $("list").querySelectorAll(".item").forEach(b => b.onclick = () => { activeId = b.dataset.id; render(); store(); });
 
-  $("topTitle").textContent = c ? c.title : "";
+  $("headTitle").textContent = c ? c.title : "";
   const collegato = !!S.url;
   $("host").innerHTML = `<span class="led ${collegato?"on":""}"></span>`
-    + esc(collegato ? S.url.replace(/^https?:\/\//,"") : "modalità dimostrativa");
+    + esc(collegato ? S.url.replace(/^https?:\/\//,"") : "dimostrativa");
 
   const usati = c ? ctxTokens(c) : 0, budget = Math.max(1, S.ctx - S.out), q = Math.min(1, usati/budget);
-  const livello = q >= 0.9 ? "crit" : q >= TRIGGER ? "warn" : "";
-  $("readout").innerHTML = `<span class="pct ${livello}">${Math.round(q*100)}%</span>`
-    + `<span>${num(usati)} / ${num(budget)} token</span>`;
-  const f = $("meterFill");
+  const liv = q >= 0.9 ? "crit" : q >= TRIGGER ? "warn" : "";
+  $("read").innerHTML = `<b class="${liv}">${Math.round(q*100)}%</b><span>${num(usati)} / ${num(budget)}</span>`;
+  const f = $("gFill");
   f.style.width = (q*100).toFixed(1)+"%";
-  f.className = "meter-fill" + (livello ? " "+livello : "");
-  $("meterTick").style.left = (TRIGGER*100)+"%";
-  $("meter").setAttribute("aria-label",
-    `Contesto al ${Math.round(q*100)} per cento, ${num(usati)} di ${num(budget)} token`);
+  f.className = liv;
+  $("gTick").style.left = (TRIGGER*100)+"%";
 
-  const mm = $("mismatch");
+  const al = $("alarm");
   if(probed && probed.vera && S.ctx > probed.vera){
-    mm.hidden = false;
-    mm.innerHTML = `<b>Finestra disallineata</b><span>Qui è impostata a ${num(S.ctx)} token ma il motore ne serve ${num(probed.vera)}: oltre quel limite taglia da sé, in silenzio, partendo dai messaggi più vecchi. Portala a ${num(probed.vera)}.</span>`;
-  } else mm.hidden = true;
+    al.hidden = false;
+    al.innerHTML = `<b>Finestra disallineata.</b> Qui è impostata a ${num(S.ctx)} token ma il motore ne serve ${num(probed.vera)}: oltre quel limite taglia da sé, in silenzio, partendo dai messaggi più vecchi. Portala a ${num(probed.vera)}.`;
+  } else al.hidden = true;
 
   const th = $("thread");
   if(!c){ th.innerHTML = ""; return; }
   th.innerHTML = c.messages.filter(m=>!m.archived).map(m => {
-    if(m.role === "error") return `<div class="alert">
-        <div class="alert-title">Il server ha rifiutato la richiesta</div>
-        <div class="alert-note">La conversazione è salva: nessun messaggio è stato perso.</div>
-        <div class="alert-raw">${esc(m.content)}</div>
-        <div class="alert-fix">${esc(m.hint||"")}</div></div>`;
+    if(m.role === "error") return `<div class="fail">
+        <div class="fail-t">Il server ha rifiutato la richiesta</div>
+        <div class="fail-n">La conversazione è salva: nessun messaggio è stato perso.</div>
+        <div class="fail-raw">${esc(m.content)}</div>
+        <div class="fail-fix">${esc(m.hint||"")}</div></div>`;
     if(m.kind === "summary"){
       const k = m.compaction||{};
-      return `<div class="rule"><span>contesto compattato · <b>${k.absorbed||0}</b> messaggi · <b>${num(k.before)}</b> → <b>${num(k.after)}</b> token</span></div>
-        <div class="memo"><div class="eyebrow">Memoria conservata</div>${md(m.content)}</div>`;
+      return `<div class="ev mark-ev">contesto compattato · <b>${k.absorbed||0}</b> messaggi assorbiti · <b>${num(k.before)}</b> → <b>${num(k.after)}</b> token</div>
+        <div class="memo"><span class="tag">Memoria conservata</span>${md(m.content)}</div>`;
     }
-    return `<article class="turn ${m.role}">
-      <div class="turn-label">${m.role==="user" ? "tu" : "modello"}</div>
-      <div class="turn-body" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="caret"></span>':""}</div>
-      <div class="turn-meta"><span>${tok(m.content)} token</span>
-        <button data-copy="${m.id}">copia</button></div></article>`;
+    return `<article class="turn ${m.role}" data-id="${m.id}">${md(m.content)}${m.streaming?'<span class="caret"></span>':""}
+      <div class="meta"><span>${tok(m.content)} token</span><button data-copy="${m.id}">copia</button></div></article>`;
   }).join("");
 
-  th.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
+  th.querySelectorAll("[data-copy]").forEach(b => b.onclick = e => {
+    e.stopPropagation();
     const m = c.messages.find(x => x.id === b.dataset.copy);
     navigator.clipboard && navigator.clipboard.writeText(m.content);
     b.textContent = "copiato"; setTimeout(()=>b.textContent="copia", 1200);
@@ -605,7 +577,7 @@ function render(){
 }
 
 function renderStream(m){
-  const el = document.querySelector(`.turn-body[data-id="${m.id}"]`);
+  const el = document.querySelector(`.turn[data-id="${m.id}"]`);
   if(!el){ render(); return; }
   el.innerHTML = md(m.content) + '<span class="caret"></span>';
   const sc = $("scroll");
@@ -615,8 +587,10 @@ function renderStream(m){
 /* ───────── eventi ───────── */
 $("input").addEventListener("input", e => {
   e.target.style.height = "auto";
-  e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
-  $("draftTok").textContent = e.target.value ? tok(e.target.value) + " token nella bozza" : "";
+  e.target.style.height = Math.min(e.target.scrollHeight, 190) + "px";
+  const t = e.target.value.trim();
+  $("draftTok").textContent = t ? tok(t) + " token nella bozza" : "";
+  $("send").classList.toggle("armed", !!t);
 });
 $("input").addEventListener("keydown", e => {
   if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); manda(); }
@@ -626,7 +600,8 @@ $("stop").onclick = () => streaming && streaming.abort();
 function manda(){
   const t = $("input").value.trim();
   if(!t || streaming) return;
-  $("input").value = ""; $("input").style.height = "auto"; $("draftTok").textContent = "";
+  $("input").value = ""; $("input").style.height = "auto";
+  $("draftTok").textContent = ""; $("send").classList.remove("armed");
   invia(t);
 }
 $("newChat").onclick = () => { nuova(); render(); store(); $("input").focus(); };
