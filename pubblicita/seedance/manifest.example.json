@@ -1,0 +1,70 @@
+{
+  "_nota": "Esempio di manifest per `python3 -m pubblicita.ephone batch`. Copialo (es. in pubblicita/seedance/manifest.json), cambia le variabili col soggetto dello spot e lancia prima `estimate`. Ogni setup produce un clip da 5 s in pubblicita/output/seedance/<id>.mp4; il montaggio ne ritaglia piu' shot (il reel di riferimento fa 26 tagli da circa 10 setup). I prompt vanno in inglese: l'italiano non e' fra le lingue supportate da Seedance.",
+  "_modalita": "Per agganciare un clip al blockout Blender: aggiungi allo shot \"first_frame\": \"../output/blender/<setup>_first.png\" (percorso relativo a questo file; still renderizzato con --still) oppure, con il render ospitato a un URL pubblico, \"reference_videos\": [{\"url\": \"https://.../setup01.mp4\", \"duration_s\": 5}] con \"omni_reference_task_type\": \"reference\". first_frame e reference_* si escludono.",
+  "variabili": {
+    "soggetto": "a glossy white-and-black 1980s sports coupe with pop-up headlights",
+    "personaggio": "a young woman in an elegant traditional outfit",
+    "luogo": "a neon-lit Japanese city street at night with wet asphalt and light rain",
+    "stile": "photorealistic cinematic commercial, anamorphic 35mm lens, shallow depth of field, fine film grain, neon reflections, smooth motion"
+  },
+  "defaults": {
+    "model": "doubao-seedance-2-5-260628",
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "duration": 5,
+    "generate_audio": false,
+    "watermark": false
+  },
+  "shots": [
+    {
+      "id": "setup01",
+      "_blockout": "campo lunghissimo dall'alto, discesa lenta",
+      "prompt": "Establishing aerial shot slowly descending over $luogo; $soggetto drives into frame from the bottom and crosses the intersection. $stile."
+    },
+    {
+      "id": "setup02",
+      "_blockout": "carrello laterale basso accanto al soggetto",
+      "prompt": "Low tracking shot alongside $soggetto moving at speed through $luogo, camera at wheel height, wheels spinning, reflections streaking on the bodywork. $stile."
+    },
+    {
+      "id": "setup03",
+      "_blockout": "dettaglio fisso con cambio di fuoco",
+      "prompt": "Extreme close-up detail of $soggetto: headlights open and light up, rack focus from the emblem to the headlight glow, rain drops on the surface. $stile."
+    },
+    {
+      "id": "setup04",
+      "_blockout": "piano medio, push-in lento sul personaggio",
+      "prompt": "Medium shot of $personaggio standing under a neon sign in $luogo, she turns her head toward the camera, slow push-in, hair moving in the wind. $stile."
+    },
+    {
+      "id": "setup05",
+      "_blockout": "over-the-shoulder dal personaggio verso la strada",
+      "prompt": "Over-the-shoulder shot from behind $personaggio watching $soggetto approach down the street and stop in front of her, headlights flaring into the lens. $stile."
+    },
+    {
+      "id": "setup06",
+      "_blockout": "tre quarti frontale fisso, passaggio ravvicinato",
+      "prompt": "Static front three-quarter hero shot at ground level: $soggetto rushes past very close to the lens, spray of water from the tires, strong motion blur. $stile."
+    },
+    {
+      "id": "setup07",
+      "_blockout": "interno abitacolo, soggettiva dal sedile",
+      "prompt": "Interior shot from the passenger seat of $soggetto, glowing analog dashboard, city lights sliding across the windshield, hands on the steering wheel shifting gear. $stile."
+    },
+    {
+      "id": "setup08",
+      "_blockout": "zenitale fisso sull'incrocio",
+      "prompt": "Top-down overhead shot of a neon-lit intersection in $luogo; $soggetto drifts through the corner leaving light trails and splashes on the wet asphalt. $stile."
+    },
+    {
+      "id": "setup09",
+      "_blockout": "panoramica a schiaffo (whip pan) che segue il passaggio",
+      "prompt": "Fast whip pan following $soggetto as it flies by, heavy horizontal motion blur, neon colors smeared into streaks, energetic transition shot. $stile."
+    },
+    {
+      "id": "setup10",
+      "_blockout": "orbita lenta finale, soggetto e personaggio insieme",
+      "prompt": "Final hero shot: slow orbit around $soggetto parked in $luogo with $personaggio leaning against it, she looks into the camera, neon reflections in the puddles. $stile."
+    }
+  ]
+}
