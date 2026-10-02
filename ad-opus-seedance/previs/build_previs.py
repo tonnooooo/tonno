@@ -385,6 +385,7 @@ def make_obj(name, geo, color, parent=None, loc=(0, 0, 0), rot=(0, 0, 0)):
 # hero coupe
 # --------------------------------------------------------------------------------------
 FLAME_PROFILE = [(0.0, 0.05), (0.12, 0.085), (0.35, 0.115), (0.62, 0.075), (0.85, 0.035), (1.0, 0.0)]   # unit-length teardrop
+ROOF_Z = 1.26               # roof height (m); the original grey-box coupe had 1.22, the real coupe measures ~1.26-1.28
 WHEELBASE = 2.78            # default wheelbase (m); axle midpoint stays at y = -0.01 (wheels at +1.38 / -1.40)
 AXLE_MID = -0.01
 CAR_DEFAULTS = dict(
@@ -417,19 +418,19 @@ def build_car(tag, parent, pos, yaw_deg, flame=False, flame_pipe=0, opts=None):
     make_obj(f"{tag}_body", g, body_col, root)
     # cabin
     g = Geo()
-    g.prism_x([(-1.65, 0.70), (1.0, 0.70), (1.0, 0.76), (0.15, 1.22), (-0.95, 1.22), (-1.65, 0.90)], 0.0, 1.56,
-              taper=(0.80, 1.22, 1.22))
+    g.prism_x([(-1.65, 0.70), (1.0, 0.70), (1.0, 0.76), (0.15, ROOF_Z), (-0.95, ROOF_Z), (-1.65, 0.90)], 0.0, 1.56,
+              taper=(0.80, ROOF_Z, 1.22))
     g.box((0.90, 0.45, 0.97), (0.14, 0.12, 0.08))     # mirrors
     g.box((-0.90, 0.45, 0.97), (0.14, 0.12, 0.08))
     make_obj(f"{tag}_cabin", g, Style.col(PAL["glass"] * Style.grey * float(o["car_grey"])), root)
     # rear spoiler: the real pearl-white coupe carries a LOW wing, its top about at roof height and ~1.26 m wide
     if o["spoiler"] == "wing":
         g = Geo()
-        g.box((0, -2.05, 1.09), (1.26, 0.40, 0.045), rot=(-6, 0, 0))     # slab, top ~z 1.12
-        g.box((0.36, -2.02, 0.99), (0.06, 0.14, 0.22))                   # two supports standing on the trunk lid
-        g.box((-0.36, -2.02, 0.99), (0.06, 0.14, 0.22))
-        g.box((0.63, -2.04, 1.11), (0.03, 0.44, 0.16))                   # end plates
-        g.box((-0.63, -2.04, 1.11), (0.03, 0.44, 0.16))
+        g.box((0, -2.06, 1.0), (1.14, 0.30, 0.04), rot=(-6, 0, 0))       # slab, top ~z 1.04 (a bit below the roof line)
+        g.box((0.32, -2.03, 0.93), (0.06, 0.12, 0.12))                   # two short supports standing on the trunk lid
+        g.box((-0.32, -2.03, 0.93), (0.06, 0.12, 0.12))
+        g.box((0.565, -2.06, 1.00), (0.03, 0.30, 0.15))                  # end plates
+        g.box((-0.565, -2.06, 1.00), (0.03, 0.30, 0.15))
         make_obj(f"{tag}_wing", g, body_col, root)
     elif o["spoiler"] == "small":
         g = Geo()
@@ -497,7 +498,7 @@ def build_car(tag, parent, pos, yaw_deg, flame=False, flame_pipe=0, opts=None):
             make_obj(f"{tag}_groove", g, C(0.04), root)
             g = Geo()
             g.rrect_y(x0, x1, z0, z1, rr, -2.2125, 0.004)
-            make_obj(f"{tag}_bezelplate", g, Style.col(float(o["panel_grey"]) * 1.35), root)
+            make_obj(f"{tag}_bezelplate", g, Style.col(float(o["panel_grey"]) * 1.7), root)
             g = Geo()
             g.box((x1 + 0.12, -2.2150, TAIL_Z - 0.017), (0.30, 0.004, 0.012))
             make_obj(f"{tag}_slot", g, C(0.04), root)
@@ -647,11 +648,15 @@ POSE_LIB = {
     "stand": {},
     "chin": {"sh_R": (48, 0, 0), "el_R": (126, 0, 51)},                       # S10: right hand on the chin
     "tilt": {"head": (0, 9, 0)},                                              # head tilted 9 deg to the figure's left
-    "temples": {"sh_R": (62, -34, 0), "el_R": (116, 0, 0), "sh_L": (62, 34, 0), "el_L": (116, 0, 0)},   # S05: fingers at the glasses
-    "temple_R": {"sh_R": (62, -34, 0), "el_R": (116, 0, 0)},
-    "temple_L": {"sh_L": (62, 34, 0), "el_L": (116, 0, 0)},
-    "point_R": {"sh_R": (84, -10, 0), "el_R": (50, 0, 0)},                    # S05: hand stretched toward the lens
-    "point_L": {"sh_L": (84, 10, 0), "el_L": (50, 0, 0)},
+    # S05 close-up gestures (IK-fitted for the bust preset torso_up 0.08, shoulder_w 0.5: fingertips beside the glasses
+    # temples, a curled hand low at the image left, a hand held out toward the lens)
+    "temple_R": {"sh_R": (46, -23, 12.4), "el_R": (149, 0, 24)},
+    "temple_L": {"sh_L": (46, 23, -12.4), "el_L": (149, 0, -24)},
+    "temples": {"sh_R": (46, -23, 12.4), "el_R": (149, 0, 24), "sh_L": (46, 23, -12.4), "el_L": (149, 0, -24)},
+    "curl_R": {"sh_R": (23.4, -17.8, 13.5), "el_R": (148.5, 0, 24.5)},
+    "point_R": {"sh_R": (36.4, -15.2, 14.2), "el_R": (137.3, 0, 23.6)},
+    "curl_L": {"sh_L": (23.4, 17.8, -13.5), "el_L": (148.5, 0, -24.5)},
+    "point_L": {"sh_L": (36.4, 15.2, -14.2), "el_L": (137.3, 0, -23.6)},
 }
 
 
@@ -1147,8 +1152,8 @@ def resolve_car(sid, pv, recipe, cam, look):
 def key_taillight(car, mode, pv, f0, f1, fps):
     """Taillight colour cue. mode: lit | off | ignite | ignite_quick (per-shot key "taillight").
     ignite: the core (and, unless lamp_outer fixes it, the outer disc) ramps from display grey ignite_from to ignite_to
-    over ignite_s seconds (default = the whole shot) with ease-out exponent ignite_pow (1 = linear), keyed every
-    frame in DISPLAY space so the screen luma rises smoothly; the macro lens disc follows lamp_lens [from, to];
+    over ignite_s seconds (default = the whole shot) with ease-out exponent ignite_pow (1 = linear) or, with
+    ignite_ease "smooth", a smoothstep, keyed every frame in DISPLAY space so the screen luma rises smoothly; the macro lens disc follows lamp_lens [from, to];
     neighbour lamps (lamp_gap) stay dark during ignition."""
     n = f1 - f0
     lit_disp = min(PAL["light"] * Style.grey, 0.98)
@@ -1195,9 +1200,10 @@ def key_taillight(car, mode, pv, f0, f1, fps):
         raise SystemExit(f"unknown taillight mode {mode!r} (lit | ignite | ignite_quick | off)")
     ign_s = float(pv.get("ignite_s", n / fps if n else 1.0))
     pw = float(pv.get("ignite_pow", 1.0))
+    smooth = str(pv.get("ignite_ease", "out")) == "smooth"       # smoothstep (slow start, slow end) instead of ease-out
     for f in range(f0, f1 + 1):
         u = min(1.0, ((f - f0) / fps) / max(1e-6, ign_s))
-        e = 1.0 - (1.0 - u) ** pw
+        e = u * u * (3.0 - 2.0 * u) if smooth else 1.0 - (1.0 - u) ** pw
         for ob in ramped:
             setc(ob, Style.col(c_from + (c_to - c_from) * e), f)
         if lens_spec is not None:
