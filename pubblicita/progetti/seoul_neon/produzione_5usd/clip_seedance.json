@@ -1,0 +1,26 @@
+{
+ "c1_strada": {
+  "prompt": "Slow cinematic dolly-in toward the woman holding the clear umbrella beside the blue Skyline. Steady rain falls, neon Hangul signs shimmer and reflect on the wet street. She slowly turns her head toward the camera. Natural subtle motion, shallow depth of field, 35mm film look, photorealistic.",
+  "duration": 5,
+  "first_frame": "c1_strada",
+  "resolution": "720p"
+ },
+ "c2_torre": {
+  "prompt": "Camera holds with a very slow push-in. The woman stands with her back to camera beside the blue Skyline, N Seoul Tower glowing in the distance, light rain, her long skirt sways gently in the wind. She slowly turns her head toward camera. Cinematic night, 35mm film look.",
+  "duration": 4,
+  "first_frame": "c2_torre",
+  "resolution": "720p"
+ },
+ "c3_hanok": {
+  "prompt": "Locked-off symmetrical shot inside the hanok room, warm lantern light flickers softly. The woman sits calmly and slowly raises her gaze toward camera with a subtle smile. Very slow push-in. Cinematic, 35mm film look.",
+  "duration": 4,
+  "first_frame": "c3_hanok",
+  "resolution": "720p"
+ },
+ "c4_auto": {
+  "prompt": "Slow smooth orbit around the blue Skyline R34 from the rear three-quarter toward the side, rain falling, neon reflections shimmer on the wet asphalt, taillights glow red. Cinematic night, 35mm film look, photorealistic.",
+  "duration": 4,
+  "first_frame": "c4_auto",
+  "resolution": "720p"
+ }
+}

@@ -1,0 +1,352 @@
+{
+ "fps": 24,
+ "bpm": 115,
+ "size": [
+  1280,
+  720
+ ],
+ "audio": {
+  "src": null,
+  "offset_s": 0
+ },
+ "shots": [
+  {
+   "id": "s01",
+   "frames": 8,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 0
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 0
+   },
+   "note": "c4_auto f0"
+  },
+  {
+   "id": "s02",
+   "frames": 6,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c3_hanok.mp4",
+    "in": 0
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c3_hanok.mp4",
+    "in": 0
+   },
+   "note": "c3_hanok f0"
+  },
+  {
+   "id": "s03",
+   "frames": 6,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 10
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 10
+   },
+   "note": "c4_auto f10"
+  },
+  {
+   "id": "s04",
+   "frames": 6,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c3_hanok.mp4",
+    "in": 9
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c3_hanok.mp4",
+    "in": 9
+   },
+   "note": "c3_hanok f9"
+  },
+  {
+   "id": "s05",
+   "frames": 14,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c2_torre.mp4",
+    "in": 0
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c2_torre.mp4",
+    "in": 0
+   },
+   "note": "c2_torre f0"
+  },
+  {
+   "id": "s06",
+   "frames": 18,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c2_torre.mp4",
+    "in": 18
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c2_torre.mp4",
+    "in": 18
+   },
+   "note": "c2_torre f18"
+  },
+  {
+   "id": "s07",
+   "frames": 19,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 0
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 0
+   },
+   "note": "c1_strada f0"
+  },
+  {
+   "id": "s08",
+   "frames": 10,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c3_hanok.mp4",
+    "in": 18
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c3_hanok.mp4",
+    "in": 18
+   },
+   "note": "c3_hanok f18"
+  },
+  {
+   "id": "s09",
+   "frames": 14,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c3_hanok.mp4",
+    "in": 31
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c3_hanok.mp4",
+    "in": 31
+   },
+   "note": "c3_hanok f31"
+  },
+  {
+   "id": "s10",
+   "frames": 10,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 18
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 18
+   },
+   "note": "c4_auto f18"
+  },
+  {
+   "id": "s11",
+   "frames": 11,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 19
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 19
+   },
+   "note": "c1_strada f19"
+  },
+  {
+   "id": "s12",
+   "frames": 15,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 30
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 30
+   },
+   "note": "c4_auto f30"
+  },
+  {
+   "id": "s13",
+   "frames": 11,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 47
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 47
+   },
+   "note": "c4_auto f47"
+  },
+  {
+   "id": "s14",
+   "frames": 14,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 30
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 30
+   },
+   "note": "c1_strada f30"
+  },
+  {
+   "id": "s15",
+   "frames": 13,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 44
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 44
+   },
+   "note": "c1_strada f44"
+  },
+  {
+   "id": "s16",
+   "frames": 10,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 57
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 57
+   },
+   "note": "c1_strada f57"
+  },
+  {
+   "id": "s17",
+   "frames": 17,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c3_hanok.mp4",
+    "in": 48
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c3_hanok.mp4",
+    "in": 48
+   },
+   "note": "c3_hanok f48"
+  },
+  {
+   "id": "s18",
+   "frames": 10,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 67
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 67
+   },
+   "note": "c1_strada f67"
+  },
+  {
+   "id": "s19",
+   "frames": 11,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 60
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 60
+   },
+   "note": "c4_auto f60"
+  },
+  {
+   "id": "s20",
+   "frames": 11,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 77
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 77
+   },
+   "note": "c1_strada f77"
+  },
+  {
+   "id": "s21",
+   "frames": 7,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 88
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 88
+   },
+   "note": "c1_strada f88"
+  },
+  {
+   "id": "s22",
+   "frames": 20,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c2_torre.mp4",
+    "in": 40
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c2_torre.mp4",
+    "in": 40
+   },
+   "note": "c2_torre f40"
+  },
+  {
+   "id": "s23",
+   "frames": 15,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c1_strada.mp4",
+    "in": 95
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c1_strada.mp4",
+    "in": 95
+   },
+   "note": "c1_strada f95"
+  },
+  {
+   "id": "s24",
+   "frames": 13,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c4_auto.mp4",
+    "in": 73
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c4_auto.mp4",
+    "in": 73
+   },
+   "note": "c4_auto f73"
+  },
+  {
+   "id": "s25",
+   "frames": 25,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c2_torre.mp4",
+    "in": 64
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c2_torre.mp4",
+    "in": 64
+   },
+   "note": "c2_torre f64"
+  },
+  {
+   "id": "s26",
+   "frames": 22,
+   "top": {
+    "src": "/home/user/tonno/pubblicita/output/blender/c3_hanok.mp4",
+    "in": 68
+   },
+   "bottom": {
+    "src": "/home/user/tonno/pubblicita/output/seedance/c3_hanok.mp4",
+    "in": 68
+   },
+   "note": "c3_hanok f68"
+  }
+ ]
+}
