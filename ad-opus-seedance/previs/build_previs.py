@@ -57,7 +57,9 @@ def parse_args(argv=None):
                                               "otherwise <frames-dir>/../previs_partial.mp4)")
     ap.add_argument("--frames-dir", default=str(DEFAULT_FRAMES),
                     help="where the PNG sequence f_0000.png.. is kept (default: $PREVIS_FRAMES_DIR or <tmp>/previs_frames)")
-    ap.add_argument("--grey", type=float, default=0.42, help="display grey of the main geometry (default 0.42)")
+    ap.add_argument("--grey", type=float, default=0.66,
+                    help="object colour (sRGB grey) of the main geometry; with Workbench STUDIO shading 0.66 renders "
+                         "as the ~0.42 mid-grey of a Blender viewport (default 0.66)")
     ap.add_argument("--aa", default="8", choices=["OFF", "FXAA", "5", "8", "11", "16", "32"], help="workbench AA samples")
     ap.add_argument("--crf", type=int, default=16, help="x264 crf (default 16)")
     ap.add_argument("--save-blend", default="", help="also save the built scene as .blend for inspection")
@@ -80,27 +82,27 @@ SHOT_Y_STEP = 1000.0                                                            
 WHEEL_R = 0.33
 HIP_Z = 0.92
 SEAT_Z = 0.55
-TAIL_X, TAIL_Z, TAIL_Y = 0.56, 0.74, -2.25
+TAIL_X, TAIL_Z, TAIL_Y = 0.56, 0.74, -2.275     # TAIL_Y = outer surface of the round taillight (rear panel at -2.2)
 
 # display greys (what you see on screen); converted to linear for object.color
 PAL = dict(
-    body=1.00, glass=0.80, floor=0.62, ground=0.50, line=1.30, dark=0.48, light=1.75,
-    spoke=1.45, tire=0.52, bg=0.065,
+    body=1.00, glass=0.80, floor=0.86, ground=0.72, ceiling=0.78, line=1.30, dark=0.48, light=1.45,
+    spoke=1.25, tire=0.52, bg=0.065,
 )
 
 # Per-shot defaults (all overridable from shotlist previs{} with the same key names).
 RECIPES = {
-    "S01": dict(lens=28, car="at_lookat", flicker=True),
+    "S01": dict(lens=32, car="at_lookat", flicker=True),
     "S02": dict(lens=50, car="at_lookat"),
     "S03": dict(lens=30, car="at_lookat", taillight="ignite_quick",
-                figure=dict(action="walk", path=[[1.0, 16.0, 0.0], [1.0, 14.4, 0.0]], appear=0.35)),
+                figure=dict(action="walk", path=[[-1.2, 13.0, 0.0], [-1.2, 11.4, 0.0]], appear=0.35)),
     "S04": dict(lens=32, car="pos:1.7,1.2", handheld=0.015, figure=dict(action="walk")),
     "S05": dict(lens=70, car="pos:1.5,3.0", figure=dict(action="flick")),
     "S06": dict(lens=40, car="macro_taillight", taillight="ignite"),
     "S07": dict(lens=32, car="origin", speed=26.0),
     "S08": dict(lens=45, car="wheel_at_lookat", speed=26.0),
-    "S09": dict(lens=28, car="at_lookat", speed=26.0),
-    "S10": dict(lens=35, car="none", figure=dict(action="poses", seated=True)),
+    "S09": dict(lens=22, car="at_lookat", speed=26.0),
+    "S10": dict(lens=42, car="none", figure=dict(action="poses", seated=True)),
     "S11": dict(lens=30, car="at_lookat", flame=True, figure=dict(action="lean")),
     "S12": dict(lens=32, car="path", ease=2.0),
 }
@@ -116,7 +118,7 @@ def s2l(c):
 
 
 class Style:
-    grey = 0.42
+    grey = 0.66
 
     @classmethod
     def col(cls, key_or_val):
@@ -234,11 +236,20 @@ class Geo:
         faces += [(last, base + (i + 1) % seg, base + i) for i in range(seg)]
         self.add(self.xf(pts, c), faces, True)
 
-    def prism_x(self, pts_yz, xc, w):
-        """polygon in (y,z) (CCW seen from +x) extruded along x, centred at xc, width w."""
+    def prism_x(self, pts_yz, xc, w, taper=None):
+        """polygon in (y,z) (CCW seen from +x) extruded along x, centred at xc, width w.
+        taper=(z0, z1, w1): width goes linearly from w (z<=z0) to w1 (z>=z1)."""
         n = len(pts_yz)
-        L = [(xc - w / 2, y, z) for y, z in pts_yz]
-        R = [(xc + w / 2, y, z) for y, z in pts_yz]
+
+        def hw(z):
+            if taper is None:
+                return w / 2
+            z0, z1, w1 = taper
+            t = min(1.0, max(0.0, (z - z0) / (z1 - z0)))
+            return (w + (w1 - w) * t) / 2
+
+        L = [(xc - hw(z), y, z) for y, z in pts_yz]
+        R = [(xc + hw(z), y, z) for y, z in pts_yz]
         faces = [(i, (i + 1) % n, n + (i + 1) % n, n + i) for i in range(n)]
         faces.append(tuple(range(n, 2 * n)))
         faces.append(tuple(reversed(range(n))))
@@ -304,9 +315,10 @@ def build_car(tag, parent, pos, yaw_deg, flame=False):
     make_obj(f"{tag}_body", g, C("body"), root)
     # cabin
     g = Geo()
-    g.prism_x([(-1.65, 0.70), (1.0, 0.70), (1.0, 0.76), (0.15, 1.24), (-0.9, 1.24), (-1.65, 0.90)], 0.0, 1.50)
-    g.box((0.86, 0.45, 0.97), (0.14, 0.12, 0.08))     # mirrors
-    g.box((-0.86, 0.45, 0.97), (0.14, 0.12, 0.08))
+    g.prism_x([(-1.65, 0.70), (1.0, 0.70), (1.0, 0.76), (0.15, 1.22), (-0.95, 1.22), (-1.65, 0.90)], 0.0, 1.56,
+              taper=(0.80, 1.22, 1.22))
+    g.box((0.90, 0.45, 0.97), (0.14, 0.12, 0.08))     # mirrors
+    g.box((-0.90, 0.45, 0.97), (0.14, 0.12, 0.08))
     make_obj(f"{tag}_cabin", g, C("glass"), root)
     # rear wing
     g = Geo()
@@ -326,13 +338,16 @@ def build_car(tag, parent, pos, yaw_deg, flame=False):
     g.box((0, 2.2, 0.38), (1.1, 0.06, 0.16))
     for sx in (-1, 1):
         g.cyl((sx * 0.36, -2.30, 0.34), 0.05, 0.2, axis="y", seg=10)
+        g.box((sx * 0.885, 0.0, 0.50), (0.012, 2.1, 0.012))                 # character line between the wheels
+        for dy in (-0.75, 0.55):
+            g.box((sx * 0.885, dy, 0.64), (0.012, 0.012, 0.40))               # door seams
     make_obj(f"{tag}_dark", g, C("dark"), root)
     # taillights: two round clusters (outer disc, dark ring, bright centre)
     outer, ring, core = Geo(), Geo(), Geo()
     for sx in (-1, 1):
-        outer.cyl((sx * TAIL_X, TAIL_Y + 0.215, TAIL_Z), 0.118, 0.07, axis="y", seg=24, smooth=False)
-        ring.cyl((sx * TAIL_X, TAIL_Y + 0.185, TAIL_Z), 0.078, 0.08, axis="y", seg=24, smooth=False)
-        core.cyl((sx * TAIL_X, TAIL_Y + 0.165, TAIL_Z), 0.042, 0.09, axis="y", seg=16, smooth=False)
+        outer.cyl((sx * TAIL_X, TAIL_Y + 0.065, TAIL_Z), 0.118, 0.07, axis="y", seg=24, smooth=False)   # -2.245 .. -2.175
+        ring.cyl((sx * TAIL_X, TAIL_Y + 0.055, TAIL_Z), 0.078, 0.08, axis="y", seg=24, smooth=False)    # to -2.255
+        core.cyl((sx * TAIL_X, TAIL_Y + 0.040, TAIL_Z), 0.042, 0.09, axis="y", seg=16, smooth=False)    # to -2.275
     tail = make_obj(f"{tag}_tail", outer, C("light"), root)
     make_obj(f"{tag}_tailring", ring, C("dark"), root)
     tail_core = make_obj(f"{tag}_tailcore", core, C("light"), root)
@@ -342,23 +357,23 @@ def build_car(tag, parent, pos, yaw_deg, flame=False):
         for wy in (1.38, -1.40):
             piv = new_empty(f"{tag}_wheel", root, loc=(sx * 0.76, wy, WHEEL_R))
             g = Geo()
-            g.cyl((0, 0, 0), WHEEL_R, 0.24, axis="x", seg=24)
+            g.cyl((0, 0, 0), WHEEL_R, 0.26, axis="x", seg=24)
             make_obj(f"{tag}_tire", g, C("tire"), piv)
             g = Geo()
-            g.cyl((0, 0, 0), 0.215, 0.250, axis="x", seg=24, smooth=False)
+            g.cyl((0, 0, 0), 0.215, 0.272, axis="x", seg=24, smooth=False)
             make_obj(f"{tag}_rim", g, C("dark"), piv)
             g = Geo()
             for side in (-1, 1):
                 for k in range(5):
-                    g.box((side * 0.134, 0, 0), (0.022, 0.06, 0.40), rot=(k * 36.0, 0, 0))
-                g.cyl((side * 0.136, 0, 0), 0.05, 0.022, axis="x", seg=12, smooth=False)
+                    g.box((side * 0.146, 0, 0), (0.022, 0.06, 0.40), rot=(k * 36.0, 0, 0))
+                g.cyl((side * 0.148, 0, 0), 0.05, 0.022, axis="x", seg=12, smooth=False)
             make_obj(f"{tag}_spokes", g, C("spoke"), piv)
             wheels.append(piv)
     fl = []
     if flame:
         for sx in (-1, 1):
             g = Geo()
-            g.cyl((0, 0, 0.45), 0.07, 0.9, r_top=0.0, seg=10, caps=False, smooth=False)
+            g.cyl((0, 0, 0.25), 0.055, 0.5, r_top=0.0, seg=10, caps=False, smooth=False)
             ob = make_obj(f"{tag}_flame", g, C("light"), root, loc=(sx * 0.36, -2.4, 0.34), rot=(90, 0, 0))
             ob.scale = (1, 1, 0.001)
             fl.append(ob)
@@ -418,6 +433,9 @@ def build_figure(tag, parent):
         g.cyl((0, 0, -0.135), 0.036, 0.27, seg=12)
         g.sphere((0, 0, 0), 0.045, 10, 8)
         g.sphere((0, 0, -0.30), 0.05, 12, 8, s=(1.0, 0.55, 1.15))
+        for fx in (-0.030, -0.010, 0.010, 0.030):                           # fingers
+            g.cyl((fx, 0.0, -0.375), 0.0115, 0.085, seg=6)
+        g.cyl((-sx * 0.052, 0.0, -0.335), 0.0125, 0.06, seg=6, rot=(0, sx * 35.0, 0))   # thumb
         make_obj(f"{tag}_farm{side}", g, C("body"), el)
         J[f"hip_{side}"], J[f"knee_{side}"], J[f"sh_{side}"], J[f"el_{side}"] = hip, knee, sh, el
     return dict(root=root, j=J, visor=visor)
@@ -496,9 +514,9 @@ def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_si
                 (0.52, dict(up, visor_dz=-0.034)),
                 (0.62, dict(up, visor_dz=-0.034, head=(-6, 0, 0))),
                 (0.72, {"sh_R": (40, -8, 0), "el_R": (60, 0, 0), "visor_dz": -0.034, "head": (-4, 0, 0)}),
-                (0.82, {"sh_R": (88, -4, 0), "el_R": (62, 0, 0), "visor_dz": -0.034, "head": (-2, 0, 0)}),
-                (0.92, {"sh_R": (90, -4, 0), "el_R": (4, 0, 0), "visor_dz": -0.034}),
-                (1.00, {"sh_R": (90, -4, 0), "el_R": (10, 0, 0), "visor_dz": -0.034}),
+                (0.82, {"sh_R": (100, -4, 0), "el_R": (62, 0, 0), "visor_dz": -0.034, "head": (-2, 0, 0)}),
+                (0.92, {"sh_R": (108, -6, 0), "el_R": (4, 0, 0), "visor_dz": -0.034}),
+                (1.00, {"sh_R": (110, -6, 0), "el_R": (10, 0, 0), "visor_dz": -0.034}),
             ]
         elif action == "poses":
             lap = {"sh_L": (18, 4, 0), "sh_R": (18, -4, 0), "el_L": (70, 0, 0), "el_R": (70, 0, 0)}
@@ -508,12 +526,10 @@ def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_si
             seq = [(0.00, lap), (0.12, lap), (0.26, pA), (0.52, pA), (0.64, pB), (0.90, pB), (1.02, pC), (1.40, pC)]
             seq = [(t * T / 1.4, p) for t, p in seq]
         elif action == "lean":
-            base = {"lean": (0, -26.0 * lean_sign, 0), "sh_L": (28, 4, 0), "sh_R": (28, -4, 0),
+            base = {"lean": (0, 22.0 * lean_sign, 0), "sh_L": (28, 4, 0), "sh_R": (28, -4, 0),
                     "el_L": (100, 0, 0), "el_R": (100, 0, 0), "knee_R": (-14, 0, 0), "hip_R": (8, 0, 0),
                     "head": (0, 4 * lean_sign, 0)}
-            near = "sh_R" if lean_sign > 0 else "sh_L"
             seq = [(0.0, base), (T * 0.5, dict(base, head=(-3, 4 * lean_sign, 0))), (T, base)]
-            _ = near
         else:  # stand
             seq = [(0.0, {}), (T, {})]
         for t, pose in seq:
@@ -532,17 +548,18 @@ def build_garage(tag, world, car_xy, flicker):
     g = Geo()   # floor
     g.box((0, 10, -0.1), (50, 110, 0.2))
     make_obj(f"{tag}_floor", g, C("floor"), world)
-    g = Geo()   # shell
+    g = Geo()   # ceiling
     g.box((0, 10, 3.15), (50, 110, 0.3))
+    make_obj(f"{tag}_ceiling", g, C("ceiling"), world)
+    g = Geo()   # walls
     for sx in (-1, 1):
         g.box((sx * 25.25, 10, 1.65), (0.5, 110.5, 3.3))
     g.box((0, -45.25, 1.65), (50.5, 0.5, 3.3))
     g.box((0, 65.25, 1.65), (50.5, 0.5, 3.3))
-    make_obj(f"{tag}_shell", g, C("body"), world)
+    make_obj(f"{tag}_walls", g, C("body"), world)
     g = Geo()   # columns + beams
     xs = (-21.0, -7.0, 7.0, 21.0)
-    ys = [-40.0 + 8 * k for k in range(13)]          # column rows y = -40 .. 56 (includes -4 and 4... via +4 offset below)
-    ys = [-44.0 + 8 * k + 4.0 for k in range(14)]
+    ys = [-40.0 + 8 * k for k in range(14)]          # column rows every 8 m: y = -40 .. 64
     for x in xs:
         for y in ys:
             g.box((x, y, 1.5), (0.8, 0.8, 3.0))
@@ -591,7 +608,7 @@ def build_highway(tag, world):
     g.box((0, 120, -0.15), (16, 540, 0.3))
     make_obj(f"{tag}_road", g, C("floor"), world)
     g = Geo()
-    for y in range(-140, 390, 9):
+    for y in range(-140, 390, 6):
         for x in (-1.75, 1.75):
             g.box((x, y + 1.5, 0.012), (0.15, 3.0, 0.024))
     for x in (-5.5, 5.5):
@@ -631,10 +648,10 @@ def build_highway(tag, world):
         y = rng.uniform(395, 430)
         w, d, h = rng.uniform(10, 26), rng.uniform(10, 24), rng.uniform(25, 120)
         g.box((x, y, h / 2), (w, d, h))
-    make_obj(f"{tag}_skyline", g, C(0.30 * Style.grey / 0.42), world)
+    make_obj(f"{tag}_skyline", g, C("ground"), world)
 
 
-def tunnel_profile(inset=0.0, half_w=7.5, wall_h=3.0, arch_h=5.6, n=14):
+def tunnel_profile(inset=0.0, half_w=5.8, wall_h=3.0, arch_h=5.6, n=14):
     hw = half_w - inset
     ah = arch_h - inset
     pts = [(-hw, 0.0), (-hw, wall_h)]
@@ -649,7 +666,7 @@ def build_tunnel(tag, world):
     C = Style.col
     y0, y1 = -60.0, 220.0
     g = Geo()
-    g.box((0, (y0 + y1) / 2, -0.15), (15.2, y1 - y0, 0.3))
+    g.box((0, (y0 + y1) / 2, -0.15), (11.8, y1 - y0, 0.3))
     make_obj(f"{tag}_road", g, C("floor"), world)
     g = Geo()
     g.tube_y(tunnel_profile(), y0, y1)
@@ -666,16 +683,16 @@ def build_tunnel(tag, world):
     g = Geo()
     for yy in range(int(y0), int(y1), 4):
         for sx in (-1, 1):
-            g.box((sx * 5.3, yy + 2.0, 6.7), (0.55, 1.3, 0.14))
+            g.box((sx * 4.0, yy + 2.0, 6.82), (0.55, 1.3, 0.14))
     make_obj(f"{tag}_lamps", g, C("light"), world)
     g = Geo()
-    for yy in range(int(y0), int(y1), 9):
+    for yy in range(int(y0), int(y1), 6):
         for x in (-1.9, 1.9):
             g.box((x, yy + 1.5, 0.012), (0.15, 3.0, 0.024))
-    for x in (-5.6, 5.6):
+    for x in (-4.4, 4.4):
         g.box((x, (y0 + y1) / 2, 0.012), (0.18, y1 - y0, 0.024))
     for sx in (-1, 1):
-        g.box((sx * 6.75, (y0 + y1) / 2, 0.2), (1.0, y1 - y0, 0.4))
+        g.box((sx * 5.3, (y0 + y1) / 2, 0.2), (1.0, y1 - y0, 0.4))
     make_obj(f"{tag}_lanes", g, C("line"), world)
 
 
