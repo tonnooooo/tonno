@@ -1,0 +1,63 @@
+--- previs/build_previs.py	2026-10-02 04:58:11.363266772 +0000
++++ previs/build_previs.py (proposed)	2026-10-02 05:01:07.905422429 +0000
+@@ -17,6 +17,7 @@
+   lens_mm / lens_to_mm focal length (sensor 36 mm) / zoom target
+   speed                convoy speed in m/s: car + camera + target travel along +Y
+                        (cam_from/cam_to/look_at are then RELATIVE to the car)
++  skyline              highway only: scale of the background tower heights (default 1, 0 = no towers)
+   handheld             camera shake amplitude in metres (0 = off); also adds a small roll wobble
+                        (HANDHELD_ROLL_DEG_PER_M degrees of roll per metre of amplitude)
+   flash [s,...]        camera-flash cue: one bright frame (+FLASH_EV exposure) at each time (seconds
+@@ -376,11 +377,11 @@
+     make_obj(f"{tag}_cabin", g, C("glass"), root)
+     # rear wing
+     g = Geo()
+-    g.box((0, -2.02, 1.29), (1.74, 0.46, 0.05), rot=(-6, 0, 0))
+-    g.box((0.60, -2.0, 1.08), (0.07, 0.16, 0.42))
+-    g.box((-0.60, -2.0, 1.08), (0.07, 0.16, 0.42))
+-    g.box((0.88, -2.02, 1.30), (0.04, 0.52, 0.22))
+-    g.box((-0.88, -2.02, 1.30), (0.04, 0.52, 0.22))
++    g.box((0, -2.05, 1.09), (1.26, 0.40, 0.045), rot=(-6, 0, 0))      # slab: top ~z 1.12, ~ roof height like the real wing
++    g.box((0.36, -2.02, 0.99), (0.06, 0.14, 0.22))                    # two supports standing on the trunk lid
++    g.box((-0.36, -2.02, 0.99), (0.06, 0.14, 0.22))
++    g.box((0.63, -2.04, 1.08), (0.03, 0.44, 0.12))                    # end plates
++    g.box((-0.63, -2.04, 1.08), (0.03, 0.44, 0.12))
+     make_obj(f"{tag}_wing", g, C("body"), root)
+     # lights / plate / exhaust
+     g = Geo()
+@@ -653,7 +654,7 @@
+     return tubes
+ 
+ 
+-def build_highway(tag, world):
++def build_highway(tag, world, skyline=1.0):
+     C = Style.col
+     g = Geo()
+     g.box((0, 120, -0.55), (400, 540, 0.8))
+@@ -696,13 +697,16 @@
+         x = side * rng.uniform(45, 170)
+         y = rng.uniform(-100, 380)
+         w, d, h = rng.uniform(10, 28), rng.uniform(10, 28), rng.uniform(12, 90)
++        h *= skyline
+         g.box((x, y, h / 2), (w, d, h))
+     for _ in range(40):
+         x = rng.uniform(-190, 190)
+         y = rng.uniform(395, 430)
+         w, d, h = rng.uniform(10, 26), rng.uniform(10, 24), rng.uniform(25, 120)
++        h *= skyline
+         g.box((x, y, h / 2), (w, d, h))
+-    make_obj(f"{tag}_skyline", g, C("ground"), world)
++    if skyline > 0:                       # skyline 0 = no background towers (S07: the real sky is black)
++        make_obj(f"{tag}_skyline", g, C("ground"), world)
+ 
+ 
+ def tunnel_profile(inset=0.0, half_w=5.8, wall_h=3.0, arch_h=5.6, n=14):
+@@ -933,7 +937,7 @@
+     if env == "garage":
+         tubes = build_garage(sid, world, car_xy, recipe.get("flicker", False))
+     elif env == "highway":
+-        build_highway(sid, world)
++        build_highway(sid, world, float(pv.get("skyline", 1.0)))
+     elif env == "tunnel":
+         build_tunnel(sid, world)
+     elif env == "booth":

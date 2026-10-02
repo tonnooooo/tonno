@@ -2,35 +2,35 @@
  "id": "S12",
  "previs": {
   "cam_from": [
-   0.0,
-   -47.0,
-   0.27
+   -150.0,
+   190.0,
+   0.12
   ],
   "cam_to": [
-   0.0,
-   -47.0,
-   0.27
+   -150.0,
+   190.0,
+   0.12
   ],
   "look_at": [
-   0.0,
-   53.0,
-   3.12
+   -250.0,
+   190.0,
+   2.97
   ],
   "lens_mm": 32,
-  "car_yaw": 0.0,
+  "car_yaw": 90.0,
   "car_path": [
    [
-    0.0,
-    -37.7,
-    0.0
+    -159.2,
+    190.0,
+    -0.15
    ],
    [
-    0.0,
-    -21.6,
-    0.0
+    -174.7,
+    190.0,
+    -0.15
    ]
   ],
-  "car_ease": 1.5
+  "car_ease": 1.38
  },
- "notes": "Real clip (window 1.20-2.74 s = clip frames 29-66, previs frames 322-359): locked-off, ground-level rear shot on wet dark tarmac that looks like an airfield / empty runway road (no lane lines, two dark skid-mark bands in a V, mirror-like wet reflections of the tail lamps, fog, a string of orange lights on the horizon at the left, teal haze). The camera does not move at all (horizon lights and skid marks stay on the same pixels, +-1 px) and sits only ~0.27 m above the road (wheel contacts 22 px below the horizon at a 143 px wide car; tail-lamp height checks out at 0.23-0.27 m), exactly behind the car (car centre x 0.495), level apart from ~1.6 deg of pitch up (the vanishing point of the road edge is at y=0.545 of the frame height, not 0.5). The pearl-white coupe accelerates away from near standstill: body width 143 px (22% of the frame width) at window start, 106 / 80 / 57 / 42 px at 25/50/75/100%, i.e. rear-plane distance 7.1 m -> 23.2 m at 32 mm (about 6 m/s -> 14 m/s, still accelerating; distance follows d = 7.1 + 16.1 (t/T)^1.5 within 0.28 m rms), rear view, taillights ~0.64 of the body width apart. Previs: camera fixed at (0,-47,0.27), aim (0,53,3.12) = 1.63 deg pitch up, 32 mm; car yaw 0 on the Y axis from y=-37.7 to y=-21.6 (rear plane 7.1 m -> 23.2 m ahead of the camera) with car_ease 1.5. The camera y was chosen (-47) so that the gantry row at y=-50 is behind the lens and the next one is 117 m ahead, and the pole rows stay at the edge of the frame. Check (previs vs real) at 0/25/50/75/100%: car body width 0.229/0.178/0.127/0.092/0.068 vs 0.225/0.166/0.125/0.089/0.066 of the frame width (the previs silhouette includes the 1.78 m wing, a constant +3-4% bias, so the real error is within 3% except ~+4% at 25%), car centre x 0.499 vs 0.495, car centre y 0.44/0.46/0.49/0.50/0.51 vs 0.44/-/-/-/0.50, horizon 0.545 vs ~0.545; frame-difference max/median 2.55 but smooth (monotone decay as the car shrinks, local max/median 1.13): no pop. Remaining mismatches: the highway builder env is a city highway (skyline blocks, rails, lamp poles, gantry at y=70 that frames the car in the second half) while the real is an open dark airfield with only a low string of orange lights; lane dashes at +-1.75 m and solid lines at +-5.5 m exist in the previs while the real has no markings (road edge ~3.5 m left of the camera); wet reflections / fog / glow are not representable; the previs car's rear is a box with a big wing and a single round lamp per side (real: 2 round lamps per side, small spoiler); the car starts slightly too close at 25% of the window (distance 9.0 vs 9.4 m) because the u^1.5 ease starts at speed 0 while the real car already moves at ~6 m/s at the window start; the lens is not constrained by the clip (a longer lens only moves the camera back and scales the distances: 24 mm -> 5.3 m, 50 mm -> 11 m)."
+ "notes": "Real clip (window 1.20-2.74 s = clip frames 29-66, previs frames 322-359): locked-off, ground-level rear shot on wet dark tarmac in an OPEN airfield: no buildings, no lane markings, no overhead structures, two dark skid-mark bands in a V, mirror-like wet reflections of the tail lamps, fog, teal haze and a low string of orange lights on the horizon at the left. The camera does not move (light string and skid marks stay on the same pixels) and sits ~0.27 m above the road, exactly behind the car (car centre x 0.487-0.497), level apart from ~1.6 deg of pitch up (road-edge vanishing point y~0.545, light string y=0.51). The pearl-white coupe accelerates away from near standstill (~5 m/s at the window start, still accelerating), seen from straight behind, always fully in frame. REFIT v2 (fixes the verifier's major environment issue: city skyline, lane lines, rails, poles and a gantry framing the car): the shot is moved off the road to an empty part of the highway world. The highway world has a large flat ground plane (x -200..200, y -150..390, top at z=-0.15); all structure lies elsewhere: lane dashes/edge lines/rails/poles/gantries within |x|<=10.5 of the world axis, skyline blocks at |x|>=31 and y>=-115 (far row y>=383). The camera stands at the west edge of the ground and looks along -X into the void: camera (-150,190,0.12) = 0.27 m above the ground plane, aim (-250,190,2.97) = 1.63 deg pitch up, 32 mm, static; car_yaw +90 (nose toward -X, rear toward the camera), car_path z=-0.15 (ground top). A cone test against the seeded skyline shows no block/pole/rail/gantry/lane line inside the 61 deg view cone from (-150, y=190) (free band y=145..240). Result: flat dark-grey ground, black sky, the car; the ground ends 50 m ahead, giving a horizon at y=0.553 (real ~0.543). HAZARD for the lead: repeated envs are offset 1000 m in Y and the camera far plane is 700 m. S07 and S12 are both 'highway', so in the full timeline S12 is the second highway world (y+1000). A first variant looking along -Y from y=-100 looked perfect when S12 was rendered alone, but with S07 built before it (--shots S07,S12) it exposed S07's far skyline row at ~470 m as a city silhouette on the horizon. Looking along -X avoids this (the S07 world is 1000 m to the side; garage/tunnel worlds are >=825 m away). The final compare sheet was rendered with --shots S07,S12, i.e. in the full-timeline layout. Re-run that layout check if the camera direction/position is changed or the env order in the shotlist changes. Distance fit: measured the outer tail-lamp span in all 38 real frames (262 -> 83 px of 1280) and converted to rear-plane distance with the start fixed at 7.0 m (body 22.3% of the frame width at 32 mm): real d = 7.0 -> 9.4 (25%) -> 12.9 (50%) -> 17.6 (75%) -> 22.3 m. Previs: d = 7.0 + 15.5*u^1.38 (rear plane 7.0 -> 22.5 m; car origin = rear plane + 2.2 m, so x=-159.2 -> -174.7). The old exponent 1.5 / 16.1 m was 0.35 m too close at 25%. Check, previs vs real at 0/25/50/75/100% (frames 322/331/341/350/359 vs clip frames 29/38/48/57/66): car body width 0.225/0.170/0.119/0.090/0.070 vs 0.223/0.167/0.121/0.089/0.070 of the frame width (wing excluded; the previs wing adds 3-4%); car centre x 0.499 vs 0.487-0.497; tail-lamp row y 0.436/0.463/0.484/0.502/0.510 vs 0.454/0.470/0.483/0.493/0.501 (max 1.8% of the frame height, previs lamps are modelled a bit higher than the real ones); wheel-contact row at the start 0.597 vs 0.597; horizon 0.553 vs ~0.543; camera static as real; the car shrinks monotonically and is never cut off. Previs frame difference is a smooth ramp over the first 4 frames then a monotone decay (car starts at zero speed while the real car already moves), no pop. Remaining mismatches (builder cannot express): (1) the low string of orange lights at the left horizon, fog/teal haze, wet reflections and the skid-mark V are missing; (2) the previs car has one round lamp per side (real: two) and a big wing (real: small spoiler); (3) u^e easing starts at zero speed (real ~5 m/s); (4) the horizon is the ground edge 50 m ahead, ~1% lower than the real one. BUILDER REQUESTS: (a) highway option to hide skyline/gantry/lanes/rails/poles (e.g. previs.env_variant='open' or previs.hide=['skyline','gantry','lanes','rails','poles']) with an endless dark ground; S12 could then return to a normal road-axis camera: cam (0,-47,0.27) static, aim (0,53,3.12), 32 mm, car_yaw 0, car_path (0,-37.8,0)->(0,-22.3,0), car_ease 1.38 (same d(t) as above). (b) optional low horizon light string: 8-12 small light boxes (z 0.3-1.2 m) in a line 80-150 m ahead spanning about the left 10-45% of the frame width at horizon height (y=0.51). (c) optional car variants: two round tail lamps per side (outer-lamp spacing ~0.76 of body width) and a small spoiler instead of the wing. (d) optional initial speed for car_path (e.g. car_v0 in m/s) so the move can be v0 + constant acceleration instead of pure u^e."
 }

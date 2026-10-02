@@ -1,0 +1,209 @@
+--- previs/build_previs.py
++++ previs/build_previs.py (proposed)
+@@ -24,4 +24,13 @@
+   car_pos [x,y,z], car_yaw (deg), car_path [[x,y,z],...], car_ease (exponent)
+-  figure_path [[x,y,z],[x,y,z]], figure_action (walk|flick|poses|lean|stand),
++  figure_path [[x,y,z],[x,y,z]], figure_action (walk|flick|poses|lean|lean_pockets|stand|chin),
+   figure_yaw (deg)
++  figure_scale (float)  uniform scale of the whole mannequin about its root (default 1)
++  head_scale (float)    extra scale of the head about the neck (default 1; the mannequin's head is small for close-ups)
++  figure_lean_deg       lean angle of figure_action 'lean' in degrees (default 22)
++  flame [[t_on,t_off,length_m(,width_m)],...]   exhaust flame cue (seconds from the shot start; teardrop, width = max diameter)
++  flame_pipe (-1|0|1)   which exhaust pipe flames: -1 car-left, +1 car-right, 0 both (default 0)
++  env_opts {...}        per-environment geometry switches, all optional (defaults = old look):
++                        garage: beams (0/1), bay_lines (0/1), columns [[x,y],...], tubes [[x,y,len,yaw_deg],...], tube_w (m),
++                                ceiling_grey (display grey of the ceiling slab)
++                        booth : window (0/1), arch [x_c,z_c,half_w,sag(,thickness)], strips [[x,width],...] (neon at the back wall)
+ All coordinates are relative to the shot's own world origin (shots live in
+@@ -292,2 +301,14 @@
+ 
++    def lathe(self, prof, c, seg=14, rot=None):
++        """solid of revolution about +z: prof = [(z, r), ...] from the base to the tip (r = 0 at the tip is fine)."""
++        ring = [(math.cos(2 * math.pi * i / seg), math.sin(2 * math.pi * i / seg)) for i in range(seg)]
++        pts, faces = [], []
++        for z, r in prof:
++            pts.extend((r * x, r * y, z) for x, y in ring)
++        for j in range(len(prof) - 1):
++            a, b = j * seg, (j + 1) * seg
++            for i in range(seg):
++                faces.append((a + i, a + (i + 1) % seg, b + (i + 1) % seg, b + i))
++        self.add(self.xf(pts, c, rot), faces, False)
++
+     def prism_x(self, pts_yz, xc, w, taper=None):
+@@ -358,3 +379,6 @@
+ # --------------------------------------------------------------------------------------
+-def build_car(tag, parent, pos, yaw_deg, flame=False):
++FLAME_PROFILE = [(0.0, 0.05), (0.12, 0.085), (0.35, 0.115), (0.62, 0.075), (0.85, 0.035), (1.0, 0.0)]   # unit-length teardrop
++
++
++def build_car(tag, parent, pos, yaw_deg, flame=False, flame_pipe=0):
+     """90s sport coupe, forward = +Y, origin on the ground at the centre. Returns dict of handles."""
+@@ -426,3 +450,3 @@
+     fl = []
+-    if flame:
++    if flame is True:                       # legacy cue: thin 0.5 m cones at both pipes, hard-coded timing
+         for sx in (-1, 1):
+@@ -433,2 +457,11 @@
+             fl.append(ob)
++    elif flame:                             # flame list: teardrop of unit length, scaled in z by the cue length
++        for sx in (-1, 1):
++            if flame_pipe and sx != flame_pipe:
++                continue
++            g = Geo()
++            g.lathe(FLAME_PROFILE, (0, 0, 0), seg=14)
++            ob = make_obj(f"{tag}_flame", g, C("light"), root, loc=(sx * 0.36, -2.34, 0.34), rot=(90, 0, 0))
++            ob.scale = (1, 1, 0.001)
++            fl.append(ob)
+     return dict(root=root, wheels=wheels, tail=tail, tail_core=tail_core, flames=fl)
+@@ -532,3 +565,3 @@
+ 
+-def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_sign=1.0, appear=None):
++def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_sign=1.0, appear=None, lean_deg=22.0):
+     """Keyframe the mannequin. path = [p_start, p_end] (world-local coordinates)."""
+@@ -582,3 +615,3 @@
+         elif action == "lean":
+-            base = {"lean": (0, 22.0 * lean_sign, 0), "sh_L": (28, 4, 0), "sh_R": (28, -4, 0),
++            base = {"lean": (0, lean_deg * lean_sign, 0), "sh_L": (28, 4, 0), "sh_R": (28, -4, 0),
+                     "el_L": (100, 0, 0), "el_R": (100, 0, 0), "knee_R": (-14, 0, 0), "hip_R": (8, 0, 0),
+@@ -586,2 +619,11 @@
+             seq = [(0.0, base), (T * 0.5, dict(base, head=(-3, 4 * lean_sign, 0))), (T, base)]
++        elif action == "lean_pockets":      # 'lean' with the arms down and the hands near the front pockets
++            base = {"lean": (0, lean_deg * lean_sign, 0), "sh_L": (8, 4, 0), "sh_R": (8, -4, 0),
++                    "el_L": (50, 0, 0), "el_R": (50, 0, 0), "knee_R": (-14, 0, 0), "hip_R": (8, 0, 0),
++                    "head": (0, 4 * lean_sign, 0)}
++            seq = [(0.0, base), (T * 0.5, dict(base, head=(-3, 4 * lean_sign, 0))), (T, base)]
++        elif action == "chin":      # S10: right hand on the chin for ~0.4 s, then both arms down and the head tilts
++            chin = {"sh_R": (48, 0, 0), "el_R": (126, 0, 51)}
++            tilt = {"head": (0, 9, 0)}
++            seq = [(0.0, chin), (0.38, chin), (0.55, tilt), (T, tilt)]
+         else:  # stand
+@@ -598,3 +640,4 @@
+ # --------------------------------------------------------------------------------------
+-def build_garage(tag, world, car_xy, flicker):
++def build_garage(tag, world, car_xy, flicker, opts=None):
++    opts = opts or {}
+     C = Style.col
+@@ -606,3 +649,3 @@
+     g.box((0, 10, 3.15), (50, 110, 0.3))
+-    make_obj(f"{tag}_ceiling", g, C("ceiling"), world)
++    make_obj(f"{tag}_ceiling", g, C(opts["ceiling_grey"]) if "ceiling_grey" in opts else C("ceiling"), world)
+     g = Geo()   # walls
+@@ -616,9 +659,10 @@
+     ys = [-40.0 + 8 * k for k in range(14)]          # column rows every 8 m: y = -40 .. 64
+-    for x in xs:
++    cols = opts.get("columns") or [(x, y) for x in xs for y in ys]
++    for x, y in cols:
++        g.box((x, y, 1.5), (0.8, 0.8, 3.0))
++    if opts.get("beams", 1):
+         for y in ys:
+-            g.box((x, y, 1.5), (0.8, 0.8, 3.0))
+-    for y in ys:
+-        g.box((0, y, 2.72), (50, 0.5, 0.56))
+-    for x in xs:
+-        g.box((x, 10, 2.72), (0.5, 110, 0.56))
++            g.box((0, y, 2.72), (50, 0.5, 0.56))
++        for x in xs:
++            g.box((x, 10, 2.72), (0.5, 110, 0.56))
+     make_obj(f"{tag}_cols", g, C("body"), world)
+@@ -626,6 +670,7 @@
+     g = Geo()
+-    for k in range(-6, 6):
+-        g.box((1.4 + 2.8 * k, cy, 0.006), (0.10, 5.8, 0.012))
+-    g.box((0, cy + 2.9, 0.006), (33.6, 0.10, 0.012))
+-    make_obj(f"{tag}_lines", g, C("line"), world)
++    if opts.get("bay_lines", 1):
++        for k in range(-6, 6):
++            g.box((1.4 + 2.8 * k, cy, 0.006), (0.10, 5.8, 0.012))
++        g.box((0, cy + 2.9, 0.006), (33.6, 0.10, 0.012))
++        make_obj(f"{tag}_lines", g, C("line"), world)
+     # aisle dashes along Y (left of the bays) for depth cue
+@@ -648,5 +693,9 @@
+     g = Geo()
+-    for x in xs2:
+-        for y in ty:
+-            g.box((x, y, 2.95), (0.12, 1.7, 0.06))
++    if opts.get("tubes"):                          # explicit tubes [[x, y, length, yaw_deg], ...]
++        for t in opts["tubes"]:
++            g.box((t[0], t[1], 2.93), (opts.get("tube_w", 0.14), t[2], 0.06), rot=(0, 0, t[3] if len(t) > 3 else 0.0))
++    else:
++        for x in xs2:
++            for y in ty:
++                g.box((x, y, 2.95), (0.12, 1.7, 0.06))
+     make_obj(f"{tag}_tubes", g, C("light"), world)
+@@ -757,3 +806,4 @@
+ 
+-def build_booth(tag, world):
++def build_booth(tag, world, opts=None):
++    opts = opts or {}
+     C = Style.col
+@@ -786,3 +836,4 @@
+     g = Geo()   # camera window, stool, foot rest
+-    g.box((0, 1.06, 1.5), (0.3, 0.04, 0.3))
++    if opts.get("window", 1):
++        g.box((0, 1.06, 1.5), (0.3, 0.04, 0.3))
+     g.cyl((0, 0.4, SEAT_Z - 0.025), 0.20, 0.05, seg=20)
+@@ -794,2 +845,13 @@
+     make_obj(f"{tag}_stool", g, C("dark"), world)
++    g = Geo()   # neon: curved arch over the back wall (smile: lowest at x_c) + vertical strips at the wall corners
++    if opts.get("arch"):
++        xc, zc, hw, sag = opts["arch"][:4]
++        th = opts["arch"][4] if len(opts["arch"]) > 4 else 0.06
++        n_ = 24
++        lo = [(xc - hw + 2 * hw * i / n_, zc + sag * ((2 * i / n_ - 1) ** 2)) for i in range(n_ + 1)]
++        g.ribbon(lo, [(x, z + th) for x, z in lo], 1.055)
++    for sx_, w_ in opts.get("strips") or []:
++        g.box((sx_, 1.05, 1.2), (w_, 0.04, 2.4))
++    if g.verts:
++        make_obj(f"{tag}_neon", g, C("light"), world)
+ 
+@@ -933,3 +995,3 @@
+     if env == "garage":
+-        tubes = build_garage(sid, world, car_xy, recipe.get("flicker", False))
++        tubes = build_garage(sid, world, car_xy, recipe.get("flicker", False), pv.get("env_opts"))
+     elif env == "highway":
+@@ -939,3 +1001,3 @@
+     elif env == "booth":
+-        build_booth(sid, world)
++        build_booth(sid, world, pv.get("env_opts"))
+ 
+@@ -948,3 +1010,5 @@
+         pos, yaw = car_def
+-        car = build_car(sid, world, pos, yaw, flame=bool(recipe.get("flame")))
++        flame_cue = pv.get("flame")
++        car = build_car(sid, world, pos, yaw, flame=(flame_cue if flame_cue else bool(recipe.get("flame"))),
++                        flame_pipe=int(pv.get("flame_pipe", 0)))
+         root = car["root"]
+@@ -996,2 +1060,16 @@
+                 for ob in car["flames"]:
++                    if isinstance(flame_cue, list) and flame_cue:           # [[t_on, t_off, length_m(, width_m)], ...] in seconds
++                        keys = {f0: (0.001, 0.0)}
++                        for item in flame_cue:
++                            t_on, t_off, length = item[0], item[1], item[2]
++                            width = item[3] if len(item) > 3 else 0.0
++                            a_, b_ = f0 + min(n, max(0, rnd(t_on * fps))), f0 + min(n, max(0, rnd(t_off * fps)))
++                            keys[a_] = (float(length), float(width))
++                            keys.setdefault(b_, (0.001, 0.0))
++                        for fr in sorted(keys):
++                            L, W_ = keys[fr]
++                            sw = (W_ / 0.23) if W_ else max(1.0, 0.6 + 0.4 * L)    # W_ = max diameter in m (optional 4th item)
++                            ob.scale = (sw, sw, L)
++                            ob.keyframe_insert("scale", frame=fr)
++                        continue
+                     for k, sc_ in ((0, 0.001), (0.50, 1.0), (0.62, 0.001), (0.78, 0.7), (0.86, 0.001)):
+@@ -1014,3 +1092,3 @@
+         lean_sign = 1.0
+-        if action == "lean" and car_def:
++        if action in ("lean", "lean_pockets") and car_def:
+             rx = (math.cos(math.radians(yaw)), math.sin(math.radians(yaw)))
+@@ -1019,3 +1097,10 @@
+         animate_figure(fig, action, f0, f1, fps, path, yaw, seated_flag=bool(fig_rec.get("seated")),
+-                       lean_sign=lean_sign, appear=fig_rec.get("appear"))
++                       lean_sign=lean_sign, appear=fig_rec.get("appear"),
++                       lean_deg=float(pv.get("figure_lean_deg", 22.0)))
++        if "figure_scale" in pv:                           # about the root, on the lean empty (the root scale is the 'appear' cue)
++            fs_ = float(pv["figure_scale"])
++            fig["j"]["lean"].scale = (fs_, fs_, fs_)
++        if "head_scale" in pv:
++            hs_ = float(pv["head_scale"])
++            fig["j"]["head"].scale = (hs_, hs_, hs_)
+     # --- garage lights flicker on one by one

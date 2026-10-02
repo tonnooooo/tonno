@@ -18,24 +18,332 @@
   ],
   "lens_mm": 24.0,
   "car_pos": [
-   2.023,
-   -2.589,
+   2.071,
+   -2.576,
    0.0
   ],
   "car_yaw": 54.3,
   "figure_path": [
    [
-    1.808,
-    -3.808,
+    2.029,
+    -3.524,
     0.0
    ],
    [
-    1.808,
-    -3.808,
+    2.029,
+    -3.524,
     0.0
    ]
   ],
-  "figure_action": "lean"
+  "figure_action": "stand"
  },
- "notes": "Real clip (window 0.90-2.10 s, previs frames 293-321): STATIC wide low shot in an underground garage (phase correlation first vs last window frame = 0 px; no drift, no zoom): camera ~0.5 m above the wet floor, looking slightly up (~+1.5 deg), wide lens (~24 mm equivalent, fit of 9 car points: rms 7 px at 24 mm, worse for longer lenses). A pearl-white R32-style coupe stands in the middle seen from its LEFT-REAR three-quarter: nose to the left and away, rear (two pairs of round tail lamps, plate, wing, exhaust) to the right and toward the camera; car axis ~39 deg off the image plane; rear wheel centre (712,415) of 1280x720 with tyre 116 px tall, front wheel (467,407) (tyre 82 px tall, i.e. clearly farther), near tail lamps (880,337), far (990,342), plate (950,385), exhaust (880,425). The man stands in front of the left flank at the door, back against the car, feet ~(590,470), head top (645,178), height ~292 px, torso leaning ~10 deg to the image right (head 55 px right of his feet), looking down-left, hands in pockets. Environment: concrete garage, ceiling light tubes in rows (vanishing point right of centre, ~60-80%), a near column cut by the left frame edge (base y 58%) and a big near column cut by the right edge (base y 61%), floor/wall line at ~58%, wet glossy floor with reflections. Action: exhaust flame - small orange pop at ~0.17-0.25 s (window f4-6), big orange fireball f8-13 (0.33-0.55 s), then a long blue flame with orange sparks f14-28 (0.6-1.2 s), blowing to the image right (car rear direction). Previs: camera static at (3.5,-8.5,0.51) in the garage world, aimed (0.912,1.159,0.789) (15 deg left of the +Y axis, pitch +1.6 deg), lens 24 mm; the camera yaw/position were also chosen so that the garage grid columns (x=-7 and x=+7, y=0) fall at the left and right frame edges like the real columns (left column x -37..72 px, base y 424; right column x 1221..1376, base y 444) and the ceiling tube rows converge to ~68% of the width. Car at (2.023,-2.589) with car_yaw 54.3 (= camera yaw 15 + the real 39.3 deg), i.e. nose left/away, rear 3/4 toward the camera. Projected numbers (previs vs real, px of 1280x720): rear wheel (716,418) vs (712,415), front wheel (466,407) vs (467,407), near tail lamp (878,334) vs (880,337), far lamp (1000,342) vs (990,342), plate (934,382) vs (950,385), rear tyre top/bottom y 356/480 vs 359/475 (all within 4 px except the plate 16 px), car size and orientation within ~2%. Man: figure_path at (1.808,-3.808) facing the camera, action 'lean' (builder lean 22 deg, towards the car = image right): feet (568,472) vs (590,470), head top (677,202) vs (645,178), height 270 vs 292 px (-8%); the root was shifted 0.13 m to the left of the real feet so the lean error is split (feet -22 px, head +32 px, both ~2-3% of the frame). Static camera, so no motion to match. Remaining mismatches (honest): (1) flame timing: the builder hard-codes the flame cones at 50-62% and 78-86% of the shot (on at 0.58-0.73 s and 0.91-1.0 s) while the real flame is 0.17-0.25 s pop, 0.33-0.55 s fireball and 0.6-1.2 s blue flame; the previs shows nothing during the real fireball; the cone is also thin/short (0.5 m) vs ~1.5 m real, and both exhausts get a cone where the real car has one visible pipe; (2) man: builder lean is 22 deg vs ~10 deg real, the mannequin is ~8% shorter and his torso sinks into the cabin; (3) environment: grey-box has parking-bay floor lines that cross the floor near the car (real floor is plain wet concrete), the ceiling beams are heavier than the real ceiling and the car/columns/beams are all the same grey so figure-ground is weak; the ceiling tubes are small at the top; no fog/reflections; (4) car model: builder coupe is a generic wedge (taillights one disc per side, plate/wing slightly different from the real R32) so the plate is 16 px off. Discontinuity check: static scene; consecutive-frame mean abs difference is 0 except the flame-cone toggles (max 0.2 grey levels), no pop/flip/crop."
+ "previs_with_builder_patch": {
+  "cam_from": [
+   3.5,
+   -8.5,
+   0.51
+  ],
+  "cam_to": [
+   3.5,
+   -8.5,
+   0.51
+  ],
+  "look_at": [
+   0.912,
+   1.159,
+   0.789
+  ],
+  "lens_mm": 24.0,
+  "car_pos": [
+   2.071,
+   -2.576,
+   0.0
+  ],
+  "car_yaw": 54.3,
+  "figure_path": [
+   [
+    1.923,
+    -3.552,
+    0.0
+   ],
+   [
+    1.923,
+    -3.552,
+    0.0
+   ]
+  ],
+  "figure_action": "lean_pockets",
+  "flame": [
+   [
+    0.1667,
+    0.2083,
+    0.14,
+    0.1
+   ],
+   [
+    0.2083,
+    0.25,
+    0.23,
+    0.2
+   ],
+   [
+    0.25,
+    0.2917,
+    0.45,
+    0.35
+   ],
+   [
+    0.2917,
+    0.3333,
+    0.53,
+    0.45
+   ],
+   [
+    0.3333,
+    0.375,
+    0.62,
+    0.5
+   ],
+   [
+    0.375,
+    0.4167,
+    0.72,
+    0.55
+   ],
+   [
+    0.4167,
+    0.4583,
+    0.83,
+    0.65
+   ],
+   [
+    0.4583,
+    0.5,
+    0.94,
+    0.7
+   ],
+   [
+    0.5,
+    0.5417,
+    1.13,
+    0.8
+   ],
+   [
+    0.5417,
+    0.5833,
+    1.32,
+    0.9
+   ],
+   [
+    0.5833,
+    0.625,
+    1.7,
+    0.95
+   ],
+   [
+    0.625,
+    0.6667,
+    0.15,
+    0.2
+   ],
+   [
+    0.6667,
+    0.7083,
+    0.68,
+    0.32
+   ],
+   [
+    0.7083,
+    0.75,
+    0.77,
+    0.33
+   ],
+   [
+    0.75,
+    0.7917,
+    0.87,
+    0.34
+   ],
+   [
+    0.7917,
+    0.8333,
+    0.85,
+    0.34
+   ],
+   [
+    0.8333,
+    0.875,
+    0.9,
+    0.35
+   ],
+   [
+    0.875,
+    0.9167,
+    0.93,
+    0.35
+   ],
+   [
+    0.9167,
+    0.9583,
+    0.93,
+    0.35
+   ],
+   [
+    0.9583,
+    1.0,
+    0.81,
+    0.33
+   ],
+   [
+    1.0,
+    1.0417,
+    0.83,
+    0.33
+   ],
+   [
+    1.0417,
+    1.0833,
+    0.93,
+    0.35
+   ],
+   [
+    1.0833,
+    1.125,
+    0.95,
+    0.35
+   ],
+   [
+    1.125,
+    1.1667,
+    0.79,
+    0.33
+   ],
+   [
+    1.1667,
+    1.2083,
+    0.8,
+    0.33
+   ]
+  ],
+  "flame_pipe": -1,
+  "figure_lean_deg": 10,
+  "figure_scale": 1.05,
+  "env_opts": {
+   "beams": 0,
+   "bay_lines": 0,
+   "columns": [
+    [
+     -7.6,
+     1.1
+    ],
+    [
+     7.15,
+     0.8
+    ],
+    [
+     -10.6,
+     9.4
+    ]
+   ],
+   "tubes": [
+    [
+     4.02,
+     -1.88,
+     1.7,
+     -21.0
+    ],
+    [
+     -1.77,
+     -1.98,
+     1.54,
+     -20.7
+    ],
+    [
+     5.6,
+     2.32,
+     1.89,
+     -21.4
+    ],
+    [
+     -0.39,
+     1.72,
+     1.61,
+     -21.7
+    ],
+    [
+     7.21,
+     6.67,
+     2.05,
+     -22.0
+    ],
+    [
+     1.03,
+     5.66,
+     1.65,
+     -22.2
+    ],
+    [
+     9.22,
+     8.27,
+     1.6,
+     67.9
+    ],
+    [
+     -5.98,
+     5.26,
+     1.69,
+     71.1
+    ],
+    [
+     2.36,
+     9.4,
+     1.6,
+     -24.5
+    ],
+    [
+     -13.18,
+     6.88,
+     1.29,
+     -18.9
+    ],
+    [
+     -4.65,
+     10.86,
+     1.65,
+     74.2
+    ]
+   ],
+   "ceiling_grey": 1.0,
+   "tube_w": 0.26
+  }
+ },
+ "notes": "REFIT v3 (verifier fix pass). Camera is KEPT (cam (3.5,-8.5,0.51), look_at (0.912,1.159,0.789), 24 mm; static): the verifier called it right and I re-checked it independently by back-projecting 11 detected ceiling light tubes onto the plane z 2.93 with this camera: they come out 1.5-2.0 m long, 4.0 m apart along rows, all with the same yaw (-21 deg), and the far column's top and base back-project to the same (x,y) (within 0.3 m) for a 3.0 m ceiling, and the detected tube lines overlay the previs tubes within a few px. Real clip (window 0.90-2.07 s, previs frames 293-321): static wide low shot in an underground garage, pearl-white coupe seen from its left-rear 3/4 (nose left-away), the man in front of the left flank (head top (645,175), feet ~(600,465), height ~290 px, lean ~10 deg to the image right, hands in pockets), concrete ceiling slab with fluorescent tubes in long rows that converge to a vanishing point right of the frame (the garage axis is ~35 deg right of the optical axis, i.e. world yaw -21 deg, not the +15 deg of the builder's fixed grid), near columns cut by the left and right frame edges plus one dim far column at x ~262, plain wet floor (no bay lines), no beams crossing the frame. Exhaust flame measured per window frame (orange/blue pixels right of the pipe at (880,425)): small pop at f4 (0.17 s), growing fireball f5-f14 (tip x 940 -> >1273, i.e. ~0.25 m -> >1.5 m long, ~0.9 m wide at the peak f12-f14), collapse at f15, then a slim blue flame f16-f28 (tip x 1055-1123, ~0.7-0.95 m long, ~0.35 m wide) with sparks. WHAT CHANGED vs v2 with the CURRENT builder ('previs'): (1) figure_action 'lean' -> 'stand' and the man re-placed at (2.029,-3.524): the builder's lean is a hard 22 deg (real ~10 deg), arms raised and one knee bent, and the 270 px lean pose was 8% short; the upright mannequin measured by background differencing is head top (622,186) vs real (645,175), feet (618,471) vs (600,465), height 285 vs ~290 px: all errors <= 23 px (1.8% of width), where the v2 lean had head +23/+25 px and feet -30 px, 'falling diagonally'; (2) car moved +0.048 m along the camera-right axis (car_pos (2.071,-2.576)) = +7 px, which centres the wheel faces (they were 15-19 px left of real) without pushing the tail lamps past the real ones. STILL WRONG with the current builder (not param-fixable, see builder_requests): the exhaust flame is hard-coded to two thin 0.5 m cones at 50-62% and 78-86% of the shot at BOTH pipes (previs shows nothing during the real fireball f4-f14); heavy ceiling beams across the frame, mid-frame posts, parking-bay floor lines, tiny ceiling tubes, black ceiling. I also tried rotating the whole rig by -20 deg about Z to give the grid the right convergence, but then the grid columns leave the frame edges (the real near columns are not on one grid row: their inner edges back-project to (-7.19,0.77) and (6.73,0.40)), so the verified camera/column layout was kept. FIX = builder patch (S10_S11_builder_requests.patch, parameters in 'previs_with_builder_patch', look in S11_compare_proposed_builder.jpg; the proposed render uses ONLY my patch, so the oversized rear wing is still the S07 request). With the patch (scratch copy, original untouched; with the old v2 params the patched builder renders pixel-identical frames, max diff 0): flame cue = 25 per-frame entries [t_on,t_off,length_m,width_m] taken from the measurement above, single pipe (car-left, flame_pipe -1), tip x within 17-30 px of real (the previs pipe sits 28 px right of the real pipe); garage = no beams, no bay lines, explicit columns [[-7.6,1.1],[7.15,0.8],[-10.6,9.4]] (the 3 real ones), explicit 11 ceiling tubes from the back-projection (0.26 m wide), lighter ceiling slab; man = 'lean_pockets' (arms down, hands at the pockets) with figure_lean_deg 10 and figure_scale 1.05: measured head top (650,177) vs real (645,175), feet (600,471) vs (600,465), height 294 vs ~290 px. Remaining mismatches even with the patch: flame is a smooth white teardrop (no orange/blue, no sparks, no reflection on the floor), the previs pipe is 28 px right of the real pipe so the flame starts a little late in x, the ceiling reads dark brown (Workbench shades down-facing faces dark), no column capitals / drop beam at the top right and no duct runs at the top left, the coupe is the generic wedge (plate 16 px off, big wing until the S07 patch is merged), no wet-floor reflections, man pose is a mannequin. Discontinuity check (patched): static camera, only the flame and the 'lean_pockets' idle head sway change between frames, no pop.",
+ "builder_requests": [
+  {
+   "id": "S11-flame",
+   "severity": "major",
+   "affects": "S11 (hero action: the exhaust pops a blue flame)",
+   "problem": "build_car/build_shot flame: two thin 0.5 m cones (one per pipe) at fixed 50-62% and 78-86% of the shot, i.e. window 0.60-0.74 s and 0.94-1.03 s. The real clip has a small pop at 0.17 s, a fireball from 0.21 to 0.62 s growing to >1.5 m long and ~0.9 m wide (peak f12-f14), then a slim ~0.9 m blue flame with sparks until the end of the window, from ONE pipe only. 3 of 5 sheet samples showed a big real flame against none in the previs.",
+   "request": "new optional previs keys 'flame' [[t_on, t_off, length_m, (width_m)], ...] (seconds from the shot start; teardrop mesh scaled in z by the length and in x/y by width/0.23; constant-interpolated per entry, entries may be contiguous) and 'flame_pipe' (-1 car-left, +1 car-right, 0 both; default 0). Without the key the old hard-coded cue stays (recipe flame True = unchanged behaviour, verified pixel-identical on S10/S11 with the old params). S11 uses 25 contiguous per-frame entries measured from the clip (see previs_with_builder_patch.flame) and flame_pipe -1."
+  },
+  {
+   "id": "S11-garage",
+   "severity": "major",
+   "affects": "S11 (and any garage shot)",
+   "problem": "build_garage always adds 50 m wide ceiling beams every 8 m in Y and 110 m long beams at every column line (0.56 m deep, they cross the whole S11 frame at y 100-225 px), a full 4 x 14 column grid (mid-frame posts / shelving behind the car), parking-bay floor lines around the car, and ceiling tubes every 4 m on a world grid that is 15 deg rotated against the camera instead of the real ~36 deg (tubes seen near end-on, only three tiny marks), plus a black ceiling. The camera cannot be changed to fix this because the columns and car are fitted to it.",
+   "request": "new optional previs key 'env_opts' (dict) with garage entries 'beams' (0/1, default 1), 'bay_lines' (0/1, default 1), 'columns' [[x,y],...] (explicit list replaces the grid), 'tubes' [[x,y,length,yaw_deg],...] (explicit list replaces the grid) with 'tube_w' (m, default 0.14), 'ceiling_grey' (display grey of the ceiling slab). Defaults reproduce the old garage exactly. S11 values are in previs_with_builder_patch.env_opts (tubes back-projected from the real frame)."
+  },
+  {
+   "id": "S11-lean",
+   "severity": "minor",
+   "affects": "S11",
+   "problem": "figure_action 'lean' is a hard-coded 22 deg lean with both arms raised and bent (reads as hands-up) while the real man leans ~10 deg with his hands in his pockets.",
+   "request": "new optional previs key 'figure_lean_deg' (default 22) and a new action 'lean_pockets' (same as 'lean' with the arms down: sh (8,+-4,0), el (50,0,0)); lean_sign logic extended to the new action. S11 uses lean_pockets, 10 deg, plus figure_scale 1.05 (same key as S10-figure-scale) so the mannequin is as tall as the real man."
+  }
+ ],
+ "proposed_files": {
+  "patch": "previs/refit/S10_S11_builder_requests.patch",
+  "compare_with_patch": "previs/refit/S11_compare_proposed_builder.jpg",
+  "usage": "to use the patch: apply it to previs/build_previs.py (applies cleanly alone and after S07_builder_requests.patch), then replace the shot's previs block by 'previs_with_builder_patch'. Without the patch keep 'previs'."
+ }
 }

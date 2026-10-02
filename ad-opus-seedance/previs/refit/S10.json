@@ -35,5 +35,90 @@
    0.42
   ]
  },
- "notes": "Real clip (window 1.00-2.40 s, previs frames 259-292): static frontal bust shot INSIDE the photo booth, camera locked off (phase correlation of the neon arch / cyan wall strips between first and last window frame = 0 px, so no push, no handheld). Camera at about nose height, level, looking straight at the back wall; the man sits centred (face centre ~x 50%, hair top y 12%, chin y 49%, jacket shoulder-to-elbow width ~39% of the frame, frame bottom cuts him at the waist); behind him a reflective silver wall with a curved magenta neon arch across the top (x 20-80%, y 0-9%) and vertical cyan neon strips at the side-wall corners (left x 8-10%, right x 98-100%). Action in the window: hand on chin / smirk until ~0.45 s, then the hand drops and he tilts his head side to side, winks and laughs; camera flash = one white-out frame at window frame 10 (t=0.42 s, mean luma 95 -> 229) + a decay frame (187) + a faint one (104); a tiny +12% blip at frame 25 (ignored). Previs: camera INSIDE the booth shell at (0,-0.81,1.20), level, aimed at the back wall (look_at (0,1.0,1.2)), lens 35 mm, static (cam_from = cam_to). The mannequin sits on the stool at (0,0.4), facing the camera (figure_yaw 180), figure_action 'stand' (arms down), flash cue at 0.42 s exactly on window frame 10 (+ builder's half-strength decay on frame 11), which reproduces the real flash timing. Projected numbers at 1280x720 (previs vs real): head top y 95 vs 88, chin y 327 vs 355 (head 232 vs 267 px = -13%), head centre x 640 vs ~640, shoulder/arm width 596 vs ~505 px (+18%, the mannequin has a small head and broad shoulders, so scale was split: head -13% / shoulders +18%), frame bottom cuts at the abdomen like the real; the booth side walls' inner back corners land at x 64 and 1216 (5% / 95%) vs the real neon strips at 8-10% / 98-100%. The previous guess (camera 3.4 m outside the booth, 42 mm, slow push) showed a small full-length figure with the curtain opening, which was wrong. Why 'stand' and not the builder's 'poses': the real man has ONE pose change (hand on chin for ~0.45 s, then arms down for the rest of the window, head tilts); 'poses' would lift both hands beside the head at 0.64-0.9 s and fling both arms out sideways from 1.0 s, none of which exists in the clip, so 'stand' is right for ~2/3 of the window and never grossly wrong. Remaining mismatches: no hand-to-chin in the first 0.45 s and no head tilt/wink (builder has no custom pose keys), head 13% small / shoulders 18% broad (mannequin proportions), the booth interior is flat grey with no neon arch / wall strips / mirror look, a dark 0.3 m 'camera window' box sits behind the head, ~5% frame-edge side-wall strips are darker grey where the real has cyan neon. Discontinuity check: the scene is static; consecutive-frame mean abs difference is 0 except the intended flash frames (exposure-normalised max 0.007), no pop/flip/crop."
+ "previs_with_builder_patch": {
+  "cam_from": [
+   -0.06,
+   -0.81,
+   1.2
+  ],
+  "cam_to": [
+   -0.06,
+   -0.81,
+   1.2
+  ],
+  "look_at": [
+   -0.06,
+   1.0,
+   1.2
+  ],
+  "lens_mm": 35,
+  "figure_path": [
+   [
+    -0.096,
+    0.4,
+    0.28
+   ],
+   [
+    -0.096,
+    0.4,
+    0.28
+   ]
+  ],
+  "figure_action": "chin",
+  "figure_yaw": 180,
+  "flash": [
+   0.42
+  ],
+  "figure_scale": 0.76,
+  "head_scale": 1.43,
+  "env_opts": {
+   "window": 0,
+   "arch": [
+    -0.045,
+    1.643,
+    0.6,
+    0.09,
+    0.06
+   ],
+   "strips": [
+    [
+     -0.87,
+     0.075
+    ],
+    [
+     0.89,
+     0.08
+    ]
+   ]
+  }
+ },
+ "notes": "REFIT v3 (verifier fix pass). 'previs' = the best fit with the CURRENT builder and is UNCHANGED from v2 (re-rendered with the live builder: identical frames): the verifier's two major issues (mannequin shoulders +34% vs head -10%; booth arch / corner neon strips missing and a spurious dark 0.3 m 'camera window' behind the head) are builder geometry, and I tried every existing lever: scale/lens/camera distance (head and shoulders scale together, so closing the head -10% opens the shoulders to +49%, shrinking the shoulders to +15% opens the head to -23%), figure_yaw (a 25 deg body turn only trims the shoulders by ~6% and turns the visor, so frontal orientation is lost), camera z / x / figure x (the window is a 0.3 m SQUARE 0.66 m behind a 0.23 m round head, parallax can shift it but not hide it; moving camera x to -0.06 to put the booth corners on the real neon strips pushes the window out beside the head, so the v2 centred layout stays the best compromise: head 2.7% right of real, corner bands 1.6-3.5% off). Real clip (window 1.00-2.38 s, previs frames 259-292): locked-off level frontal bust inside the booth (no motion), silver wall, curved magenta neon arch at the very top (x 20-80%, y 0-9%), cyan vertical neon strips at the side-wall corners (x 6.6-10% and 97.6-100%), man centred at x ~47.5% (hair top y 85, chin y 340, head 255 x 220 px), jacket 430-440 px wide at the shoulder line widening to ~515 px at the frame bottom, sunglasses pushed up on the hair; hand on the chin for the first ~0.4 s, then arms down and the head tilts to the image left, wink; flash = one white-out frame at window frame 10 (0.42 s) plus a decay frame. Everything else of v2 is kept: static camera (0,-0.81,1.2) 35 mm aimed at (0,1,1.2), flash cue at 0.42 s lands on window frame 10 (mean luma 108 -> 200 -> 136, real 96 -> 231 -> 188, same frames). FIX = builder patch (see builder_requests, patch file previs/refit/S10_S11_builder_requests.patch, parameters in 'previs_with_builder_patch', look in S10_compare_proposed_builder.jpg). With that patch (tested on a scratch copy, original untouched) the measured silhouette at 1280x720 is: hair top y 86 (real 85), chin ~339 (340), head width 217 px at y 250 (real ~220), head centre x 590-600 (real 605-610), width at the shoulder row y 432 = 458 px (real ~440, +4% instead of +34%), at the frame bottom 457 (real ~515, -11%); booth neon strips at 7.2-9.1% and 97.9-99.1% of the frame width (real 6.6-10% / 97.6-100%), curved arch across the top at y 24-63 px at the centre and 0-18 px at x 300 (real ~25-65 / 0-15), the camera window is gone, the hand sits on the chin until 0.38 s and the arms drop by 0.55 s with a 9 deg head tilt, flash frame unchanged. Remaining mismatches even with the patch: the arms hang straight (real sleeves flare out, -11% width at the bottom), the head tilt is a fixed 9 deg (real tilts 0-12 deg and winks), side-wall bands left/right of the strips are flat dark grey (real: lit silver/pink wall), no mirror/reflection look. Current-builder residual (honest): head 230 px (-10%), shoulders 595 px (+34% at the shoulder row), no arch / no corner strips (dark bands at ~5% / 95% instead), a dark window box behind the head, pose 'stand' only (no hand-on-chin, no tilt).",
+ "builder_requests": [
+  {
+   "id": "S10-figure-scale",
+   "severity": "major",
+   "affects": "S10 (any close-up of the mannequin)",
+   "problem": "build_figure proportions: head 0.2 x 0.23 m vs shoulder-ball span 0.58 m. In the S10 close-up the real man's head is 255 x 220 px and his jacket 440 px at the shoulder line (ratio 0.5), the mannequin's is 0.34; fitting the head (-10%) leaves the shoulders at +34% and there is no existing param that changes the ratio.",
+   "request": "new optional previs keys 'figure_scale' (float, default 1: uniform scale of the whole mannequin about its root, applied on the 'lean' empty so the 'appear' scale cue is untouched) and 'head_scale' (float, default 1, scale of the head empty about the neck). S10 uses figure_scale 0.76, head_scale 1.43 (head 1.09x the old size, shoulders 0.76x) and raises figure_path z by 0.28 m to put the shoulder line back (scaling is about the root on the floor). Implemented in the patch (docstring, build_shot after animate_figure)."
+  },
+  {
+   "id": "S10-booth-neon",
+   "severity": "major",
+   "affects": "S10",
+   "problem": "build_booth has no neon: no curved arch across the top and no cyan strips at the side-wall back corners (they are flat dark grey side-wall bands), and it always adds a 0.3 x 0.3 m dark 'camera window' box on the back wall at z 1.5 that sits behind/above the head (16% x 28% of the frame) and does not exist in the real clip.",
+   "request": "new optional previs key 'env_opts' (dict, default {} = old look). Booth entries: 'window' (0/1, default 1), 'arch' [x_c, z_c, half_width, sag, (thickness)] (a smile-shaped light ribbon on the back wall; S10: [-0.045, 1.643, 0.6, 0.09, 0.06]), 'strips' [[x, width], ...] (full-height light boxes at the back wall; S10: [[-0.87,0.075],[0.89,0.08]]). Implemented in build_booth(tag, world, opts) as an extra 'neon' mesh in the 'light' colour. S10 also moves the camera and figure x by -0.06 / -0.096 so the booth corners land on the real strips (the real booth is centred ~0.06 m right of the camera axis)."
+  },
+  {
+   "id": "S10-chin",
+   "severity": "minor",
+   "affects": "S10",
+   "problem": "no way to get the real hand-on-chin first 0.4 s followed by arms down (the 'poses' action lifts both hands and flings the arms out, which the clip never does).",
+   "request": "new figure_action 'chin': right hand on the chin until 0.38 s, arms down by 0.55 s, 9 deg head tilt afterwards (fixed seconds, meant for the 1.4 s S10 shot). Arm angles from a forward-kinematics fit (sh_R (48,0,0), el_R (126,0,51)); in the patch as one elif in animate_figure."
+  }
+ ],
+ "proposed_files": {
+  "patch": "previs/refit/S10_S11_builder_requests.patch",
+  "compare_with_patch": "previs/refit/S10_compare_proposed_builder.jpg",
+  "usage": "to use the patch: apply it to previs/build_previs.py (applies cleanly alone and after S07_builder_requests.patch), then replace the shot's previs block by 'previs_with_builder_patch'. Without the patch keep 'previs'."
+ }
 }

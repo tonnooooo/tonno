@@ -2,44 +2,44 @@
  "id": "S03",
  "previs": {
   "cam_from": [
-   3.27,
-   0.195,
+   6.27,
+   -3.805,
    0.49
   ],
   "cam_to": [
-   3.107,
-   0.324,
+   6.107,
+   -3.676,
    0.49
   ],
   "look_at": [
-   -1.241,
-   4.145,
+   1.759,
+   0.145,
    0.71
   ],
   "look_at_to": [
-   -1.404,
-   4.274,
+   1.596,
+   0.274,
    0.71
   ],
   "lens_mm": 24,
   "car_pos": [
-   -1,
-   4,
+   2,
+   0,
    0
   ],
   "car_yaw": 90,
   "figure_path": [
    [
-    -9.8,
-    4.9,
+    -6.8,
+    0.9,
     0
    ],
    [
-    -7.02,
-    4.16,
+    -4.02,
+    0.16,
     0
    ]
   ]
  },
- "notes": "Real clip window 2.5-3.7 s: static-ish low (cam ~0.5 m, pitched ~2 deg up) wide (~24 mm equiv.) view of the white coupe at the rear-left three-quarter (nose pointing left and slightly away, we see its left flank + rear panel with lit round taillights), centred slightly right of frame; wet garage floor, ceiling tube rows receding to the right, a thin pillar far behind-left; the man (small, ~115 px tall at start, ~140 px at end) walks toward the camera from far left, ending left of the car. Camera: very slow dolly-in of ~0.22 m along the optical axis (car grows ~6%, background parallax confirms a dolly and not a zoom), no visible shake. Fit method: pinhole camera solved (LM) on wheel hubs, tyre bottoms and taillight clusters at window start/end (rms 2-3 px at 1280x720) giving lens 24 mm, cam height 0.49 m, car yaw 90 (nose -X), camera heading ~48.7 deg; figure ground path obtained by ray/ground intersection of his feet (head height check 1.6-1.74 m). Whole scene then translated by (-1,+4) m (garage grid period 8 m in Y) so that no builder column sits between camera, figure and car (before the shift a column hid the walker). Matched: car centre/size/orientation, wheel and taillight positions (within ~1-2% of frame), horizon/floor line, figure position/height (+-5%), camera move direction/amount. Remaining mismatches: builder car silhouette (wing/roof shape, boxier), garage structure (beams/columns grid vs the clip's flat ceiling and fog), and two builder-forced behaviours that cannot be overridden from the previs block: taillights start dim and flicker on at +0.3 s (clip has them lit the whole window) and the figure is hidden (scale 0.001) for the first 8 frames (clip shows him from frame 0)."
+ "notes": "Real clip window 2.5-3.7 s (previs frames 58-85): low (cam ~0.5 m, pitched ~2 deg up) wide (~24 mm equiv.) view of the white coupe at the rear-left three-quarter (nose pointing left and slightly away, left flank + rear panel with lit round taillights), centred slightly right of frame (~57% of width, ~50% of frame width wide); wet garage floor, ceiling tube rows receding to the right, flat foggy ceiling, a thin pillar far left (~19% of width); the man (small, ~14-16% of frame height at the start, growing to ~19% at the end) is visible from the first frame and walks toward the camera at ~24% of the width, ending left of the car. Camera: very slow dolly-in of ~0.22 m along the optical axis (car grows ~6%, background parallax confirms a dolly and not a zoom), no visible shake.\nFit method: pinhole camera solved (LM) on wheel hubs, tyre bottoms and taillight clusters at window start/end (rms 2-3 px at 1280x720) giving lens 24 mm, cam height 0.49 m, car yaw 90 (nose -X), camera heading ~48.7 deg; figure ground path from ray/ground intersection of his feet (head height check 1.6-1.74 m). Verifier measurement of this fit: wheels and taillights land within ~5 px of 960, horizon ~54%, walker at 24% width with feet y=320/540.\nREVISION 2 (this file): only the scene translation changed. All coordinates are the previous ones plus (+3,-4) m (clean-fit frame + (2,0) instead of + (-1,+4)); camera/car/figure relative geometry is untouched (phase correlation of the car region between the old and new renders: 0 px shift at f58/f72/f85), so every measured match stands. Reason (verifier issue c): with the old shift the garage column (-7,16) stood 18 m behind the car's tail and read as growing out of the trunk. Columns of the builder grid (x=+-7,+-21, every 8 m) were projected for u=0/0.5/1 over a grid of shifts and the candidates rendered and compared; with (+2,0) no column or beam stands behind the tail zone or between camera and car/walker, and one column stands at ~16% of the width behind-left of the man, like the thin far-left pillar of the real clip (~19%). The beam grid above the car is still denser than the real clip's flat foggy ceiling (not removable by params).\nThe tall post + plate that still rises above the trunk is the builder's REAR WING (uprights + plate at z 0.87-1.5 m, higher/larger than the real low spoiler), not a garage column (checked by rendering with the columns removed); it is a car-geometry difference, not fixable from the previs block.\nRemaining mismatches: (1) BUILDER-FORCED, needs a builder change: RECIPES S03 figure.appear=0.35 keeps the man scaled to 0.001 for frames 58-65 (8 of 28 frames) and pops him in at frame 66, while the clip shows him from the first frame; no previs key overrides it (a key such as figure_appear, with 0/null = visible from the first frame, or removing appear=0.35 from RECIPES S03, fixes it). (2) BUILDER-FORCED: RECIPES S03 taillight='ignite_quick' makes the taillights start dark and flicker on at +0.3 s (frame ~65) while the clip's are lit from the first frame; this also causes the 1.8x frame-difference step at frames 61-63 (a previs key taillight='lit', or changing RECIPES S03 to 'lit', fixes it). (3) builder car: boxier silhouette, oversized rear wing, lights/livery absent; builder garage has a beam/column grid where the clip has a flat foggy ceiling and floor reflections."
 }
