@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-import copy
 import hashlib
 import json
 import os
@@ -260,13 +259,20 @@ class Client:
         if resp.status != 200:
             part.unlink(missing_ok=True)
             raise DownloadHttpError(resp.status, resp.text())
-        with open(part, "rb") as f:
-            head = f.read(16)
-        if head[4:8] != b"ftyp":
+        return _finalize_mp4(part, dest)
+
+    def download_curl(self, url: str, dest: Path) -> int:
+        """Last-resort fallback: the CDN is known to accept curl's user agent. No Authorization header."""
+        curl = shutil.which("curl")
+        if not curl:
+            raise NetError("curl is not installed, cannot use the curl fallback")
+        part = dest.with_name(dest.name + ".part")
+        proc = subprocess.run([curl, "-sS", "-L", "--fail", "--retry", str(self.retries), "--retry-delay", "1",
+                               "-A", "curl/8.5.0", "-o", str(part), url], capture_output=True, text=True, timeout=600)
+        if proc.returncode != 0:
             part.unlink(missing_ok=True)
-            raise NetError(f"downloaded file is not an mp4 (first bytes: {head[:12]!r})")
-        os.replace(part, dest)
-        return dest.stat().st_size
+            raise NetError(redact(f"curl exit {proc.returncode}: {proc.stderr.strip()[:200]}"))
+        return _finalize_mp4(part, dest)
 
     def download_any(self, url: str, dest: Path) -> int:
         """Download a small non-mp4 asset (last frame png/jpg). No Authorization header either."""
@@ -276,6 +282,16 @@ class Client:
             raise DownloadHttpError(resp.status, resp.text())
         dest.write_bytes(resp.body)
         return len(resp.body)
+
+
+def _finalize_mp4(part: Path, dest: Path) -> int:
+    with open(part, "rb") as f:
+        head = f.read(16)
+    if head[4:8] != b"ftyp":
+        part.unlink(missing_ok=True)
+        raise NetError(f"downloaded file is not an mp4 (first bytes: {head[:12]!r})")
+    os.replace(part, dest)
+    return dest.stat().st_size
 
 
 class DownloadHttpError(Exception):
@@ -562,34 +578,41 @@ def probe_file(path: Path) -> str:
         return ""
 
 
-def finish_download(client: Client, job: Job, args, norm: dict) -> None:
-    url = norm["video_url"]
-    say(f"[{job.shot}] downloading {safe_url(url)}")
-    path = PROFILES[args.profile]["poll"].format(id=urllib.parse.quote(job.task_id, safe=""))
-    for attempt in (1, 2):
+def fetch_video(client: Client, job: Job, args, url: str) -> int:
+    """urllib with a browser UA -> on 403/404/410 refresh the signed url once -> if still 403, fall back to curl."""
+    try:
+        return client.download(url, job.mp4)
+    except DownloadHttpError as e:
+        err = e
+    if err.status in (403, 404, 410):
+        say(f"[{job.shot}] download refused ({err}); refreshing the signed url once")
+        path = PROFILES[args.profile]["poll"].format(id=urllib.parse.quote(job.task_id, safe=""))
         try:
-            nbytes = client.download(url, job.mp4)
-            break
-        except DownloadHttpError as e:
-            if attempt == 1 and e.status in (403, 404, 410):   # expired/invalid signed url -> ask for a fresh one
-                say(f"[{job.shot}] download refused ({e}); refreshing the signed url once")
-                try:
-                    r = client.api("GET", path, retries=args.poll_retries)
-                    fresh = normalize_status(args.profile, r.json()).get("video_url") if r.status == 200 else None
-                except (NetError, ValueError):
-                    fresh = None
-                if fresh:
-                    url = fresh
-                    continue
-            job.outcome, job.detail = "download_failed", str(e)
-            job.sc.update(state="download_failed", error=str(e))
-            job.save()
-            return
-        except NetError as e:
-            job.outcome, job.detail = "download_failed", str(e)
-            job.sc.update(state="download_failed", error=str(e))
-            job.save()
-            return
+            r = client.api("GET", path, retries=args.poll_retries)
+            fresh = normalize_status(args.profile, r.json()).get("video_url") if r.status == 200 else None
+        except (NetError, ValueError):
+            fresh = None
+        if fresh:
+            url = fresh
+            try:
+                return client.download(url, job.mp4)
+            except DownloadHttpError as e2:
+                err = e2
+        if err.status == 403 and shutil.which("curl"):
+            say(f"[{job.shot}] urllib is still refused by the CDN; trying curl")
+            return client.download_curl(url, job.mp4)
+    raise err
+
+
+def finish_download(client: Client, job: Job, args, norm: dict) -> None:
+    say(f"[{job.shot}] downloading {safe_url(norm['video_url'])}")
+    try:
+        nbytes = fetch_video(client, job, args, norm["video_url"])
+    except (DownloadHttpError, NetError) as e:
+        job.outcome, job.detail = "download_failed", f"{e} (the task is still queryable: --resume-task {job.task_id} --shot {job.shot})"
+        job.sc.update(state="download_failed", error=job.detail)
+        job.save()
+        return
     info = probe_file(job.mp4)
     job.sc.update(state="downloaded", downloaded={"path": job.mp4.name, "bytes": nbytes, "at": now_iso(), "probe": info})
     lf = norm.get("last_frame_url")
@@ -813,7 +836,7 @@ def cmd_generate(client: Client, args, shots: list, negative: str, project_dir: 
             if norm is not None and handle_poll_result(client, job, args, norm):
                 active.remove(job)
                 done.append(job)
-        if active or jobs:
+        if active:
             time.sleep(args.poll_interval)
     return summarize(results, done, args.resolution)
 

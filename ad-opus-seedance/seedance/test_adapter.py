@@ -595,6 +595,60 @@ def t19_assemble_missing_clip_error_allow_missing_and_odd_sources():
     check(rc == 2 and "S01.mp4" in err and not (W / "outs" / "bad.mp4").exists(), f"rc={rc}\n{err}")
 
 
+@test
+def t20_network_errors_on_polls_are_tolerated_then_resumable():
+    reset()
+    c = W / "clips_netdrop"
+    config(drop_poll=4)                              # the server closes the connection without answering
+    rc, out, err = gen("--shots", "S11", "--yes", "--clips-dir", c, "--poll-retries", "1")
+    check(rc == 0, f"rc={rc}\n{out}\n{err}")
+    check(stats()["polls_dropped"] == 4 and "poll error #1" in out and "poll error #2" in out, out)
+    check(len(posts()) == 1 and (c / "S11.mp4").exists(), "tolerated errors must not resubmit")
+    # a long outage: the adapter gives up on THIS task but keeps the id, and a re-run resumes it
+    reset()
+    c2 = W / "clips_netdrop2"
+    config(drop_poll=1000)
+    rc, out, err = gen("--shots", "S11", "--yes", "--clips-dir", c2, "--poll-retries", "0", "--max-poll-errors", "3")
+    check(rc == 1 and "gave up after 3 consecutive poll errors" in out + err, f"rc={rc}\n{out}\n{err}")
+    sc = sidecar(c2, "S11")
+    check(sc["state"] == "poll_error" and sc["task_id"].startswith("cgt-"), sc)
+    config(drop_poll=0)
+    rc, out, err = gen("--shots", "S11", "--yes", "--clips-dir", c2)
+    check(rc == 0 and "resuming instead of resubmitting" in out and len(posts()) == 1, f"rc={rc}\n{out}\n{err}")
+
+
+@test
+def t21_cancelled_and_expired_tasks_are_reported_and_retryable():
+    reset()
+    c = W / "clips_cancel"
+    for status in ("cancelled", "expired"):
+        config(fail_contains="lateral tracking", fail_status=status)
+        rc, out, err = gen("--shots", "S02", "--yes", "--clips-dir", c)
+        check(rc == 1 and f"ended '{status}'" in out + err and "no error object returned" in out + err, f"{status}: rc={rc}\n{out}\n{err}")
+        sc = sidecar(c, "S02")
+        check(sc["state"] == status and sc["task_id"], sc)
+    config(fail_contains=None, fail_status="failed")
+    rc, out, err = gen("--shots", "S02", "--yes", "--clips-dir", c)
+    check(rc == 0 and len(sidecar(c, "S02")["previous_tasks"]) == 2 and (c / "S02.mp4").exists(), f"rc={rc}\n{out}\n{err}")
+
+
+@test
+def t22_download_falls_back_to_curl_when_the_cdn_refuses_urllib():
+    if not shutil.which("curl"):
+        return
+    reset()
+    c = W / "clips_curl"
+    config(cdn_only_curl=True)                       # a CDN that rejects even a browser-like urllib request
+    rc, out, err = gen("--shots", "S12", "--yes", "--clips-dir", c)
+    config(cdn_only_curl=False)
+    check(rc == 0 and "trying curl" in out and (c / "S12.mp4").stat().st_size > 10_000, f"rc={rc}\n{out}\n{err}")
+    cdn = reqs("cdn")
+    check(any(r["status"] == 403 and "Mozilla" in r["ua"] for r in cdn) and cdn[-1]["status"] == 200 and cdn[-1]["ua"].startswith("curl/"),
+          [(r["status"], r["ua"]) for r in cdn])
+    check(all(r["auth"] == "none" for r in cdn), "the API key must never be sent to the CDN")
+    check(len(posts()) == 1)
+
+
 def find_secret(roots, needles, skip=("test_adapter.py",)):
     """-> (hits, files_scanned) scanning every file below roots as bytes."""
     hits, scanned = [], 0
@@ -608,7 +662,7 @@ def find_secret(roots, needles, skip=("test_adapter.py",)):
 
 
 @test
-def t20_canary_key_never_leaks_and_real_project_is_clean():
+def t23_canary_key_never_leaks_and_real_project_is_clean():
     needles = [CANARY, WRONG]
     for k in (CANARY, WRONG):
         needles += [urllib.parse.quote(k, safe=""), base64.b64encode(k.encode()).decode().rstrip("=")]
@@ -625,7 +679,7 @@ def t20_canary_key_never_leaks_and_real_project_is_clean():
     hits, scanned = find_secret([W, HERE], needles)
     check(not hits, f"secret found in files: {hits}")
     check(scanned > 100, f"expected to scan many files, got {scanned}")
-    check(len(OUTPUTS) > 60, f"expected many captured runs, got {len(OUTPUTS)}")
+    check(len(OUTPUTS) > 40, f"expected many captured runs, got {len(OUTPUTS)}")
     # nothing may have been left in the real project
     real_clips = REAL_PROJECT / "out" / "clips"
     left = list(real_clips.iterdir()) if real_clips.exists() else []

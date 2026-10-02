@@ -13,7 +13,7 @@ are piped to ffmpeg for the final H.264/AAC encode.
 Examples (run from the project dir):
   python compose/compose_ad.py --top out/previs.mp4 --bottom seedance/final.mp4 --out out/ad.mp4
   python compose/compose_ad.py --top a.mp4 --bottom b.mp4 --out ad_1080.mp4 --scale 1.5 --audio music.wav \\
-         --header "Opus 5.5" --badge-top Blender --badge-bottom "Seedance 2.5"
+         --header "Opus 5.5" --badge-top Blender --badge-bottom "Kleo AI" --icon-bottom kleo
   python compose/compose_ad.py --top a.mp4 --bottom b.mp4 --out x.mp4 --png-at 0.3,2,6.5,12 --png-dir /tmp/frames
 """
 import argparse
@@ -161,7 +161,7 @@ def read_frame(proc, w, h, last):
 # the compositor
 # --------------------------------------------------------------------------------------
 class Compositor:
-    def __init__(self, layout, waves, scale, header, badge_top, badge_bottom):
+    def __init__(self, layout, waves, scale, header, badge_top, badge_bottom, icon_bottom="seedance"):
         self.L = layout
         self.s = float(scale)
         s = self.s
@@ -176,7 +176,7 @@ class Compositor:
         self._build_waves(waves)
         self._build_header(header)
         self.badges = [self._build_badge(badge_top, "blender", self.card_top),
-                       self._build_badge(badge_bottom, "seedance", self.card_bottom)]
+                       self._build_badge(badge_bottom, icon_bottom, self.card_bottom)]
         self.prog = self.L["progress"]
 
     # ------------------------------------------------------------------ background / shadow
@@ -495,6 +495,22 @@ class Compositor:
                 d.ellipse([px - r, py - r, px + r, py + r], fill=orange)
             for r, col in ((8.2, orange), (5.4, (255, 255, 255, 255)), (3.6, blue)):
                 d.ellipse([cx - r * k, cy - r * k, cx + r * k, cy + r * k], fill=col)
+        elif kind == "kleo":
+            # Kleo AI mark (kleooai.com/brand/kleo-favicon.svg geometry, 100-unit box): amber rounded square with a
+            # square bottom-left corner and a dark, round-joined play triangle
+            sz = size * (22.0 / 24.0)
+            ox, oy = x + (size - sz) / 2.0, y + (size - sz) / 2.0
+            u = sz / 100.0
+            amber, ink = (243, 181, 63, 255), (26, 18, 0, 255)
+            d.rounded_rectangle([ox, oy, ox + sz - 1, oy + sz - 1], radius=27 * u, fill=amber,
+                                corners=(True, True, True, False))
+            tri = [(ox + 39 * u, oy + 30 * u), (ox + 69 * u, oy + 50 * u), (ox + 39 * u, oy + 70 * u)]
+            w, r = 9 * u, 4.5 * u
+            d.polygon(tri, fill=ink)
+            for i in range(3):
+                p, q = tri[i], tri[(i + 1) % 3]
+                d.line([p, q], fill=ink, width=int(round(w)))
+                d.ellipse([p[0] - r, p[1] - r, p[0] + r, p[1] + r], fill=ink)
         else:
             # small rounded-square icon: teal -> orange diagonal gradient with a white 4-point sparkle
             sz = int(round(22 * k))
@@ -582,6 +598,8 @@ def main():
     ap.add_argument("--header", default=None, help="header text under the logo (default from layout: 'Opus 5.5'; '' hides)")
     ap.add_argument("--badge-top", default="Blender", help="label of the top card badge ('' hides)")
     ap.add_argument("--badge-bottom", default="Seedance 2.5", help="label of the bottom card badge ('' hides)")
+    ap.add_argument("--icon-bottom", default="seedance", choices=["seedance", "kleo", "blender"],
+                    help="icon of the bottom card badge (kleo = Kleo AI mark from kleooai.com)")
     ap.add_argument("--fps", type=float, default=None, help="output fps (default 24)")
     ap.add_argument("--duration", type=float, default=None, help="override duration in s (default: shorter input)")
     ap.add_argument("--crf", type=int, default=18, help="x264 CRF (default 18)")
@@ -602,7 +620,7 @@ def main():
     layout["canvas"]["fps"] = fps
     header = layout["header"]["text"]["default"] if a.header is None else a.header
 
-    comp = Compositor(layout, waves, a.scale, header, a.badge_top, a.badge_bottom)
+    comp = Compositor(layout, waves, a.scale, header, a.badge_top, a.badge_bottom, a.icon_bottom)
     W, H = comp.W, comp.H
 
     info_t, info_b = probe(a.top), probe(a.bottom)

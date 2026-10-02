@@ -18,6 +18,8 @@ Fault injection (CLI flags or POST /__mock/config with a JSON object):
   --download-503 N            the next N CDN downloads answer 503
   --submit-status CODE --submit-errors N   the next N submits answer CODE (e.g. 500) WITHOUT creating a task
   --polls-to-done N           polls needed before the terminal state (default 3; huge = never finishes)
+  config only (POST /__mock/config): drop_poll N (close the connection on the next N polls), fail_status
+                              ('failed'|'cancelled'|'expired' for failing tasks), cdn_only_curl (403 unless UA starts with curl/)
   --leak-key-in-errors        error bodies echo the received Authorization header (tests redaction)
 Control: GET /__mock/requests, /__mock/stats, /__mock/tasks, POST /__mock/reset, POST /__mock/config.
 The Authorization header value is never stored in the request log (only ok/bad/none).
@@ -73,7 +75,8 @@ class State:
         self.cfg = {"key": args.key, "polls_to_done": args.polls_to_done, "fail_nth": list(args.fail_nth or []),
                     "fail_contains": args.fail_contains, "poll_429": args.poll_429, "download_503": args.download_503,
                     "submit_status": args.submit_status, "submit_errors": args.submit_errors,
-                    "leak_key_in_errors": args.leak_key_in_errors}
+                    "leak_key_in_errors": args.leak_key_in_errors, "drop_poll": 0, "fail_status": "failed",
+                    "cdn_only_curl": False}
         self.tmp = Path(tempfile.mkdtemp(prefix="mock_ephone_"))
         self.clip_cache: dict = {}
         self.base = ""
@@ -314,16 +317,24 @@ class Handler(BaseHTTPRequestHandler):
     def _poll(self, tid, profile):
         st = self.state
         with st.lock:
-            if st.cfg.get("poll_429", 0) > 0:
+            drop = False
+            if st.cfg.get("drop_poll", 0) > 0:
+                st.cfg["drop_poll"] -= 1
+                st.stats["polls_dropped"] = st.stats.get("polls_dropped", 0) + 1
+                drop = True
+            if st.cfg.get("poll_429", 0) > 0 and not drop:
                 st.cfg["poll_429"] -= 1
                 st.stats["poll_429_served"] += 1
                 inject = True
             else:
                 inject = False
             t = st.tasks.get(tid)
-            if t and not inject:
+            if t and not inject and not drop:
                 t["polls"] += 1
                 st.stats["polls"] += 1
+        if drop:                                   # connection closed without any response (network error)
+            self.close_connection = True
+            return
         if inject:
             return self._err(429, "TooManyRequests", "rate limit exceeded", headers={"Retry-After": "0"})
         if not t or t["profile"] != profile:
@@ -340,8 +351,10 @@ class Handler(BaseHTTPRequestHandler):
                 out["status"] = "running"
             elif status == "terminal":
                 if t["fail"]:
-                    out.update(status="failed", error={"code": "OutputVideoSensitiveContentDetected",
-                                                       "message": "The request failed because the output video may contain sensitive information."})
+                    fs = st.cfg.get("fail_status", "failed")
+                    out.update(status=fs, error={"code": "OutputVideoSensitiveContentDetected",
+                                                 "message": "The request failed because the output video may contain sensitive information."}
+                               if fs == "failed" else None)
                 else:
                     sig = hashlib.sha1((tid + "mock").encode()).hexdigest()[:16]
                     content = {"video_url": f"{st.base}/cdn/{tid}.mp4?sig={sig}&expires={int(time.time()) + 86400}"}
@@ -377,6 +390,11 @@ class Handler(BaseHTTPRequestHandler):
             with st.lock:
                 st.stats["cdn_rejections"] += 1
             self._send(403, b"<html><body>403 Forbidden (bot user agent)</body></html>", "text/html")
+            return self._record("cdn")
+        if st.cfg.get("cdn_only_curl") and not ua.startswith("curl/"):
+            with st.lock:
+                st.stats["cdn_rejections"] += 1
+            self._send(403, b"<html><body>403 Forbidden (this CDN only talks to curl)</body></html>", "text/html")
             return self._record("cdn")
         with st.lock:
             if st.cfg.get("download_503", 0) > 0:
