@@ -8,7 +8,11 @@ downloads out/clips/<shot>.mp4.
 Safety rules baked in:
   * nothing is ever submitted without --yes (--probe / --dry-run / --resume-task send nothing paid)
   * a POST submit is NEVER retried (a retried submit double-bills); GETs/downloads are
-  * budget caps (--budget-max-cny, --budget-max-clips) are checked BEFORE the first submit
+  * budget caps (--budget-max-cny, --budget-max-clips) are checked BEFORE the first submit, against the estimate of the
+    FINAL request body (an --extra-json resolution/ratio/duration override is priced; NaN/inf caps are rejected)
+  * a task that already has an id is never resubmitted unless --force: that includes a task that succeeded without a
+    video url (state no_video_url) and a sidecar that exists but cannot be parsed (the shot is REFUSED)
+  * a download is kept only if it is a complete, decodable mp4 of about the task duration (else download_failed, task id kept)
   * the API key comes from the EPHONE_API_KEY env var only; it is never printed, never
     written to disk and is redacted from every message, sidecar and exception
 """
@@ -18,6 +22,7 @@ import argparse
 import base64
 import hashlib
 import json
+import math
 import os
 import random
 import re
@@ -41,12 +46,19 @@ MIN_DURATION, MAX_DURATION = 4, 30
 MAX_REFERENCE_IMAGES = 9
 MAX_LOCAL_IMAGE_BYTES = 30 * 1024 * 1024
 FAIL_STATES = {"failed", "cancelled", "canceled", "expired"}
+# only these sidecar states may lead to a NEW (paid) submit on a re-run. Everything else that carries a task id
+# (including "no_video_url": the task succeeded and was billed, only the url is missing) is resumed, never resubmitted.
 RETRYABLE_SUBMIT_STATES = {"failed", "cancelled", "canceled", "expired", "submit_failed"}
 UNKNOWN_SUBMIT_STATES = {"submitting", "submit_unknown"}
+ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")              # shot ids become file names
+LAST_FRAME_EXTS = (".png", ".jpg", ".jpeg", ".webp")
+MIN_DOWNLOAD_RATIO = 0.95                            # a download shorter than this x the task duration is truncated
+EXPIRES_AFTER_S = 172800                             # execution_expires_after sent on the ark profile (drop: --no-expires)
 
 EXIT_OK, EXIT_FAIL, EXIT_USAGE, EXIT_BUDGET = 0, 1, 2, 3
 
 # Output frame size used ONLY for the cost estimate (provider-side sizes are approximate).
+RATIOS = ("16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "adaptive")
 DIMS = {
     "480p": {"16:9": (864, 480), "9:16": (480, 864), "1:1": (640, 640), "4:3": (736, 544),
              "3:4": (544, 736), "21:9": (960, 416)},
@@ -99,6 +111,13 @@ class UsageError(Exception):
     pass
 
 
+class SidecarError(Exception):
+    """A sidecar file exists but cannot be parsed: a paid task id may be inside it."""
+    def __init__(self, path: Path, why: str, salvaged: str | None = None):
+        super().__init__(f"{path.name} exists but cannot be parsed ({why})")
+        self.path, self.salvaged = path, salvaged
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
@@ -141,7 +160,8 @@ def estimate_cost(duration: int, resolution: str, ratio: str) -> dict:
     w, h = frame_dims(resolution, ratio)
     tokens = round(duration * w * h * 24 / 1024 * TOKEN_CALIBRATION)
     cny = tokens * PRICE_CNY_PER_MTOK[resolution] / 1e6
-    return {"tokens": tokens, "cny": round(cny, 4), "usd": round(cny / CNY_PER_USD, 4), "width": w, "height": h}
+    return {"tokens": tokens, "cny": round(cny, 4), "usd": round(cny / CNY_PER_USD, 4), "width": w, "height": h,
+            "resolution": resolution, "ratio": ratio, "duration": duration}
 
 
 # ----------------------------------------------------------------------------- HTTP
@@ -240,8 +260,10 @@ class Client:
         return with_retries(lambda: http_request(method, url, self._headers(), data, timeout),
                             retries=retries, base=self.retry_base, what=f"{method} {path.split('/')[-1][:24]}")
 
-    def download(self, url: str, dest: Path) -> int:
-        """Download a CDN url to dest (atomic). Browser-like UA, NO Authorization header."""
+    def download(self, url: str, dest: Path, expect_s: float | None = None) -> int:
+        """Download a CDN url to dest (atomic). Browser-like UA, NO Authorization header.
+        The file is checked (mp4 header, decodable, long enough for expect_s) BEFORE it is moved into place; a truncated
+        or corrupt body is retried like a network error."""
         part = dest.with_name(dest.name + ".part")
 
         def once() -> Resp:
@@ -249,19 +271,23 @@ class Client:
             try:
                 with _opener(url, True).open(req, timeout=120) as r, open(part, "wb") as f:
                     shutil.copyfileobj(r, f, 1024 * 1024)
-                    return Resp(r.status, r.headers, b"")
+                    status, headers = r.status, r.headers
             except urllib.error.HTTPError as e:
                 return Resp(e.code, e.headers, e.read()[:2000])
             except Exception as e:
                 raise NetError(redact(f"{type(e).__name__}: {e}")) from None
+            if status == 200:
+                _check_mp4(part, expect_s)                       # raises NetError -> retried by with_retries
+            return Resp(status, headers, b"")
 
         resp = with_retries(once, retries=self.retries, base=self.retry_base, what="download " + safe_url(url)[-40:])
         if resp.status != 200:
             part.unlink(missing_ok=True)
             raise DownloadHttpError(resp.status, resp.text())
-        return _finalize_mp4(part, dest)
+        os.replace(part, dest)
+        return dest.stat().st_size
 
-    def download_curl(self, url: str, dest: Path) -> int:
+    def download_curl(self, url: str, dest: Path, expect_s: float | None = None) -> int:
         """Last-resort fallback: the CDN is known to accept curl's user agent. No Authorization header."""
         curl = shutil.which("curl")
         if not curl:
@@ -272,7 +298,9 @@ class Client:
         if proc.returncode != 0:
             part.unlink(missing_ok=True)
             raise NetError(redact(f"curl exit {proc.returncode}: {proc.stderr.strip()[:200]}"))
-        return _finalize_mp4(part, dest)
+        _check_mp4(part, expect_s)
+        os.replace(part, dest)
+        return dest.stat().st_size
 
     def download_any(self, url: str, dest: Path) -> int:
         """Download a small non-mp4 asset (last frame png/jpg). No Authorization header either."""
@@ -284,14 +312,67 @@ class Client:
         return len(resp.body)
 
 
-def _finalize_mp4(part: Path, dest: Path) -> int:
+def _check_mp4(part: Path, expect_s: float | None) -> None:
+    """Reject (and delete) a downloaded body that is not a complete, decodable mp4."""
     with open(part, "rb") as f:
         head = f.read(16)
     if head[4:8] != b"ftyp":
         part.unlink(missing_ok=True)
         raise NetError(f"downloaded file is not an mp4 (first bytes: {head[:12]!r})")
-    os.replace(part, dest)
-    return dest.stat().st_size
+    ok, why = verify_mp4(part, expect_s)
+    if not ok:
+        part.unlink(missing_ok=True)
+        raise NetError(f"downloaded mp4 is truncated or corrupt: {why}")
+
+
+def _parse_rate(r) -> float:
+    try:
+        a, _, b = str(r).partition("/")
+        v = float(a) / float(b or 1)
+        return v if v > 0 else 24.0
+    except (ValueError, ZeroDivisionError):
+        return 24.0
+
+
+def verify_mp4(path: Path, expect_s: float | None) -> tuple[bool, str]:
+    """(ok, reason). Needs ffprobe + ffmpeg: container must be readable, the whole stream must decode without errors
+    and the video must last at least MIN_DOWNLOAD_RATIO x expect_s (both by container duration and by decoded frames).
+    Without ffmpeg/ffprobe the check is skipped (with a warning) instead of blocking the download."""
+    if not (shutil.which("ffprobe") and shutil.which("ffmpeg")):
+        say("    WARNING: ffprobe/ffmpeg not found, the truncated-download check is skipped")
+        return True, "check skipped"
+    try:
+        pr = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type,r_frame_rate",
+                             "-show_entries", "format=duration", "-of", "json", str(path)],
+                            capture_output=True, text=True, timeout=60)
+        j = json.loads(pr.stdout or "{}")
+        vs = next((x for x in j.get("streams", []) if x.get("codec_type") == "video"), None)
+        if pr.returncode != 0 or vs is None:
+            return False, f"ffprobe cannot read it ({(pr.stderr or 'no video stream').strip()[:160]})"
+        dur = float((j.get("format") or {}).get("duration") or 0)
+        fps = _parse_rate(vs.get("r_frame_rate"))
+        dc = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(path), "-map", "0:v:0", "-map", "0:a?",
+                             "-f", "null", "-progress", "pipe:1", "-"], capture_output=True, text=True, timeout=300)
+    except (subprocess.TimeoutExpired, ValueError, OSError) as e:
+        return False, f"could not be verified ({type(e).__name__}: {e})"
+    errs = (dc.stderr or "").strip()
+    if dc.returncode != 0 or errs:
+        return False, f"decode errors ({errs.splitlines()[0][:160] if errs else 'rc ' + str(dc.returncode)})"
+    frames = 0
+    for line in dc.stdout.splitlines():
+        if line.startswith("frame="):
+            try:
+                frames = int(line.split("=", 1)[1])
+            except ValueError:
+                pass
+    if expect_s:
+        need_s = MIN_DOWNLOAD_RATIO * expect_s
+        if dur < need_s or frames < need_s * fps - 1e-6:
+            return False, (f"only {dur:.2f} s / {frames} frames, expected about {expect_s:g} s "
+                           f"(>= {need_s:.2f} s / {math.ceil(need_s * fps)} frames)")
+    elif frames < 1:
+        return False, "no decodable video frames"
+    return True, f"{dur:.2f} s / {frames} frames"
 
 
 class DownloadHttpError(Exception):
@@ -405,30 +486,43 @@ def build_shot_request(shot: dict, args, negative: str, project_dir: Path) -> di
               "generate_audio": bool(args.audio), "watermark": False,
               "return_last_frame": bool(args.return_last_frame)}
     if args.profile == "ephone-ark":
-        body = {"model": args.model, "content": content, **params, "execution_expires_after": 172800}
+        body = {"model": args.model, "content": content, **params}
+        if not getattr(args, "no_expires", False):
+            body["execution_expires_after"] = EXPIRES_AFTER_S
         if args.extra_json:
             deep_merge(body, args.extra_json)
-        dur = body.get("duration")
-        has_seed = "seed" in body
+        final = body                                     # where resolution/ratio/duration/model really end up
     else:
         inp = {"content": content, **params}
         if args.extra_json:
             deep_merge(inp, args.extra_json)
         body = {"model": args.model, "input": inp}
-        dur = inp.get("duration")
-        has_seed = "seed" in inp
-    if not isinstance(dur, int) or dur < MIN_DURATION:
+        final = inp
+    # Everything that drives the price is read from the FINAL body (after --extra-json), never from the CLI flags,
+    # so the estimate and the budget check always describe what is really sent.
+    dur, res, ratio = final.get("duration"), final.get("resolution"), final.get("ratio")
+    model = body.get("model")
+    if not isinstance(dur, int) or isinstance(dur, bool) or dur < MIN_DURATION:
         raise UsageError(f"{shot['id']}: duration {dur!r} is below the {MIN_DURATION} s model minimum")
-    if has_seed and "seedance-2-5" in args.model:
+    if dur > MAX_DURATION:
+        raise UsageError(f"{shot['id']}: duration {dur!r} is above the {MAX_DURATION} s model maximum")
+    if res not in DIMS:
+        raise UsageError(f"{shot['id']}: resolution {res!r} is not one of {list(DIMS)} (cannot estimate the cost)")
+    if ratio not in RATIOS:
+        raise UsageError(f"{shot['id']}: ratio {ratio!r} is not one of {list(RATIOS)} (cannot estimate the cost)")
+    if not isinstance(model, str) or not model:
+        raise UsageError(f"{shot['id']}: model must be a non-empty string, got {model!r}")
+    if "seed" in final and "seedance-2-5" in model:
         raise UsageError("Seedance 2.5 does not accept a 'seed' parameter")
-    est = estimate_cost(dur, args.resolution, args.ratio)
+    est = estimate_cost(dur, res, ratio)
     return {"shot": shot["id"], "prompt": prompt, "body": body, "estimate": est, "media": media,
-            "params": {**params, "duration": dur, "model": args.model, "profile": args.profile}}
+            "params": {**params, "resolution": res, "ratio": ratio, "duration": dur, "model": model, "profile": args.profile}}
 
 
 # ----------------------------------------------------------------------------- state normalisation
 def normalize_status(profile: str, raw: dict) -> dict:
-    """-> {"state": pending|succeeded|failed, "status": str, "video_url", "last_frame_url", "error"}"""
+    """-> {"state": pending|succeeded|failed|no_video_url, "status": str, "video_url", "last_frame_url", "error"}
+    'no_video_url' = the provider says the task finished OK (billed) but returned no url: never retryable as a new submit."""
     status = str(raw.get("status", "")).lower()
     out = {"status": status, "video_url": None, "last_frame_url": None, "error": None}
     if profile == "ephone-ark":
@@ -446,14 +540,27 @@ def normalize_status(profile: str, raw: dict) -> dict:
         out["error"] = raw.get("error")
         done = status == "completed"
     if done:
-        out["state"] = "succeeded" if out["video_url"] else "failed"
+        out["state"] = "succeeded" if out["video_url"] else "no_video_url"
         if not out["video_url"]:
-            out["error"] = {"code": "NoVideoUrl", "message": "task finished but the response has no video url"}
+            out["error"] = {"code": "NoVideoUrl", "message": "task finished but the response has no video url "
+                                                              "(the task is NOT resubmitted; re-run to poll the same task again)"}
     elif status in FAIL_STATES:
         out["state"] = "failed"
     else:
         out["state"] = "pending"
     return out
+
+
+def provider_info(args) -> dict:
+    """The provider settings that live as constants in this file (what a provider.json would have held). No secrets."""
+    return {"source": "constants at the top of generate_clips.py; no provider.json exists",
+            "base_url": args.base_url, "base_url_env": "EPHONE_BASE_URL", "api_key_env": "EPHONE_API_KEY (never printed or stored)",
+            "default_profile": "ephone-ark", "profiles": PROFILES, "model": args.model, "default_model": DEFAULT_MODEL,
+            "duration_s": {"min": MIN_DURATION, "max": MAX_DURATION},
+            "execution_expires_after_s": None if args.no_expires else EXPIRES_AFTER_S,
+            "pricing": {"cny_per_million_tokens": PRICE_CNY_PER_MTOK, "cny_per_usd": CNY_PER_USD,
+                        "token_calibration": round(TOKEN_CALIBRATION, 6)},
+            "cdn_user_agent": BROWSER_UA}
 
 
 def fmt_error(err) -> str:
@@ -475,19 +582,57 @@ class Job:
         self.errors = 0
         self.last_status = None
         self.last_beat = time.monotonic()
+        self.save_failed = False
         self.outcome = "pending"                   # downloaded | failed | timeout | poll_error | submit_failed ...
         self.detail = ""
 
-    def save(self) -> None:
+    def save(self) -> bool:
+        """Write the sidecar. Never raises: on a disk error it says so loudly (with the task id) and returns False."""
         self.sc["updated_at"] = now_iso()
-        write_json_atomic(self.sidecar_path, self.sc)
+        try:
+            write_json_atomic(self.sidecar_path, self.sc)
+            return True
+        except OSError as e:
+            if not self.save_failed:                   # say it once per job, loudly, with the id
+                tid = self.task_id or self.sc.get("task_id")
+                say(f"[{self.shot}] ERROR: cannot write {self.sidecar_path}: {e} (further sidecar updates of this shot are not saved)"
+                    + (f"\n[{self.shot}] THE PAID TASK ID IS {tid} -- keep it. Resume with: generate_clips.py "
+                       f"--resume-task {tid} --shot {self.shot}" if tid else ""), err=True)
+            self.save_failed = True
+            return False
 
 
 def load_sidecar(path: Path) -> dict | None:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    """None when there is no sidecar. A sidecar that exists but is unreadable/invalid raises SidecarError (it may hold the
+    id of a paid task, so it must never be silently treated as 'no previous task')."""
+    if not path.exists():
         return None
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as e:
+        raise SidecarError(path, f"{type(e).__name__}: {e}")
+    try:
+        data = json.loads(text)
+        if not isinstance(data, dict):
+            raise ValueError("not a JSON object")
+    except ValueError as e:
+        m = re.search(r'"task_id"\s*:\s*"([^"\s]+)"', text)
+        raise SidecarError(path, str(e)[:80], m.group(1) if m else None)
+    return data
+
+
+def backup_corrupt_sidecar(path: Path) -> None:
+    """Keep an unreadable sidecar as <name>.corrupt before a forced resubmit overwrites it."""
+    if not path.exists():
+        return
+    try:
+        load_sidecar(path)
+    except SidecarError:
+        try:
+            shutil.copy2(path, path.with_name(path.name + ".corrupt"))
+            say(f"[{path.stem}] unreadable sidecar kept as {path.name}.corrupt")
+        except OSError as e:
+            say(f"[{path.stem}] WARNING: could not back up the unreadable sidecar: {e}", err=True)
 
 
 def new_sidecar(req: dict, args, previous: list) -> dict:
@@ -500,8 +645,11 @@ def new_sidecar(req: dict, args, previous: list) -> dict:
 
 def submit_job(client: Client, job: Job, args, previous: list) -> bool:
     """One POST, never retried. The sidecar is written before AND right after the POST."""
+    backup_corrupt_sidecar(job.sidecar_path)
     job.sc = new_sidecar(job.req, args, previous)
-    job.save()                                     # a crash mid-POST leaves state=submitting (outcome unknown)
+    if not job.save():                             # a crash mid-POST leaves state=submitting (outcome unknown)
+        job.outcome, job.detail = "sidecar_unwritable", "cannot write the sidecar, so nothing was submitted (no task id could be kept)"
+        return False
     try:
         resp = client.api("POST", PROFILES[args.profile]["submit"], job.req["body"], retries=0, timeout=90)
     except NetError as e:
@@ -516,18 +664,22 @@ def submit_job(client: Client, job: Job, args, previous: list) -> bool:
             tid = None
         if tid:
             job.task_id = str(tid)
+            say(f"[{job.shot}] submitted, task id {job.task_id}")   # printed BEFORE the write: it survives a disk error
             job.sc.update(task_id=job.task_id, state="submitted", submitted_at=now_iso())
-            job.save()                             # <- the paid task id is on disk before anything else happens
-            say(f"[{job.shot}] submitted, task id {job.task_id} (saved to {job.sidecar_path.name})")
+            if job.save():                         # <- the paid task id is on disk before anything else happens
+                say(f"[{job.shot}] task id saved to {job.sidecar_path.name}")
             return True
         job.sc.update(state="submit_unknown", error=f"HTTP {resp.status} without task id: {resp.text(300)}")
         job.save()
         job.outcome, job.detail = "submit_unknown", f"HTTP {resp.status} but no task id in response: {resp.text(300)}"
         return False
     state = "submit_failed" if resp.status < 500 else "submit_unknown"
-    job.sc.update(state=state, error=f"HTTP {resp.status}: {resp.text(400)}")
+    hint = ""
+    if state == "submit_failed" and "execution_expires" in resp.text(2000).lower():
+        hint = "  (the gateway rejected execution_expires_after: nothing was billed, retry with --no-expires)"
+    job.sc.update(state=state, error=f"HTTP {resp.status}: {resp.text(400)}{hint}")
     job.save()
-    job.outcome, job.detail = state, f"HTTP {resp.status}: {resp.text(400)}"
+    job.outcome, job.detail = state, f"HTTP {resp.status}: {resp.text(400)}{hint}"
     return False
 
 
@@ -578,10 +730,24 @@ def probe_file(path: Path) -> str:
         return ""
 
 
-def fetch_video(client: Client, job: Job, args, url: str) -> int:
+def last_frame_ext(url: str) -> str:
+    """File extension for the last-frame image: taken from a server-supplied url, so only png/jpg/jpeg/webp are allowed."""
+    ext = Path(urllib.parse.urlsplit(url).path).suffix.lower()
+    return ext if ext in LAST_FRAME_EXTS else ".png"
+
+
+def expected_seconds(job: Job, norm: dict) -> float | None:
+    """Duration the finished task should have: what the provider reports, else what was requested."""
+    for v in ((norm.get("raw") or {}).get("duration"), job.req["params"].get("duration")):
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0:
+            return float(v)
+    return None
+
+
+def fetch_video(client: Client, job: Job, args, url: str, expect_s: float | None = None) -> int:
     """urllib with a browser UA -> on 403/404/410 refresh the signed url once -> if still 403, fall back to curl."""
     try:
-        return client.download(url, job.mp4)
+        return client.download(url, job.mp4, expect_s)
     except DownloadHttpError as e:
         err = e
     if err.status in (403, 404, 410):
@@ -595,19 +761,19 @@ def fetch_video(client: Client, job: Job, args, url: str) -> int:
         if fresh:
             url = fresh
             try:
-                return client.download(url, job.mp4)
+                return client.download(url, job.mp4, expect_s)
             except DownloadHttpError as e2:
                 err = e2
         if err.status == 403 and shutil.which("curl"):
             say(f"[{job.shot}] urllib is still refused by the CDN; trying curl")
-            return client.download_curl(url, job.mp4)
+            return client.download_curl(url, job.mp4, expect_s)
     raise err
 
 
 def finish_download(client: Client, job: Job, args, norm: dict) -> None:
     say(f"[{job.shot}] downloading {safe_url(norm['video_url'])}")
     try:
-        nbytes = fetch_video(client, job, args, norm["video_url"])
+        nbytes = fetch_video(client, job, args, norm["video_url"], expected_seconds(job, norm))
     except (DownloadHttpError, NetError) as e:
         job.outcome, job.detail = "download_failed", f"{e} (the task is still queryable: --resume-task {job.task_id} --shot {job.shot})"
         job.sc.update(state="download_failed", error=job.detail)
@@ -617,7 +783,7 @@ def finish_download(client: Client, job: Job, args, norm: dict) -> None:
     job.sc.update(state="downloaded", downloaded={"path": job.mp4.name, "bytes": nbytes, "at": now_iso(), "probe": info})
     lf = norm.get("last_frame_url")
     if args.return_last_frame and lf:
-        ext = Path(urllib.parse.urlsplit(lf).path).suffix or ".png"
+        ext = last_frame_ext(lf)
         try:
             client.download_any(lf, job.mp4.with_name(f"{job.shot}.last{ext}"))
             job.sc["downloaded"]["last_frame"] = f"{job.shot}.last{ext}"
@@ -654,6 +820,13 @@ def handle_poll_result(client: Client, job: Job, args, norm: dict) -> bool:
                         "ratio": raw.get("ratio"), "generate_audio": raw.get("generate_audio"),
                         "video_url": safe_url(norm["video_url"]) if norm["video_url"] else None,
                         "error": norm["error"]}
+    if norm["state"] == "no_video_url":
+        job.outcome, job.detail = "no_video_url", fmt_error(norm["error"])
+        job.sc.update(state="no_video_url", error=norm["error"])
+        job.save()
+        say(f"[{job.shot}] task {job.task_id} ended '{status}' but returned no video url; it stays resumable "
+            f"(re-run, or --resume-task {job.task_id} --shot {job.shot})", err=True)
+        return True
     if norm["state"] == "failed":
         job.outcome, job.detail = status if status in FAIL_STATES else "failed", fmt_error(norm["error"])
         job.sc.update(state=job.outcome, error=norm["error"])
@@ -667,14 +840,15 @@ def handle_poll_result(client: Client, job: Job, args, norm: dict) -> bool:
 
 # ----------------------------------------------------------------------------- planning / printing
 def fmt_est(est: dict) -> str:
-    return f"{est['tokens']:,} tokens ~ CNY {est['cny']:.2f} ~ USD {est['usd']:.2f}"
+    return (f"{est['tokens']:,} tokens ~ CNY {est['cny']:.2f} ~ USD {est['usd']:.2f}"
+            f"  [{est['resolution']} {est['ratio']} {est['duration']}s]")
 
 
 def check_budget(n_clips: int, total_cny: float, args) -> list:
     problems = []
     if n_clips > args.budget_max_clips:
         problems.append(f"{n_clips} clips to submit > --budget-max-clips {args.budget_max_clips}")
-    if total_cny > args.budget_max_cny + 1e-9:
+    if not (total_cny <= args.budget_max_cny + 1e-9):   # also blocks when either side is NaN
         problems.append(f"estimated CNY {total_cny:.2f} > --budget-max-cny {args.budget_max_cny:g}")
     return problems
 
@@ -682,9 +856,22 @@ def check_budget(n_clips: int, total_cny: float, args) -> list:
 def decide_action(shot_id: str, clips_dir: Path, args) -> tuple[str, str, dict | None]:
     """-> (action, why, sidecar). action: skip | submit | resume | refuse"""
     mp4 = clips_dir / f"{shot_id}.mp4"
-    sc = load_sidecar(clips_dir / f"{shot_id}.json")
+    bad = None
+    try:
+        sc = load_sidecar(clips_dir / f"{shot_id}.json")
+    except SidecarError as e:
+        sc, bad = None, e
     if mp4.exists() and mp4.stat().st_size > 0 and not args.force:
         return "skip", f"{mp4.name} already exists (use --force to regenerate)", sc
+    if bad is not None:
+        if args.force:
+            return ("submit", f"forced new submit; the unreadable {bad.path.name} is kept as {bad.path.name}.corrupt"
+                    + (f" (task id found inside: {bad.salvaged})" if bad.salvaged else ""),
+                    {"task_id": bad.salvaged} if bad.salvaged else None)
+        return "refuse", (f"{bad}; a paid task may exist at the provider and resubmitting could double-bill. "
+                          f"Repair or delete {bad.path.name}"
+                          + (f" (it seems to contain task id {bad.salvaged}: --resume-task {bad.salvaged} --shot {shot_id})"
+                             if bad.salvaged else f", then re-run; or use --force to submit anyway")), None
     if args.force or not sc:
         return "submit", "forced new submit" if args.force and sc else "no previous task", sc
     state = sc.get("state")
@@ -712,7 +899,20 @@ def load_shotlist(path: Path):
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
         raise UsageError(f"cannot read shotlist {path}: {e}")
-    return data.get("shots", []), (data.get("look") or {}).get("negative", "")
+    shots = data.get("shots", []) if isinstance(data, dict) else None
+    if not isinstance(shots, list):
+        raise UsageError(f"{path} has no 'shots' list")
+    seen = set()
+    for i, s in enumerate(shots):
+        sid = s.get("id") if isinstance(s, dict) else None
+        if not isinstance(sid, str) or not ID_RE.fullmatch(sid):
+            raise UsageError(f"shot #{i + 1}: invalid id {sid!r} (allowed: letters, digits, '_' and '-'; ids become file names)")
+        if sid in seen:
+            raise UsageError(f"duplicate shot id {sid!r} in {path}")
+        seen.add(sid)
+        if not isinstance(s.get("seedance_prompt"), str) or not s["seedance_prompt"].strip():
+            raise UsageError(f"shot {sid}: 'seedance_prompt' must be a non-empty string")
+    return shots, (data.get("look") or {}).get("negative", "")
 
 
 def select_shots(shots: list, wanted: list | None) -> list:
@@ -773,9 +973,12 @@ def cmd_generate(client: Client, args, shots: list, negative: str, project_dir: 
     else:
         for sid, action, why, _ in plan:
             say(f"[{sid}] {action}: {why}")
+    res_used = sorted({reqs[sid]["estimate"]["resolution"] for sid in to_submit} or {args.resolution})
+    price_note = ", ".join(f"{r} CNY {PRICE_CNY_PER_MTOK[r]:g}/M tokens" for r in res_used)
     say(f"estimate (new submits only): {len(to_submit)} clip(s), {total_tok:,} tokens ~ CNY {total_cny:.2f} "
         f"~ USD {total_cny / CNY_PER_USD:.2f}  [formula: duration x W x H x 24 / 1024 tokens, "
-        f"CNY {PRICE_CNY_PER_MTOK[args.resolution]:g}/M tokens, CNY 7 = USD 1; only successful clips are billed]")
+        f"{price_note}, CNY 7 = USD 1; resolution/ratio/duration are read from the final request body; "
+        f"only successful clips are billed]")
     say(f"budget: max {args.budget_max_clips} clips / CNY {args.budget_max_cny:g} -> "
         + ("OK" if not problems else "BLOCKED: " + "; ".join(problems)))
     refused = [sid for sid, a, _, _ in plan if a == "refuse"]
@@ -838,15 +1041,15 @@ def cmd_generate(client: Client, args, shots: list, negative: str, project_dir: 
                 done.append(job)
         if active:
             time.sleep(args.poll_interval)
-    return summarize(results, done, args.resolution)
+    return summarize(results, done)
 
 
-def summarize(results: list, done: list, resolution: str = "720p") -> int:
+def summarize(results: list, done: list) -> int:
     for job in done:
         results.append((job.shot, job.outcome, job.detail if job.outcome != "downloaded" else job.mp4.name))
     results.sort()
     say("\nshot  result              detail")
-    spent = 0
+    spent, spent_cny = 0, 0.0
     bad = 0
     for sid, outcome, detail in results:
         say(f"{sid:<5} {outcome:<19} {detail}"[:200])
@@ -856,9 +1059,9 @@ def summarize(results: list, done: list, resolution: str = "720p") -> int:
         tok = (job.sc.get("result", {}).get("usage") or {}).get("total_tokens")
         if job.outcome == "downloaded" and tok:
             spent += tok
+            spent_cny += tok * PRICE_CNY_PER_MTOK[job.req["params"]["resolution"]] / 1e6
     if spent:
-        cny = spent * PRICE_CNY_PER_MTOK[resolution] / 1e6
-        say(f"billed this run (provider usage): {spent:,} tokens ~ CNY {cny:.2f} ~ USD {cny / CNY_PER_USD:.2f}")
+        say(f"billed this run (provider usage): {spent:,} tokens ~ CNY {spent_cny:.2f} ~ USD {spent_cny / CNY_PER_USD:.2f}")
     return EXIT_FAIL if bad else EXIT_OK
 
 
@@ -872,7 +1075,12 @@ def cmd_resume(client: Client, args, shots: list, negative: str, project_dir: Pa
         raise UsageError(f"{mp4} already exists; use --force to overwrite it")
     job = Job(req, clips_dir, "resume")
     job.task_id = args.resume_task
-    old = load_sidecar(job.sidecar_path) or {}
+    try:
+        old = load_sidecar(job.sidecar_path) or {}
+    except SidecarError as e:
+        say(f"[{job.shot}] note: {e}; continuing with the task id you gave ({job.task_id})")
+        backup_corrupt_sidecar(job.sidecar_path)
+        old = {"previous_tasks": [e.salvaged] if e.salvaged and e.salvaged != job.task_id else []}
     prev = list(old.get("previous_tasks", []))
     if old.get("task_id") and old["task_id"] != job.task_id:
         prev.insert(0, old["task_id"])
@@ -914,9 +1122,14 @@ def build_parser() -> argparse.ArgumentParser:
                 "    (optional per-shot 'use_from' in shotlist.json, seconds into the clip).\n"
                 "  * per-shot overrides in shotlist.json: \"seedance\": {\"reference_images\": [...], \"first_frame\": ..., \"last_frame\": ...}\n"
                 "  * the ephone-task profile's 'input' layout is Ark-shaped and unverified live; adjust with --extra-json.\n"
+                "  * the cost estimate and the budget check use the resolution/ratio/duration of the FINAL request body, so an\n"
+                "    --extra-json override is priced too; execution_expires_after is sent unless --no-expires.\n"
                 "  * exit codes: 0 ok, 1 some shot failed/timed out, 2 usage error or --yes missing, 3 budget cap hit."))
     m = p.add_argument_group("mode (default: generate; requires --yes)")
     m.add_argument("--probe", action="store_true", help="GET /v1/models and list seedance/seedream ids (free)")
+    m.add_argument("--show-provider", action="store_true",
+                   help="print the effective provider settings (base URL, model, endpoints, prices) as JSON and exit; "
+                        "there is no provider.json, these are constants at the top of this script")
     m.add_argument("--dry-run", action="store_true", help="print exact request bodies (key redacted) + cost estimate; send nothing")
     m.add_argument("--resume-task", metavar="TASK_ID", help="poll+download an already submitted task (needs --shot); no new submit")
     m.add_argument("--yes", action="store_true", help="REQUIRED to actually submit (and spend) anything")
@@ -936,7 +1149,11 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--first-frame", metavar="PATH_OR_URL", help="image-to-video first frame (cannot be mixed with --reference-image)")
     g.add_argument("--last-frame", metavar="PATH_OR_URL", help="last frame (needs --first-frame)")
     g.add_argument("--return-last-frame", action="store_true", help="ask for and download the last frame as <shot>.last.<ext>")
-    g.add_argument("--extra-json", type=json.loads, metavar="JSON", help="object deep-merged into the request body (ark) or 'input' (task)")
+    g.add_argument("--extra-json", type=json.loads, metavar="JSON",
+                   help="object deep-merged into the request body (ark) or 'input' (task); resolution/ratio/duration set "
+                        "here are validated and used for the cost estimate and the budget check")
+    g.add_argument("--no-expires", action="store_true",
+                   help="do not send execution_expires_after (ark profile; use it if the gateway rejects that field)")
     b = p.add_argument_group("budget")
     b.add_argument("--budget-max-cny", type=float, default=40.0, help="abort before submitting if the estimate exceeds this (default 40)")
     b.add_argument("--budget-max-clips", type=int, default=3, help="abort before submitting if more clips would be submitted (default 3)")
@@ -963,17 +1180,26 @@ def main(argv=None) -> int:
     key = os.environ.get("EPHONE_API_KEY", "").strip().strip("'\"")
     register_secret(key)
     try:
-        modes = [bool(args.probe), bool(args.dry_run), bool(args.resume_task)]
+        modes = [bool(args.probe), bool(args.dry_run), bool(args.resume_task), bool(args.show_provider)]
         if sum(modes) > 1:
-            raise UsageError("--probe, --dry-run and --resume-task are mutually exclusive")
+            raise UsageError("--probe, --dry-run, --resume-task and --show-provider are mutually exclusive")
         args.base_url = (args.base_url or os.environ.get("EPHONE_BASE_URL") or DEFAULT_BASE_URL).rstrip("/")
         pu = urllib.parse.urlsplit(args.base_url)
         if pu.scheme not in ("http", "https") or not pu.hostname:
             raise UsageError(f"invalid base URL {args.base_url!r}")
         if pu.scheme == "http" and not is_loopback_url(args.base_url):
             raise UsageError("refusing plain http for a non-local host (the API key would travel unencrypted)")
-        if args.max_concurrent < 1 or args.budget_max_clips < 0 or args.timeout_min <= 0:
-            raise UsageError("--max-concurrent must be >= 1, --budget-max-clips >= 0, --timeout-min > 0")
+        if args.max_concurrent < 1 or args.budget_max_clips < 0:
+            raise UsageError("--max-concurrent must be >= 1 and --budget-max-clips >= 0")
+        if not math.isfinite(args.budget_max_cny) or args.budget_max_cny < 0:
+            raise UsageError(f"--budget-max-cny must be a finite number >= 0 (got {args.budget_max_cny!r}); "
+                             f"a NaN/inf cap would silently disable the spending limit, use a large number instead")
+        for name in ("timeout_min", "poll_interval", "retry_base_delay"):
+            v = getattr(args, name)
+            if not math.isfinite(v) or v < 0 or (name == "timeout_min" and v == 0):
+                raise UsageError(f"--{name.replace('_', '-')} must be a finite number " + ("> 0" if name == "timeout_min" else ">= 0"))
+        if args.max_retries < 0 or args.poll_retries < 0 or args.max_poll_errors < 1:
+            raise UsageError("--max-retries/--poll-retries must be >= 0 and --max-poll-errors >= 1")
         if args.extra_json is not None and not isinstance(args.extra_json, dict):
             raise UsageError("--extra-json must be a JSON object")
         if args.shot and not args.resume_task:
@@ -982,6 +1208,10 @@ def main(argv=None) -> int:
         shotlist = (args.shotlist or project_dir / "shotlist.json")
         clips_dir = (args.clips_dir or project_dir / "out" / "clips")
         client = Client(args.base_url, key or None, args.max_retries, args.retry_base_delay)
+
+        if args.show_provider:
+            print(json.dumps(provider_info(args), indent=2))
+            return EXIT_OK
 
         if args.probe:
             return cmd_probe(client, args)

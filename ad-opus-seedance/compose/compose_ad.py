@@ -11,7 +11,7 @@ Everything except the two video streams is drawn with Pillow/numpy (4x supersamp
 are piped to ffmpeg for the final H.264/AAC encode.
 
 Examples (run from the project dir):
-  python compose/compose_ad.py --top out/previs.mp4 --bottom seedance/final.mp4 --out out/ad.mp4
+  python compose/compose_ad.py --top out/previs.mp4 --bottom out/final_ai.mp4 --out out/ad.mp4
   python compose/compose_ad.py --top a.mp4 --bottom b.mp4 --out ad_1080.mp4 --scale 1.5 --audio music.wav \\
          --header "Opus 5.5" --badge-top Blender --badge-bottom "Kleo AI" --icon-bottom kleo
   python compose/compose_ad.py --top a.mp4 --bottom b.mp4 --out x.mp4 --png-at 0.3,2,6.5,12 --png-dir /tmp/frames
@@ -595,10 +595,10 @@ def main():
     ap.add_argument("--out", required=True, help="output .mp4 (H.264 yuv420p, +faststart)")
     ap.add_argument("--audio", help="optional audio file; trimmed/padded to the video duration, encoded AAC")
     ap.add_argument("--scale", type=float, default=1.0, help="1 -> 720x1280 (default), 1.5 -> 1080x1920")
-    ap.add_argument("--header", default=None, help="header text under the logo (default from layout: 'Opus 5.5'; '' hides)")
+    ap.add_argument("--header", default="Sonnet 5.5", help="header text under the logo (reference ad: 'Opus 5.5'; '' hides)")
     ap.add_argument("--badge-top", default="Blender", help="label of the top card badge ('' hides)")
-    ap.add_argument("--badge-bottom", default="Seedance 2.5", help="label of the bottom card badge ('' hides)")
-    ap.add_argument("--icon-bottom", default="seedance", choices=["seedance", "kleo", "blender"],
+    ap.add_argument("--badge-bottom", default="Kleo AI", help="label of the bottom card badge ('' hides)")
+    ap.add_argument("--icon-bottom", default="kleo", choices=["seedance", "kleo", "blender"],
                     help="icon of the bottom card badge (kleo = Kleo AI mark from kleooai.com)")
     ap.add_argument("--fps", type=float, default=None, help="output fps (default 24)")
     ap.add_argument("--duration", type=float, default=None, help="override duration in s (default: shorter input)")

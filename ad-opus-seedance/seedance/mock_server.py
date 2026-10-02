@@ -19,8 +19,14 @@ Fault injection (CLI flags or POST /__mock/config with a JSON object):
   --submit-status CODE --submit-errors N   the next N submits answer CODE (e.g. 500) WITHOUT creating a task
   --polls-to-done N           polls needed before the terminal state (default 3; huge = never finishes)
   config only (POST /__mock/config): drop_poll N (close the connection on the next N polls), fail_status
-                              ('failed'|'cancelled'|'expired' for failing tasks), cdn_only_curl (403 unless UA starts with curl/)
+                              ('failed'|'cancelled'|'expired' for failing tasks), cdn_only_curl (403 unless UA starts with curl/),
+                              truncate_download N (the next N mp4 downloads send only truncate_frac (default 0.33) of the bytes,
+                              with NO Content-Length, then close), omit_video_url N (the next N terminal polls say 'succeeded'/
+                              'completed' but carry no video url), reject_expires (400 when the ark body carries
+                              execution_expires_after)
   --leak-key-in-errors        error bodies echo the received Authorization header (tests redaction)
+  --tmp-dir DIR               where the generated clips are cached (default: a fresh system temp dir); the directory the mock
+                              creates is always removed when the server exits (SIGTERM/SIGINT/normal exit)
 Control: GET /__mock/requests, /__mock/stats, /__mock/tasks, POST /__mock/reset, POST /__mock/config.
 The Authorization header value is never stored in the request log (only ok/bad/none).
 """
@@ -31,6 +37,8 @@ import base64
 import hashlib
 import json
 import re
+import shutil
+import signal
 import struct
 import subprocess
 import sys
@@ -76,8 +84,8 @@ class State:
                     "fail_contains": args.fail_contains, "poll_429": args.poll_429, "download_503": args.download_503,
                     "submit_status": args.submit_status, "submit_errors": args.submit_errors,
                     "leak_key_in_errors": args.leak_key_in_errors, "drop_poll": 0, "fail_status": "failed",
-                    "cdn_only_curl": False}
-        self.tmp = Path(tempfile.mkdtemp(prefix="mock_ephone_"))
+                    "cdn_only_curl": False, "truncate_download": 0, "truncate_frac": 0.33, "omit_video_url": 0, "reject_expires": False}
+        self.tmp = Path(tempfile.mkdtemp(prefix="mock_ephone_", dir=getattr(args, "tmp_dir", None)))
         self.clip_cache: dict = {}
         self.base = ""
 
@@ -244,6 +252,9 @@ class Handler(BaseHTTPRequestHandler):
         p = body if profile == "ark" else body.get("input")
         if not isinstance(p, dict):
             return self._err(400, "InvalidParameter", "missing 'input' object", "input")
+        if "execution_expires_after" in p and st.cfg.get("reject_expires"):
+            return self._err(400, "InvalidParameter", "parameter 'execution_expires_after' is not supported by this gateway",
+                             "execution_expires_after")
         if "seed" in p and "2-5" in model:
             return self._err(400, "InvalidParameter", "parameter 'seed' is not supported by this model", "seed")
         dur = p.get("duration", 5)
@@ -344,6 +355,12 @@ class Handler(BaseHTTPRequestHandler):
         status = "queued" if k <= 1 else ("running" if k < done_at else "terminal")
         w, h = DIMS[t["resolution"]].get(t["ratio"], DIMS[t["resolution"]]["16:9"])
         tokens = round(t["duration"] * w * h * 24 / 1024 * 1.0104)
+        omit = False
+        if status == "terminal" and not t["fail"]:
+            with st.lock:
+                if st.cfg.get("omit_video_url", 0) > 0:
+                    st.cfg["omit_video_url"] -= 1
+                    omit = True
         if profile == "ark":
             out = {"id": tid, "model": t["model"], "status": "queued", "content": None, "error": None,
                    "created_at": t["created_at"], "updated_at": int(time.time())}
@@ -357,8 +374,8 @@ class Handler(BaseHTTPRequestHandler):
                                if fs == "failed" else None)
                 else:
                     sig = hashlib.sha1((tid + "mock").encode()).hexdigest()[:16]
-                    content = {"video_url": f"{st.base}/cdn/{tid}.mp4?sig={sig}&expires={int(time.time()) + 86400}"}
-                    if t["last_frame"]:
+                    content = {} if omit else {"video_url": f"{st.base}/cdn/{tid}.mp4?sig={sig}&expires={int(time.time()) + 86400}"}
+                    if t["last_frame"] and not omit:
                         content["last_frame_url"] = f"{st.base}/cdn/{tid}_last.png?sig={sig}"
                     out.update(status="succeeded", content=content, usage={"completion_tokens": tokens, "total_tokens": tokens},
                                seed=123456, resolution=t["resolution"], ratio=t["ratio"], duration=t["duration"],
@@ -374,7 +391,7 @@ class Handler(BaseHTTPRequestHandler):
                 out.update(status="failed", error="generation failed: output video may contain sensitive information")
             else:
                 sig = hashlib.sha1((tid + "mock").encode()).hexdigest()[:16]
-                out.update(status="completed", outputs=[f"{st.base}/cdn/{tid}.mp4?sig={sig}"])
+                out.update(status="completed", outputs=[] if omit else [f"{st.base}/cdn/{tid}.mp4?sig={sig}"])
         self._send(200, out)
 
     # ---- CDN
@@ -426,7 +443,22 @@ class Handler(BaseHTTPRequestHandler):
                 return self._record("cdn")
             ctype = "video/mp4"
         with st.lock:
-            st.stats["downloads_ok"] += 1
+            cut = m.group(2) == ".mp4" and st.cfg.get("truncate_download", 0) > 0
+            if cut:
+                st.cfg["truncate_download"] -= 1
+                st.stats["downloads_truncated"] = st.stats.get("downloads_truncated", 0) + 1
+            else:
+                st.stats["downloads_ok"] += 1
+        if cut:                                    # no Content-Length: the body just ends early when the connection closes
+            frac = float(st.cfg.get("truncate_frac", 0.33))
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.end_headers()
+            self.wfile.write(data[:max(32, int(len(data) * frac))])
+            self.wfile.flush()
+            self.close_connection = True
+            self._last_status = 200
+            return self._record("cdn")
         self._send(200, data, ctype)
         self._record("cdn")
 
@@ -445,22 +477,33 @@ def main(argv=None) -> int:
     ap.add_argument("--submit-errors", type=int, default=0)
     ap.add_argument("--leak-key-in-errors", action="store_true")
     ap.add_argument("--port-file", help="write the base URL here once listening")
+    ap.add_argument("--tmp-dir", help="parent directory for the mock's scratch dir (default: the system temp dir)")
     args = ap.parse_args(argv)
     if args.host not in ("127.0.0.1", "localhost", "::1"):
         print("mock_server.py only binds to loopback", file=sys.stderr)
         return 2
     st = State(args)
     Handler.state = st
-    srv = ThreadingHTTPServer((args.host, args.port), Handler)
-    srv.daemon_threads = True
-    st.base = f"http://{args.host}:{srv.server_address[1]}"
-    print(f"MOCK_LISTENING {st.base}", flush=True)
-    if args.port_file:
-        Path(args.port_file).write_text(st.base)
     try:
-        srv.serve_forever()
-    except KeyboardInterrupt:
-        pass
+        srv = ThreadingHTTPServer((args.host, args.port), Handler)
+        srv.daemon_threads = True
+        st.base = f"http://{args.host}:{srv.server_address[1]}"
+
+        def _stop(signum, frame):                  # SIGTERM/SIGHUP would otherwise skip the cleanup below
+            raise SystemExit(0)
+        for sig in (signal.SIGTERM, signal.SIGHUP):
+            signal.signal(sig, _stop)
+        print(f"MOCK_LISTENING {st.base}", flush=True)
+        if args.port_file:
+            Path(args.port_file).write_text(st.base)
+        try:
+            srv.serve_forever()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        finally:
+            srv.server_close()
+    finally:
+        shutil.rmtree(st.tmp, ignore_errors=True)  # never leave mock_ephone_* behind
     return 0
 
 

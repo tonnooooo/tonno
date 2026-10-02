@@ -153,16 +153,50 @@ def rnd(x):
     return int(math.floor(x + 0.5 + 1e-9))
 
 
+def _iter_fcurves():
+    """(owner name, fcurve) for every animated object / scene (slotted actions of Blender >= 4.4 and legacy)."""
+    for idb in list(bpy.data.objects) + list(bpy.data.scenes):
+        ad = getattr(idb, "animation_data", None)
+        if not ad or not ad.action:
+            continue
+        act = ad.action
+        if hasattr(act, "layers"):
+            fcs = [fc for layer in act.layers for strip in layer.strips
+                   for cb in strip.channelbags for fc in cb.fcurves]
+        else:
+            fcs = list(act.fcurves)
+        for fc in fcs:
+            yield idb.name, fc
+
+
+def _key_id(owner, fc, k):
+    return (owner, fc.data_path, fc.array_index, round(k.co[0], 4))
+
+
+_FORCED_KEYS = set()
+
+
 @contextmanager
 def interp(kind):
-    """Default interpolation for keyframes inserted inside the block."""
+    """Interpolation for keyframes inserted inside the block.
+
+    keyframe_new_interpolation_type has no effect in Blender 5 (new keys always come out BEZIER), so the keys
+    that appear during the block are found by diffing a snapshot and set explicitly. A key already set by an
+    inner block keeps the inner kind."""
     pref = bpy.context.preferences.edit
     old = pref.keyframe_new_interpolation_type
     pref.keyframe_new_interpolation_type = kind
+    before = {_key_id(n, fc, k) for n, fc in _iter_fcurves() for k in fc.keyframe_points}
     try:
         yield
     finally:
         pref.keyframe_new_interpolation_type = old
+        for n, fc in _iter_fcurves():
+            for k in fc.keyframe_points:
+                kid = _key_id(n, fc, k)
+                if kid not in before and kid not in _FORCED_KEYS:
+                    k.interpolation = kind
+                    _FORCED_KEYS.add(kid)
 
 
 @contextmanager

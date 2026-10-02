@@ -7,6 +7,8 @@
                    else --trim-mode start|center|end (default center)
 * the windows are joined with hard cuts; frame counts come from cumulative rounding of the shot
   durations, so the film is exactly format.duration_s * 24 = 360 frames (15.0 s)
+* a clip shorter than its shot holds its last frame (and goes silent) for the missing frames and prints a WARNING on
+  stderr; a clip that is not 16:9 is centre-cropped and also gets a WARNING
 * audio (--audio keep|drop|silence): always an AAC track of 15.0 s; 'keep' cuts the matching audio
   window of every clip with a 40 ms fade at each cut (no pops); 'drop' and 'silence' both discard the
   clip audio and write a silent AAC track of the same length
@@ -16,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import shutil
 import subprocess
 import sys
@@ -27,10 +30,36 @@ SAMPLE_RATE = 48000
 SAMPLES_PER_FRAME = SAMPLE_RATE // FPS          # 2000: audio stays sample-exact against the video frames
 FADE_SAMPLES = SAMPLE_RATE * 40 // 1000         # 40 ms = 1920 samples
 EXIT_OK, EXIT_FAIL, EXIT_USAGE = 0, 1, 2
+ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")           # shot ids become file names: no path separators, no dots
+TARGET_ASPECT = OUT_W / OUT_H
+ASPECT_TOL = 0.02
 
 
 class UsageError(Exception):
     pass
+
+
+def load_shotlist(path: Path) -> dict:
+    """Read and validate shotlist.json (ids are used in file names, so they are checked strictly)."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise UsageError(f"cannot read shotlist {path}: {e}")
+    shots = data.get("shots") if isinstance(data, dict) else None
+    if not isinstance(shots, list) or not shots:
+        raise UsageError(f"{path} has no 'shots' list")
+    seen = set()
+    for i, s in enumerate(shots):
+        sid = s.get("id") if isinstance(s, dict) else None
+        if not isinstance(sid, str) or not ID_RE.fullmatch(sid):
+            raise UsageError(f"shot #{i + 1}: invalid id {sid!r} (allowed: letters, digits, '_' and '-'; ids become file names)")
+        if sid in seen:
+            raise UsageError(f"duplicate shot id {sid!r} in {path}")
+        seen.add(sid)
+        dur = s.get("dur")
+        if isinstance(dur, bool) or not isinstance(dur, (int, float)) or not math.isfinite(dur) or dur <= 0:
+            raise UsageError(f"shot {sid}: 'dur' must be a positive number of seconds, got {dur!r}")
+    return data
 
 
 def half_up(x: float) -> int:
@@ -70,18 +99,36 @@ def shot_frames(shots: list, total_frames: int) -> list:
     return counts
 
 
+def parse_use_from(shot: dict):
+    """Optional per-shot 'use_from' -> float seconds (or None). Anything else is a clear usage error."""
+    raw = shot.get("use_from")
+    if raw is None:
+        return None
+    try:
+        if isinstance(raw, bool):
+            raise ValueError
+        v = float(raw)
+    except (TypeError, ValueError):
+        raise UsageError(f"shot {shot['id']}: use_from must be a number (seconds into the clip), got {raw!r}")
+    if not math.isfinite(v):
+        raise UsageError(f"shot {shot['id']}: use_from must be a finite number, got {raw!r}")
+    return v
+
+
 def plan_shot(shot: dict, n: int, info: dict | None, trim_mode: str) -> dict:
     """Window selection for one shot. info None = clip missing (black card)."""
     p = {"id": shot["id"], "frames": n, "src_dur": None, "start_f": 0, "pad_f": 0, "note": "", "missing": info is None,
-         "has_audio": bool(info and info["has_audio"])}
+         "has_audio": bool(info and info["has_audio"]), "warnings": []}
+    use_from = parse_use_from(shot)
     if info is None:
         p["note"] = "MISSING -> black card"
         return p
-    src_frames = int(math.floor(info["duration"] * FPS + 1e-6))
+    # ffprobe prints 6 decimals (5 frames = 0.208333 s): floor() would lose a frame, so round to the nearest frame
+    src_frames = max(1, half_up(info["duration"] * FPS))
     p["src_dur"], p["src_frames"] = info["duration"], src_frames
     win = n / FPS
-    if "use_from" in shot and shot["use_from"] is not None:
-        t0, how = float(shot["use_from"]), "use_from"
+    if use_from is not None:
+        t0, how = use_from, "use_from"
     elif trim_mode == "start":
         t0, how = 0.0, "start"
     elif trim_mode == "end":
@@ -97,6 +144,13 @@ def plan_shot(shot: dict, n: int, info: dict | None, trim_mode: str) -> dict:
     if src_frames < n:
         p["pad_f"] = n - src_frames
         notes.append(f"clip shorter than shot: last frame held for {p['pad_f']} frames")
+        p["warnings"].append(f"shot {shot['id']}: clip is {info['duration']:.3f} s ({src_frames} frames) but the shot needs "
+                             f"{win:.3f} s ({n} frames); the last frame is held for {p['pad_f']} frames")
+    w, h = info.get("width"), info.get("height")
+    if w and h and abs((w / h) / TARGET_ASPECT - 1) > ASPECT_TOL:
+        notes.append(f"cropped (aspect {w / h:.2f} -> 16:9)")
+        p["warnings"].append(f"shot {shot['id']}: clip is {w}x{h} (aspect {w / h:.2f}), not 16:9; it is scaled to fill and "
+                             f"CENTRE-CROPPED to 1280x720, so part of the frame is lost")
     if not info["has_audio"]:
         notes.append("no audio stream")
     p["start_f"], p["note"] = sf, ", ".join(notes)
@@ -115,8 +169,10 @@ def build_filtergraph(plans: list, audio_mode: str, total_frames: int) -> tuple[
             k = len(inputs)
             inputs.append(p["path"])
             sf = p["start_f"]
-            tpad = f",tpad=stop_mode=clone:stop={p['pad_f']}" if p["pad_f"] else ""
-            parts.append(f"[{k}:v]setpts=PTS-STARTPTS,fps={FPS},trim=start_frame={sf}:end_frame={sf + n},setpts=PTS-STARTPTS{tpad},"
+            # take everything from the window start, clone the last frame a little beyond what is needed, then cut to
+            # exactly n frames: the segment length is exact even when the probed duration is off by a frame
+            parts.append(f"[{k}:v]setpts=PTS-STARTPTS,fps={FPS},trim=start_frame={sf},setpts=PTS-STARTPTS,"
+                         f"tpad=stop_mode=clone:stop={p['pad_f'] + 2},trim=end_frame={n},setpts=PTS-STARTPTS,"
                          f"scale={OUT_W}:{OUT_H}:force_original_aspect_ratio=increase:flags=lanczos,crop={OUT_W}:{OUT_H},"
                          f"setsar=1,format=yuv420p[v{i}]")
         v_labels.append(f"[v{i}]")
@@ -125,9 +181,11 @@ def build_filtergraph(plans: list, audio_mode: str, total_frames: int) -> tuple[
                 parts.append(f"anullsrc=r={SAMPLE_RATE}:cl=stereo,atrim=end_sample={L},asetpts=PTS-STARTPTS[a{i}]")
             else:
                 a0 = p["start_f"] * SAMPLES_PER_FRAME
+                # pad with silence BEFORE trimming: a window that starts after the end of a short audio track must
+                # still yield L samples of silence (atrim on an already ended stream makes ffmpeg fail)
                 parts.append(f"[{inputs.index(p['path'])}:a]asetpts=PTS-STARTPTS,aresample={SAMPLE_RATE},"
-                             f"aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=start_sample={a0}:end_sample={a0 + L},"
-                             f"asetpts=PTS-STARTPTS,apad=whole_len={L},atrim=end_sample={L},"
+                             f"aformat=sample_fmts=fltp:channel_layouts=stereo,apad,"
+                             f"atrim=start_sample={a0}:end_sample={a0 + L},asetpts=PTS-STARTPTS,"
                              f"afade=t=in:ss=0:ns={FADE_SAMPLES},afade=t=out:ss={L - FADE_SAMPLES}:ns={FADE_SAMPLES}[a{i}]")
             a_labels.append(f"[a{i}]")
     n_shots = len(plans)
@@ -187,10 +245,7 @@ def main(argv=None) -> int:
         shotlist = args.shotlist or project / "shotlist.json"
         clips_dir = args.clips_dir or project / "out" / "clips"
         output = args.output or project / "out" / "final_ai.mp4"
-        try:
-            data = json.loads(shotlist.read_text(encoding="utf-8"))
-        except (OSError, ValueError) as e:
-            raise UsageError(f"cannot read shotlist {shotlist}: {e}")
+        data = load_shotlist(shotlist)
         shots = data["shots"]
         fmt = data.get("format", {})
         if int(fmt.get("fps", FPS)) != FPS:
@@ -219,6 +274,9 @@ def main(argv=None) -> int:
             aud = "-" if p["missing"] else ("yes" if p["has_audio"] else "no")
             print(f"{p['id']:<5} {p['frames']:>6} {p['frames'] / FPS:>6.3f} {src:>9}  {win:<19} {aud:<5}  {p['note']}")
         print(f"total {sum(counts)} frames = {sum(counts) / FPS:.3f} s @ {FPS} fps, audio mode: {args.audio}")
+        for p in plans:
+            for w in p["warnings"]:
+                print(f"WARNING: {w}", file=sys.stderr)
 
         graph, inputs = build_filtergraph(plans, args.audio, total_frames)
         tmp = output.with_name(output.stem + ".partial.mp4")
@@ -240,7 +298,8 @@ def main(argv=None) -> int:
         r = subprocess.run(cmd, text=True, stderr=subprocess.PIPE)
         if r.returncode != 0:
             tmp.unlink(missing_ok=True)
-            print("ffmpeg failed:\n" + r.stderr[-1500:], file=sys.stderr)
+            lines = [l.strip() for l in re.split(r"[\r\n]+", r.stderr) if l.strip() and not re.match(r"(frame|size)=", l.strip())]
+            print(f"ffmpeg failed (rc {r.returncode}):\n" + "\n".join(lines[-15:]), file=sys.stderr)
             return EXIT_FAIL
         m = measure_output(tmp)
         ok = (m["frames"] == total_frames and (m["width"], m["height"]) == (OUT_W, OUT_H) and m["fps"] == f"{FPS}/1"

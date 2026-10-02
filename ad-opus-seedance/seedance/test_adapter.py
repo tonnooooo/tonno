@@ -2,10 +2,14 @@
 """End-to-end tests for generate_clips.py / assemble_clips.py against mock_server.py (no real API, no network).
 
 Run:   python test_adapter.py [--keep] [--workdir DIR]
-Uses a fake random canary API key and a throw-away project copy under the scratchpad (or a temp dir);
-the real project's out/clips and out/final_ai.mp4 are never touched (checked at the end).
+Uses a fake random canary API key and a throw-away project copy. Work dir: --workdir DIR, else the env var
+SEEDANCE_TEST_WORKDIR, else a fresh tempfile.mkdtemp() (honours TMPDIR). The real project's out/clips and
+out/final_ai.mp4 are never touched (checked at the end).
 """
 from __future__ import annotations
+
+import sys
+sys.dont_write_bytecode = True       # in-process imports of generate_clips must not leave a __pycache__ in seedance/
 
 import argparse
 import array
@@ -15,9 +19,9 @@ import os
 import re
 import secrets
 import shutil
+import signal
 import struct
 import subprocess
-import sys
 import tempfile
 import time
 import traceback
@@ -30,7 +34,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REAL_PROJECT = HERE.parent
 GEN, ASM, MOCK = HERE / "generate_clips.py", HERE / "assemble_clips.py", HERE / "mock_server.py"
-SCRATCH = Path("/tmp/claude-0/-home-user-tonno/4a068dc4-eaa2-5f84-917a-5a917d76cf58/scratchpad")
+WORKDIR_MARKER = ".seedance_test_workdir"
 CANARY = "sk-canary-" + secrets.token_hex(12)
 WRONG = "sk-wrongkey-" + secrets.token_hex(10)
 OUTPUTS: list = []          # every stdout/stderr captured from the tools under test (scanned for the canary)
@@ -84,6 +88,12 @@ def stats():
 
 def reset():
     mjson("POST", "/__mock/reset", {})
+
+
+# mock fault-injection settings restored before every test, so one failing test cannot cascade into the next ones
+CONFIG_DEFAULTS = {"polls_to_done": 3, "fail_contains": None, "fail_status": "failed", "poll_429": 0, "download_503": 0,
+                   "submit_errors": 0, "drop_poll": 0, "cdn_only_curl": False, "truncate_download": 0, "omit_video_url": 0,
+                   "reject_expires": False, "leak_key_in_errors": False}
 
 
 def config(**kw):
@@ -649,6 +659,334 @@ def t22_download_falls_back_to_curl_when_the_cdn_refuses_urllib():
     check(len(posts()) == 1)
 
 
+# ----------------------------------------------------------------------------- regression tests for the verifier findings
+def inproc(args, patch=None):
+    """Run generate_clips.main() inside this process (so a function can be monkeypatched). -> (rc, stdout, stderr)."""
+    import contextlib
+    import io
+    if str(HERE) not in sys.path:
+        sys.path.insert(0, str(HERE))
+    import generate_clips as gc
+    old_hook, old_env = sys.excepthook, {k: os.environ.get(k) for k in ("EPHONE_API_KEY", "EPHONE_BASE_URL")}
+    os.environ.update({"EPHONE_API_KEY": CANARY, "EPHONE_BASE_URL": MOCK_URL})
+    orig = gc.write_json_atomic
+    if patch:
+        gc.write_json_atomic = patch(orig)
+    out, err = io.StringIO(), io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = gc.main(["--project-dir", str(PROJ), "--poll-interval", "0.15", "--retry-base-delay", "0.05", *map(str, args)])
+    finally:
+        gc.write_json_atomic = orig
+        sys.excepthook = old_hook
+        for k, v in old_env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    OUTPUTS.append(f"$ <in-process> generate_clips {' '.join(map(str, args))}\n{out.getvalue()}\n{err.getvalue()}")
+    return rc, out.getvalue(), err.getvalue()
+
+
+@test
+def t23_extra_json_cannot_bypass_the_budget_guard():
+    reset()
+    c = W / "clips_xjson"
+    big = '{"resolution":"1080p"}'
+    rc, out, err = gen("--yes", "--shots", "S01", "--extra-json", big, "--budget-max-cny", "7", "--clips-dir", c)
+    check(rc == 3 and "budget-max-cny" in out + err, f"extra-json 1080p must hit the 7 CNY cap: rc={rc}\n{out}\n{err}")
+    check("196,425 tokens" in out and "CNY 15.12" in out, "estimate must be the 1080p one:\n" + out)
+    check(not posts() and not c.exists(), "a blocked run must send nothing and write nothing")
+    # same price as the explicit flag
+    rc, out2, err = gen("--dry-run", "--shots", "S01", "--resolution", "1080p", "--clips-dir", c)
+    check(rc == 0 and "196,425 tokens" in out2, out2)
+    # ratio via extra-json is priced too (1:1 720p = 960x960 -> different from 16:9)
+    rc, out3, err = gen("--dry-run", "--shots", "S01", "--extra-json", '{"ratio":"21:9"}', "--clips-dir", c)     # 1470x630 px
+    check(rc == 0 and "87,300 tokens" not in out3 and "720p 21:9 4s" in out3, out3)
+    # the ephone-task profile reads the same keys from its 'input' object
+    rc, out4, err = gen("--yes", "--shots", "S01", "--profile", "ephone-task", "--extra-json", big, "--budget-max-cny", "7", "--clips-dir", c)
+    check(rc == 3 and "CNY 15.12" in out4, f"task profile: rc={rc}\n{out4}\n{err}")
+    # duration via extra-json is priced as well and still bounded
+    rc, out5, err = gen("--dry-run", "--shots", "S01", "--extra-json", '{"duration":8}', "--clips-dir", c)
+    check(rc == 0 and "174,600 tokens" in out5, out5)
+    rc, out5, err = gen("--yes", "--shots", "S01", "--extra-json", '{"duration":99}', "--clips-dir", c)
+    check(rc == 2 and "maximum" in err, f"rc={rc} {err}")
+    # unknown resolution/ratio in extra-json cannot be priced -> refused
+    for bad in ('{"resolution":"4k"}', '{"ratio":"2:1"}', '{"resolution":null}'):
+        rc, out5, err = gen("--yes", "--shots", "S01", "--extra-json", bad, "--clips-dir", c)
+        check(rc == 2 and "cannot estimate the cost" in err, f"{bad}: rc={rc} {err}")
+    # a within-budget override still goes through, and the request really carries it
+    rc, out6, err = gen("--yes", "--shots", "S01", "--extra-json", '{"resolution":"480p"}', "--budget-max-cny", "7", "--clips-dir", c)
+    check(rc == 0 and posts()[-1]["body"]["resolution"] == "480p", f"rc={rc}\n{out6}\n{err}")
+    check(sidecar(c, "S01")["params"]["resolution"] == "480p" and sidecar(c, "S01")["estimate"]["resolution"] == "480p", sidecar(c, "S01")["estimate"])
+    # a NaN / inf / negative cap would silently disable (or break) the CNY guard -> refused
+    for bad in ("nan", "NaN", "inf", "-inf", "-1"):
+        rc, out7, err = gen("--yes", "--shots", "S02", "--budget-max-cny", bad, "--clips-dir", W / "clips_nan")
+        check(rc == 2 and "--budget-max-cny" in err, f"cap {bad}: rc={rc}\n{out7}\n{err}")
+    check(len(posts()) == 1, "refused caps must not submit")
+    rc, out7, err = gen("--dry-run", "--timeout-min", "nan")
+    check(rc == 2 and "--timeout-min" in err, f"rc={rc} {err}")
+
+
+@test
+def t24_no_expires_flag_and_hint_when_the_gateway_rejects_the_field():
+    reset()
+    c = W / "clips_expires"
+    rc, out, err = gen("--dry-run", "--shots", "S01", "--clips-dir", c)
+    check(rc == 0 and '"execution_expires_after": 172800' in out, out)
+    rc, out, err = gen("--dry-run", "--shots", "S01", "--no-expires", "--clips-dir", c)
+    check(rc == 0 and "execution_expires_after" not in out, out)
+    reset()
+    rc, out, err = gen("--show-provider")                          # stands in for the missing provider.json; offline, no secrets
+    prov = json.loads(out)
+    check(rc == 0 and prov["model"] == "doubao-seedance-2-5-260628" and "ephone-ark" in prov["profiles"] and prov["execution_expires_after_s"] == 172800
+          and CANARY not in out and not reqs(), out)
+    rc, out, err = gen("--show-provider", "--no-expires")
+    check(rc == 0 and json.loads(out)["execution_expires_after_s"] is None, out)
+    config(reject_expires=True)
+    rc, out, err = gen("--yes", "--shots", "S01", "--clips-dir", c)
+    check(rc == 1 and "--no-expires" in out + err and sidecar(c, "S01")["state"] == "submit_failed", f"rc={rc}\n{out}\n{err}")
+    check(not sidecar(c, "S01").get("task_id"), "a rejected submit has no task id")
+    rc, out, err = gen("--yes", "--shots", "S01", "--no-expires", "--clips-dir", c)         # submit_failed is retryable
+    config(reject_expires=False)
+    check(rc == 0 and "execution_expires_after" not in posts()[-1]["body"] and (c / "S01.mp4").exists(), f"rc={rc}\n{out}\n{err}")
+    rc, out, err = gen("--yes", "--shots", "S02", "--profile", "ephone-task", "--clips-dir", W / "clips_expires_task")
+    check(rc == 0 and "execution_expires_after" not in json.dumps(posts()[-1]["body"]), "task profile never sent the field")
+
+
+@test
+def t25_truncated_download_is_rejected_retried_and_resumable():
+    reset()
+    c = W / "clips_trunc"
+    config(truncate_download=100)                    # every mp4 body stops after 1/3 and has no Content-Length
+    rc, out, err = gen("--shots", "S01", "--yes", "--max-retries", "2", "--clips-dir", c)
+    config(truncate_download=0)
+    check(rc == 1 and "truncated or corrupt" in out + err, f"rc={rc}\n{out}\n{err}")
+    sc = sidecar(c, "S01")
+    check(sc["state"] == "download_failed" and sc["task_id"].startswith("cgt-"), sc)
+    check(not (c / "S01.mp4").exists() and not (c / "S01.mp4.part").exists(), "a truncated file must not be kept")
+    check(stats()["downloads_truncated"] == 3, f"expected 1 try + 2 retries, saw {stats()}")
+    rc, out, err = gen("--shots", "S01", "--yes", "--clips-dir", c)            # same task id, no second paid submit
+    check(rc == 0 and "resuming instead of resubmitting" in out and len(posts()) == 1, f"rc={rc}\n{out}\n{err}")
+    check(sidecar(c, "S01")["state"] == "downloaded" and (c / "S01.mp4").stat().st_size > 10_000)
+    # a transient truncation is retried and succeeds on its own
+    reset()
+    c2 = W / "clips_trunc2"
+    config(truncate_download=1)
+    rc, out, err = gen("--shots", "S02", "--yes", "--clips-dir", c2)
+    check(rc == 0 and "retry" in out and stats()["downloads_truncated"] == 1 and (c2 / "S02.mp4").exists(), f"rc={rc}\n{out}\n{err}")
+    j = ffprobe_json(c2 / "S02.mp4", count=True)
+    check(int(next(s for s in j["streams"] if s["codec_type"] == "video")["nb_read_frames"]) == 96, "retried file is not complete")
+
+
+@test
+def t26_succeeded_without_video_url_is_resumed_never_resubmitted():
+    for profile, shot in (("ephone-ark", "S03"), ("ephone-task", "S04")):
+        reset()
+        c = W / f"clips_nourl_{profile}"
+        config(omit_video_url=1)
+        rc, out, err = gen("--shots", shot, "--yes", "--profile", profile, "--clips-dir", c)
+        config(omit_video_url=0)
+        check(rc == 1 and "no video url" in out + err, f"{profile}: rc={rc}\n{out}\n{err}")
+        sc = sidecar(c, shot)
+        check(sc["state"] == "no_video_url" and sc["task_id"] and sc["error"]["code"] == "NoVideoUrl", sc)
+        check(len(posts()) == 1)
+        rc, out, err = gen("--shots", shot, "--yes", "--profile", profile, "--clips-dir", c)
+        check(rc == 0 and "resuming instead of resubmitting" in out and len(posts()) == 1, f"{profile} rerun: rc={rc}\n{out}\n{err}")
+        check(sidecar(c, shot)["state"] == "downloaded" and (c / f"{shot}.mp4").exists())
+
+
+@test
+def t27_unreadable_sidecar_blocks_a_blind_resubmit_and_the_task_id_is_printed_first():
+    reset()
+    c = W / "clips_corrupt"
+    c.mkdir()
+    (c / "S04.json").write_text('{"shot": "S04", "task_id": "cgt-precious123", "state": "submitt')       # truncated by a crash
+    (c / "S05.json").write_text("")                                                                       # empty file
+    rc, out, err = gen("--shots", "S04", "S05", "--yes", "--clips-dir", c)
+    check(rc == 1 and not posts(), f"nothing may be submitted: rc={rc}\n{out}\n{err}")
+    check(out.count("REFUSED") + err.count("REFUSED") >= 2 and "cannot be parsed" in out + err, out + err)
+    check("cgt-precious123" in out + err and "--resume-task cgt-precious123" in out + err, "the salvaged task id must be shown")
+    check((c / "S04.json").read_text().startswith('{"shot"'), "the unreadable sidecar must not be overwritten")
+    rc, out, err = gen("--dry-run", "--shots", "S04", "--clips-dir", c)
+    check(rc == 0 and "REFUSE" in out, out)
+    rc, out, err = gen("--shots", "S04", "--yes", "--force", "--clips-dir", c)                          # explicit override
+    check(rc == 0 and len(posts()) == 1, f"rc={rc}\n{out}\n{err}")
+    check((c / "S04.json.corrupt").read_text().find("cgt-precious123") > 0, "the old file must be kept as .corrupt")
+    check("cgt-precious123" in sidecar(c, "S04")["previous_tasks"], sidecar(c, "S04"))
+    # --resume-task with an explicit id works even when the sidecar is garbage
+    (c / "S06.json").write_text("{{{{ not json")
+    st, j = mjson("POST", "/doubao/api/v3/contents/generations/tasks", {"model": "doubao-seedance-2-5-260628", "duration": 4,
+                                                                        "content": [{"type": "text", "text": "x"}]},
+                  headers={"Authorization": "Bearer " + CANARY})
+    rc, out, err = gen("--resume-task", j["id"], "--shot", "S06", "--clips-dir", c)
+    check(rc == 0 and sidecar(c, "S06")["task_id"] == j["id"], f"rc={rc}\n{out}\n{err}")
+    # the id is printed BEFORE it is persisted, and a failing disk write after the POST is loud and does not lose it
+    reset()
+
+    def fail_after_post(orig):
+        n = {"i": 0}
+
+        def w(path, obj):
+            n["i"] += 1
+            if n["i"] >= 2:                                    # 1st write = state 'submitting' (before the POST)
+                raise OSError(28, "No space left on device")
+            return orig(path, obj)
+        return w
+    rc, out, err = inproc(["--shots", "S07", "--yes", "--clips-dir", W / "clips_disk"], patch=fail_after_post)
+    m = re.search(r"\[S07\] submitted, task id (\S+)", out)
+    check(len(posts()) == 1 and m and m.group(1) in mjson("GET", "/__mock/tasks")[1], out + err)
+    tid = m.group(1)
+    check(f"THE PAID TASK ID IS {tid}" in err and f"--resume-task {tid}" in err, "disk error must show the paid task id:\n" + err)
+    check(err.count("cannot write") == 1, "the disk error should be reported once per shot:\n" + err)
+    check((W / "clips_disk" / "S07.mp4").exists(), "the download should still complete")
+    # if the very first write fails nothing is submitted at all
+    reset()
+    rc, out, err = inproc(["--shots", "S08", "--yes", "--clips-dir", W / "clips_disk2"],
+                          patch=lambda orig: (lambda path, obj: (_ for _ in ()).throw(OSError(28, "No space left on device"))))
+    check(rc == 1 and not posts() and "nothing was submitted" in out + err, f"rc={rc}\n{out}\n{err}")
+
+
+@test
+def t28_shot_ids_are_validated_and_last_frame_extension_is_whitelisted():
+    bad = W / "proj_badid"
+    bad.mkdir(exist_ok=True)
+    data = json.loads((PROJ / "shotlist.json").read_text())
+    for evil in ("../../evil", "a/b", "S 01", "S01.mp4", ""):
+        data["shots"][0]["id"] = evil
+        (bad / "shotlist.json").write_text(json.dumps(data))
+        for script, extra in ((GEN, ["--dry-run", "--poll-interval", "0.1"]), (ASM, ["--dry-run"])):
+            rc, out, err = run(script, "--project-dir", bad, "--clips-dir", W / "clips_badid", *extra)
+            check(rc == 2 and "invalid id" in err, f"{script.name} id {evil!r}: rc={rc}\n{out}\n{err}")
+    data["shots"][0]["id"] = data["shots"][1]["id"]
+    (bad / "shotlist.json").write_text(json.dumps(data))
+    for script in (GEN, ASM):
+        rc, out, err = run(script, "--project-dir", bad, "--dry-run")
+        check(rc == 2 and "duplicate shot id" in err, f"{script.name}: rc={rc} {err}")
+    check(not (W / "evil.json").exists() and not (W / "clips_badid").exists() and not (W.parent / "evil.json").exists())
+    sys.path.insert(0, str(HERE))
+    import generate_clips as gc
+    sys.excepthook = sys.__excepthook__
+    for url, want in (("https://cdn/x/a_last.png?sig=1", ".png"), ("https://cdn/a.JPG", ".jpg"), ("https://cdn/a.webp", ".webp"),
+                      ("https://cdn/a.jpeg?x=.sh", ".jpeg"), ("https://cdn/a.sh", ".png"), ("https://cdn/a.php", ".png"),
+                      ("https://cdn/a", ".png"), ("https://cdn/a.mp4/../../x.py", ".png")):
+        check(gc.last_frame_ext(url) == want, f"{url} -> {gc.last_frame_ext(url)} (want {want})")
+
+
+def make_clip(path: Path, size="1280x720", rate=24, frames=None, seconds=4, audio=None):
+    """Synthetic test clip. audio = seconds of sine audio (None = no audio stream)."""
+    cmd = ["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", f"testsrc2=size={size}:rate={rate}" + ("" if frames else f":duration={seconds}")]
+    if audio:
+        cmd += ["-f", "lavfi", "-i", f"sine=frequency=440:sample_rate=48000:duration={audio}", "-c:a", "aac"]
+    cmd += ["-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"]
+    if frames:
+        cmd += ["-frames:v", str(frames)]
+    subprocess.run(cmd + [str(path)], check=True)
+
+
+def clips_copy(name: str) -> Path:
+    d = W / name
+    shutil.rmtree(d, ignore_errors=True)
+    shutil.copytree(PROJ / "out" / "clips", d, ignore=shutil.ignore_patterns("*.json"))
+    return d
+
+
+FAST = ("--preset", "ultrafast", "--crf", "30")
+
+
+@test
+def t29_assemble_survives_audio_shorter_than_the_window_in_every_trim_mode():
+    d = clips_copy("clips_shortaudio")
+    make_clip(d / "S02.mp4", seconds=4, audio=2)                 # 4 s of video but only 2 s of audio
+    for mode in ("end", "center", "start"):
+        out_mp4 = W / "outs" / f"shortaudio_{mode}.mp4"
+        rc, out, err = asm("--clips-dir", d, "--output", out_mp4, "--trim-mode", mode, *FAST)
+        check(rc == 0 and out_mp4.exists(), f"trim-mode {mode}: rc={rc}\n{out}\n{err[-600:]}")
+        assert_final_ok(out_mp4)
+    # in 'end' mode the S02 window (2.6 s..4 s of its clip) lies after the audio: it must be silent, the others not
+    pcm_all = pcm(W / "outs" / "shortaudio_end.mp4")
+    a, b = 29 * 2000, 58 * 2000
+    check(max(abs(x) for x in pcm_all[a + 2000:b - 2000]) < 50, "audio past the end of the short track must be silence")
+    check(max(abs(x) for x in pcm_all[2000:20000]) > 1000, "neighbouring shots must keep their audio")
+    # ffmpeg failures are readable: no wall of -stats lines
+    rc, out, err = asm("--clips-dir", d, "--output", W / "outs" / "x.mp4", "--crf", "abc")
+    check(rc != 0 and "frame=" not in err, f"rc={rc} {err[-300:]}")
+
+
+@test
+def t30_short_clip_hold_is_frame_exact_and_warned():
+    d = clips_copy("clips_hold")
+    make_clip(d / "S05.mp4", frames=5)                           # 5 frames = 0.208333 s (ffprobe prints 6 decimals)
+    out_mp4 = W / "outs" / "hold.mp4"
+    rc, out, err = asm("--clips-dir", d, "--output", out_mp4, *FAST)
+    check(rc == 0, f"rc={rc}\n{out}\n{err[-600:]}")
+    assert_final_ok(out_mp4)
+    s5 = next(l for l in out.splitlines() if l.startswith("S05 "))
+    check("last frame held for 19 frames" in s5, s5)                  # 24 - 5, not 20
+    check("WARNING" in err and "S05" in err and "held" in err, "a short clip must warn on stderr:\n" + err)
+    # S05 owns output frames 120..143: the hold is flat, the first jump is the cut to S06 at frame 144
+    prev = raw_frame(out_mp4, 124)
+    first_cut = None
+    for k in range(125, 150):
+        cur = raw_frame(out_mp4, k)
+        if mad(prev, cur) > 1.0:
+            first_cut = k
+            break
+        prev = cur
+    check(first_cut == 144, f"S06 must start at output frame 144, first visible cut at {first_cut}")
+    # audio stays in step: S06's tone starts at sample 144*2000
+    tasks = mjson("GET", "/__mock/tasks")[1]
+    samples = pcm(out_mp4)
+    want = tasks[sidecar(PROJ / "out" / "clips", "S06")["task_id"]]["tone"]
+    got = tone_hz(samples, 144 * 2000 + 10000, 168 * 2000 - 10000)
+    check(abs(got - want) / want < 0.04, f"S06 tone {got:.0f} != {want}")
+    # a bad use_from is a clear error, not a traceback
+    uf = W / "proj_badusefrom"
+    uf.mkdir(exist_ok=True)
+    data = json.loads((PROJ / "shotlist.json").read_text())
+    for bad in ("abc", True, [1], "nan"):
+        data["shots"][0]["use_from"] = bad
+        (uf / "shotlist.json").write_text(json.dumps(data))
+        rc, out, err = run(ASM, "--project-dir", uf, "--clips-dir", PROJ / "out" / "clips", "--output", W / "outs" / "uf.mp4")
+        check(rc == 2 and "S01: use_from must be" in err and "Traceback" not in err, f"use_from={bad!r}: rc={rc}\n{err}")
+    check(not (W / "outs" / "uf.mp4").exists())
+
+
+@test
+def t31_non_16x9_clip_is_flagged_as_cropped():
+    d = clips_copy("clips_portrait")
+    make_clip(d / "S03.mp4", size="720x1280", audio=4)
+    out_mp4 = W / "outs" / "portrait.mp4"
+    rc, out, err = asm("--clips-dir", d, "--output", out_mp4, *FAST)
+    check(rc == 0, f"rc={rc}\n{out}\n{err[-400:]}")
+    s3 = next(l for l in out.splitlines() if l.startswith("S03 "))
+    check("cropped (aspect 0.56 -> 16:9)" in s3 and "rescaled 720x1280" in s3, s3)
+    check("WARNING" in err and "S03" in err and "CENTRE-CROPPED" in err, err)
+    assert_final_ok(out_mp4)
+    rc, out, err = asm("--clips-dir", PROJ / "out" / "clips", "--output", W / "outs" / "plain.mp4", "--dry-run")
+    check(rc == 0 and "WARNING" not in err and "cropped" not in out, "16:9 clips must not warn")
+
+
+@test
+def t32_mock_removes_its_scratch_dir_on_sigterm():
+    tmp = W / "mock_tmp_probe"
+    tmp.mkdir(exist_ok=True)
+    p = subprocess.Popen([sys.executable, str(MOCK), "--tmp-dir", str(tmp), "--port-file", str(W / "probe.url")],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
+    try:
+        for _ in range(100):
+            if (W / "probe.url").exists() and (W / "probe.url").read_text().startswith("http"):
+                break
+            time.sleep(0.1)
+        check(len(list(tmp.glob("mock_ephone_*"))) == 1, "the mock should create exactly one scratch dir")
+        p.send_signal(signal.SIGTERM)
+        check(p.wait(timeout=10) == 0, "SIGTERM should be a clean exit")
+    finally:
+        if p.poll() is None:
+            p.kill()
+    check(not list(tmp.glob("mock_ephone_*")), "scratch dir left behind after SIGTERM")
+
+
 def find_secret(roots, needles, skip=("test_adapter.py",)):
     """-> (hits, files_scanned) scanning every file below roots as bytes."""
     hits, scanned = [], 0
@@ -662,7 +1000,7 @@ def find_secret(roots, needles, skip=("test_adapter.py",)):
 
 
 @test
-def t23_canary_key_never_leaks_and_real_project_is_clean():
+def t33_canary_key_never_leaks_and_real_project_is_clean():
     needles = [CANARY, WRONG]
     for k in (CANARY, WRONG):
         needles += [urllib.parse.quote(k, safe=""), base64.b64encode(k.encode()).decode().rstrip("=")]
@@ -693,11 +1031,21 @@ def main() -> int:
     global W, PROJ, MOCK_URL
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--keep", action="store_true", help="keep the work dir even when everything passes")
-    ap.add_argument("--workdir", type=Path, help="default: scratchpad/test_adapter_work (or a temp dir)")
+    ap.add_argument("--workdir", type=Path, help="work dir (default: $SEEDANCE_TEST_WORKDIR, else a fresh tempfile.mkdtemp dir); "
+                                                 "it is wiped first, so it must be new, empty or a previous test work dir")
     args = ap.parse_args()
-    base = args.workdir or (SCRATCH / "test_adapter_work" if SCRATCH.is_dir() else Path(tempfile.mkdtemp(prefix="seedance_test_")))
-    shutil.rmtree(base, ignore_errors=True)
+    chosen = args.workdir or (Path(os.environ["SEEDANCE_TEST_WORKDIR"]) if os.environ.get("SEEDANCE_TEST_WORKDIR") else None)
+    if chosen is None:
+        base = Path(tempfile.mkdtemp(prefix="seedance_test_"))
+    else:
+        base = chosen.expanduser()
+        if base.exists() and any(base.iterdir()) and not (base / WORKDIR_MARKER).exists():
+            print(f"refusing to wipe {base}: it is not empty and not a previous test work dir"); return 2
+        shutil.rmtree(base, ignore_errors=True)
+        base.mkdir(parents=True)
     W, PROJ = base.resolve(), base.resolve() / "proj"
+    (W / WORKDIR_MARKER).write_text("seedance test work dir\n")
+    (W / "mock_tmp").mkdir()
     (PROJ / "out").mkdir(parents=True)
     shutil.copy(REAL_PROJECT / "shotlist.json", PROJ / "shotlist.json")
     (W / "outs").mkdir()
@@ -706,7 +1054,8 @@ def main() -> int:
             print(f"{tool} not found"); return 2
 
     mock_out = open(W / "mock.stdout", "w")
-    mock = subprocess.Popen([sys.executable, str(MOCK), "--key", CANARY, "--port-file", str(W / "mock.url")],
+    mock = subprocess.Popen([sys.executable, str(MOCK), "--key", CANARY, "--port-file", str(W / "mock.url"),
+                             "--tmp-dir", str(W / "mock_tmp")],
                             stdout=mock_out, stderr=subprocess.STDOUT, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
     failures = []
     try:
@@ -721,6 +1070,7 @@ def main() -> int:
         t_all = time.time()
         for fn in TESTS:
             t0 = time.time()
+            mjson("POST", "/__mock/config", CONFIG_DEFAULTS)
             try:
                 fn()
                 print(f"PASS  {fn.__name__}  ({time.time() - t0:.1f}s)")
@@ -736,6 +1086,10 @@ def main() -> int:
         except subprocess.TimeoutExpired:
             mock.kill()
         mock_out.close()
+    left = list((W / "mock_tmp").glob("mock_ephone_*"))
+    if left:                                       # the mock must remove its scratch dir when it is terminated
+        failures.append("mock_cleanup")
+        print(f"FAIL  mock did not remove its scratch dir on SIGTERM: {left}")
     if failures:
         print(f"FAILED: {', '.join(failures)}\nwork dir kept: {W}")
         return 1
