@@ -19,7 +19,7 @@ Fault injection (CLI flags or POST /__mock/config with a JSON object):
   --submit-status CODE --submit-errors N   the next N submits answer CODE (e.g. 500) WITHOUT creating a task
   --polls-to-done N           polls needed before the terminal state (default 3; huge = never finishes)
   --leak-key-in-errors        error bodies echo the received Authorization header (tests redaction)
-Control: GET /__mock/requests, GET /__mock/stats, POST /__mock/reset, POST /__mock/config.
+Control: GET /__mock/requests, /__mock/stats, /__mock/tasks, POST /__mock/reset, POST /__mock/config.
 The Authorization header value is never stored in the request log (only ok/bad/none).
 """
 from __future__ import annotations
@@ -205,6 +205,11 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/__mock/requests":
             with self.state.lock:
                 return self._send(200, list(self.state.log))
+        if path == "/__mock/tasks":
+            with self.state.lock:
+                return self._send(200, {tid: {"n": t["n"], "tone": 220 + 60 * (t["n"] % 8), "profile": t["profile"], "polls": t["polls"],
+                                              "fail": t["fail"], "duration": t["duration"], "prompt": t["prompt"]}
+                                        for tid, t in self.state.tasks.items()})
         if path == "/__mock/stats":
             with self.state.lock:
                 return self._send(200, {**self.state.stats, "tasks": len(self.state.tasks)})

@@ -815,10 +815,10 @@ def cmd_generate(client: Client, args, shots: list, negative: str, project_dir: 
                 done.append(job)
         if active or jobs:
             time.sleep(args.poll_interval)
-    return summarize(results, done)
+    return summarize(results, done, args.resolution)
 
 
-def summarize(results: list, done: list) -> int:
+def summarize(results: list, done: list, resolution: str = "720p") -> int:
     for job in done:
         results.append((job.shot, job.outcome, job.detail if job.outcome != "downloaded" else job.mp4.name))
     results.sort()
@@ -834,7 +834,8 @@ def summarize(results: list, done: list) -> int:
         if job.outcome == "downloaded" and tok:
             spent += tok
     if spent:
-        say(f"billed this run (provider usage): {spent:,} tokens ~ CNY {spent * 70 / 1e6:.2f} ~ USD {spent * 70 / 1e6 / CNY_PER_USD:.2f}")
+        cny = spent * PRICE_CNY_PER_MTOK[resolution] / 1e6
+        say(f"billed this run (provider usage): {spent:,} tokens ~ CNY {cny:.2f} ~ USD {cny / CNY_PER_USD:.2f}")
     return EXIT_FAIL if bad else EXIT_OK
 
 
