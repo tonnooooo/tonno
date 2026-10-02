@@ -1,0 +1,39 @@
+{
+ "id": "S10",
+ "previs": {
+  "cam_from": [
+   0.0,
+   -0.81,
+   1.2
+  ],
+  "cam_to": [
+   0.0,
+   -0.81,
+   1.2
+  ],
+  "look_at": [
+   0.0,
+   1.0,
+   1.2
+  ],
+  "lens_mm": 35,
+  "figure_path": [
+   [
+    0.0,
+    0.4,
+    0.0
+   ],
+   [
+    0.0,
+    0.4,
+    0.0
+   ]
+  ],
+  "figure_action": "stand",
+  "figure_yaw": 180,
+  "flash": [
+   0.42
+  ]
+ },
+ "notes": "Real clip (window 1.00-2.40 s, previs frames 259-292): static frontal bust shot INSIDE the photo booth, camera locked off (phase correlation of the neon arch / cyan wall strips between first and last window frame = 0 px, so no push, no handheld). Camera at about nose height, level, looking straight at the back wall; the man sits centred (face centre ~x 50%, hair top y 12%, chin y 49%, jacket shoulder-to-elbow width ~39% of the frame, frame bottom cuts him at the waist); behind him a reflective silver wall with a curved magenta neon arch across the top (x 20-80%, y 0-9%) and vertical cyan neon strips at the side-wall corners (left x 8-10%, right x 98-100%). Action in the window: hand on chin / smirk until ~0.45 s, then the hand drops and he tilts his head side to side, winks and laughs; camera flash = one white-out frame at window frame 10 (t=0.42 s, mean luma 95 -> 229) + a decay frame (187) + a faint one (104); a tiny +12% blip at frame 25 (ignored). Previs: camera INSIDE the booth shell at (0,-0.81,1.20), level, aimed at the back wall (look_at (0,1.0,1.2)), lens 35 mm, static (cam_from = cam_to). The mannequin sits on the stool at (0,0.4), facing the camera (figure_yaw 180), figure_action 'stand' (arms down), flash cue at 0.42 s exactly on window frame 10 (+ builder's half-strength decay on frame 11), which reproduces the real flash timing. Projected numbers at 1280x720 (previs vs real): head top y 95 vs 88, chin y 327 vs 355 (head 232 vs 267 px = -13%), head centre x 640 vs ~640, shoulder/arm width 596 vs ~505 px (+18%, the mannequin has a small head and broad shoulders, so scale was split: head -13% / shoulders +18%), frame bottom cuts at the abdomen like the real; the booth side walls' inner back corners land at x 64 and 1216 (5% / 95%) vs the real neon strips at 8-10% / 98-100%. The previous guess (camera 3.4 m outside the booth, 42 mm, slow push) showed a small full-length figure with the curtain opening, which was wrong. Why 'stand' and not the builder's 'poses': the real man has ONE pose change (hand on chin for ~0.45 s, then arms down for the rest of the window, head tilts); 'poses' would lift both hands beside the head at 0.64-0.9 s and fling both arms out sideways from 1.0 s, none of which exists in the clip, so 'stand' is right for ~2/3 of the window and never grossly wrong. Remaining mismatches: no hand-to-chin in the first 0.45 s and no head tilt/wink (builder has no custom pose keys), head 13% small / shoulders 18% broad (mannequin proportions), the booth interior is flat grey with no neon arch / wall strips / mirror look, a dark 0.3 m 'camera window' box sits behind the head, ~5% frame-edge side-wall strips are darker grey where the real has cyan neon. Discontinuity check: the scene is static; consecutive-frame mean abs difference is 0 except the intended flash frames (exposure-normalised max 0.007), no pop/flip/crop."
+}

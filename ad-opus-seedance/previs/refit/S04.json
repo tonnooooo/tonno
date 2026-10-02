@@ -1,0 +1,46 @@
+{
+ "id": "S04",
+ "previs": {
+  "cam_from": [
+   5.01,
+   -8.11,
+   1.45
+  ],
+  "cam_to": [
+   5.327,
+   -9.058,
+   1.45
+  ],
+  "look_at": [
+   3.108,
+   -2.425,
+   1.209
+  ],
+  "look_at_to": [
+   3.226,
+   -3.438,
+   1.356
+  ],
+  "lens_mm": 28,
+  "handheld": 0,
+  "car_pos": [
+   3.19,
+   -3.02,
+   0
+  ],
+  "car_yaw": 72.7,
+  "figure_path": [
+   [
+    4.636,
+    -6.99,
+    -0.025
+   ],
+   [
+    4.95,
+    -8.055,
+    -0.025
+   ]
+  ]
+ },
+ "notes": "Real clip window 1.8-3.2 s: medium chest-up shot, level camera at ~1.45 m (horizon slightly above frame centre, camera tilts up ~1.4 deg over the shot), man centred, face ~1.1 m from the lens, walking straight at the camera at ~0.8 m/s while the camera backs up ~1.0 m (background shrinks ~9%, man grows ~10%); background: coupe seen almost broadside (nose left, slightly away, rear panel + wing visible at right behind his shoulder, front wheel at left), one concrete pillar at the right edge, teal ceiling tubes; the background moves perfectly smoothly (frame-to-frame optical flow shows no handheld jitter, only the man's walking head-bob of +-20 px), so handheld was set to 0 (RECIPES default 0.05 would add shake the clip does not have). Fit method: lens 28 mm assumed (not observable from the framing alone; fits of ceiling-row vanishing point and car all consistent with 24-35 mm), camera height 1.45 m from the face/car/ground scale relation, camera heading from the ceiling-row vanishing point (18.5 deg, +2 deg pan over the shot), car pose solved so that the front wheel hub/tyre and the two taillight clusters land on the clip pixels (yaw 72.7 deg), whole scene translated so that builder column (7,0) lands on the clip's right-edge pillar (matches within ~2% at both ends). Man: face scale ~850 px/m, path 1.1 m toward the camera, ground z lowered 2.5 cm to compromise the mannequin's longer neck (head+shoulders both within ~5% of frame height of the clip). Matched: man centre/scale/growth, car position/size/orientation, pillar, camera back-up direction/amount, horizon/floor line. Remaining mismatches: mannequin proportions (head ~28 px/720 high vs the real face when shoulders are matched), no sunglasses on head, arms hang straight, builder garage has a dense grid of columns/beams vs the clip's open foggy space, builder car is boxier and ~0.1 m lower (taillights 0.74 m high vs ~0.88 m on the real car so they sit ~30 px lower)."
+}

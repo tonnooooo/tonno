@@ -1,0 +1,33 @@
+{
+ "id": "S02",
+ "previs": {
+  "cam_from": [
+   -1.59,
+   -1.8,
+   0.4
+  ],
+  "cam_to": [
+   -1.59,
+   -1.4,
+   0.49
+  ],
+  "look_at": [
+   4.658,
+   5.97,
+   1.167
+  ],
+  "look_at_to": [
+   4.99,
+   6.116,
+   0.944
+  ],
+  "lens_mm": 33.1,
+  "car_pos": [
+   0,
+   0,
+   0
+  ],
+  "car_yaw": 0
+ },
+ "notes": "Real clip (window 2.2-3.4 s): a very close, low (~0.4-0.5 m), slightly upward-looking lateral glide along the car's flank, ~0.7 m from the sheet metal, lens ~33 mm equivalent. The coupe faces frame-left; the camera starts near the rear wheel looking forward at ~50 degrees off the perpendicular. Frame content at the start: small front wheel cut by the left edge at ~65% height, door mirror upper left, door occupying the middle, rear wheel arch + a big rear wheel filling the right third. Over the window the whole scene slides to the right (camera moves toward the front of the car, ~0.4 m, while panning slightly toward the perpendicular and tilting down ~2 degrees): the door rear shut-line goes from x~42% to x~60% of the width, the rear wheel leaves the frame to the right by about 3/4 of the window, the mirror drifts slightly up/right, the front wheel stays at the left edge and grows. Previs: car at the origin, yaw 0 (nose +Y), camera on the car's -X side at x=-1.59 (0.71 m from the flank), z 0.40 -> 0.49, y -1.80 -> -1.40 (forward = toward the nose, so the scene shifts right), lens 33.1 mm, look_at (4.66,5.97,1.17) -> (4.99,6.12,0.94) (aim ~51 -> ~49 degrees off the perpendicular, pitch +4.4 -> +2.6). Fitted by least squares to hand-measured landmarks (mirror, door shut-lines, front/rear hubs, rear rim edge) at five times, then checked with 50% blends: front wheel, mirror, door seams and rear wheel agree within ~3-4% of the frame width at all five times; no far-side wheel shows under the car; motion direction (scene sliding right, rear wheel exiting right) and relative amount agree. Remaining mismatches: grey-box car is a simplified wedge (door seams are two thin dark lines at builder positions, door shorter/less tall than the real one, no glass/handle/arch detail), rear wheel is ~10% smaller than the real one at the start and the mirror/front-hub drift to the right is about half the real drift (real front part rotates a bit more), ceiling tubes are dark flat boxes and appear only as small bars top-left whereas the real has big blurred bright tubes."
+}

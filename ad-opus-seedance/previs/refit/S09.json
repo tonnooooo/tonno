@@ -1,0 +1,29 @@
+{
+ "id": "S09",
+ "previs": {
+  "cam_from": [
+   -0.37,
+   -7.6,
+   2.93
+  ],
+  "cam_to": [
+   -0.37,
+   -7.6,
+   2.93
+  ],
+  "look_at": [
+   1.5,
+   21.3,
+   -4.93
+  ],
+  "lens_mm": 26,
+  "speed": 38.0,
+  "car_pos": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "car_yaw": 0.0
+ },
+ "notes": "Real clip (window 1.00-2.17 s = clip frames 24-52, previs frames 230-258): NOT a top-down shot. It is a high chase camera behind and above the coupe in a wide 3-lane night tunnel: the car is seen from behind-above (rear panel with 4 round lamps, wing/trunk lid, big rear window and roof all visible, car roof-front y=0.41, bumper bottom y=0.74 of the frame height), dead centre of the frame (x 0.50, body 22% of the frame width = 140 px of 640), orange sodium ceiling lamps in two rows converging to a vanishing point at x=0.453, y=0.15, smooth tan walls with a dark kerb band, three lanes ~3.3 m wide (dashes at about +-1.7 m of the car axis, dash ~4.4 m long on a ~15 m period, solid edge lines at roughly 5 m left / 6.3 m right of the camera), exit light slit at the VP. The camera is static relative to the car (car size within 6%, car y within 1%, VP drifts 5 px up) and the whole tunnel streams past: tracking one lane dash gives ~1.6 m/frame (about 38 m/s at the 26 mm assumption). Solved with a pinhole model from 5 landmarks (VP row, tail-lamp row, bumper bottom, roof front, car/lamp widths): camera height ~2.9 m (independent of the lens), 5.4 m behind the car's rear plane at 26 mm (distance scales with the lens), pitch 15.2 deg down, yaw 3.7 deg right of the tunnel axis, camera 0.37 m left of the car axis. Previs: car at the origin, yaw 0 (nose +Y), convoy 38 m/s, cam (-0.37,-7.6,2.93) held fixed relative to the car (cam_from = cam_to), aim (1.5,21.3,-4.93) (pitch 15.2 deg, yaw +3.7 deg), lens 26 mm. No zenith crossing any more (the old 'top-down' sweep is gone). Check (previs vs real, px of 640x360, frame 244 vs clip 38): tail-lamp row 237 vs 235, bumper bottom 270 vs 268, car body x-extent 252-390 vs 252-392, VP (291,52) vs (290,53); car centre y 0.60 vs 0.58, silhouette width 0.234 vs 0.222 of the frame (the wing adds ~3%); lane dashes land within ~10 px of the real ones; dash flow measured on the same crop is ~20-40 px/frame in both; frame-difference max/median = 1.04 (no pop/flip). Remaining mismatches: the grey-box tunnel is narrower and ribbed (half width 5.8 m, edge lines at +-4.4 m vs real ~+-5-6 m, dashes +-1.9 m vs ~+-1.7 m, 6 m dash period vs ~15 m real, so the previs dashes are shorter and more frequent at the same ground speed); the ceiling lamps (z=6.82) sit above the top of the frame except near the VP while the real lamp rows are visible in the top 10-20% of the image; the tunnel end is a black hole instead of a bright exit; the previs car roof-front is ~9 px (2.5%) lower than the real one and the wing is much larger than the real small spoiler; the car is grey on grey so the silhouette contrast is low; the lens is not constrained by the clip (a different lens only moves the camera back/forward and scales the speed: 24 mm -> 36 m/s, 32 mm -> 47 m/s); real car width varies by ~6% over the window (AI drift), not reproduced."
+}

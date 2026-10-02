@@ -1,0 +1,28 @@
+{
+  "id": "S06",
+  "previs": {
+    "cam_from": [
+      0.0,
+      -1.04,
+      0.74
+    ],
+    "cam_to": [
+      0.0,
+      -1.028,
+      0.74
+    ],
+    "look_at": [
+      0.0,
+      5.0,
+      0.74
+    ],
+    "lens_mm": 85,
+    "car_pos": [
+      -0.56,
+      2.275,
+      0.0
+    ],
+    "car_yaw": 0
+  },
+  "notes": "Real clip (window 1.3-2.3 s of S06.mp4): extreme macro, locked-off, dead-on view of the rear of the car, one round taillight centred at (0.495,0.508) of the frame, lens diameter ~0.47-0.48 W (0.85 H), grey bezel ring out to ~0.53 W; the lamp ignites from a dark lens with a faint red core (k=0) to a hot white-orange concentric core inside a glowing red ribbed lens (k=12) and stays lit (k=23), with a horizontal anamorphic streak through the centre. Also visible: the curved housing edge and a slot to the right of the lamp, and a second dark round lamp cropped at the extreme left edge (its right edge at ~0.11 W). Camera: perfectly level/perpendicular, no pan/tilt; rim radius measured at 302-304 px of 1280 over the window and phase-correlated shifts show only ~1% scale change, i.e. practically static (very slow push-in ~1%). Previs: lens 85 mm, camera level at z=0.74 (lamp centre height) on the lamp axis x=0, 1.04 m behind the lamp (-> 1.028 m, 1.2% push-in), looking +Y; car placed explicitly (car_pos (-0.56,2.275), yaw 0) so the car's right taillight (local x=+0.56) sits at world x=0 and the car's rear faces the lens (viewer sees the car from behind, lamp neighbour/housing to the right as in the real clip). Measured in the final frames: lamp outer disc centre (0.498,0.498), diameter 0.52 W x 0.92 H (real bezel 0.53 W, lens 0.47 W), core ~0.19 W (real ~0.20-0.21 W); everything within ~2% of frame size of the real lamp. Checked with 50% blends at all five times. Remaining mismatches: (1) the builder's taillight is a single plain disc/ring/core, no second lamp at the left edge, no curved housing/slot/ribbed lens, no flare streak; (2) the ignite recipe is a linear-in-linear-light ramp over the whole shot: the first step is large (frame-diff spike 5.2x median on the first pair, monotonic decay afterwards, no discontinuity) and the lamp's outer disc crosses the grey of the rear panel around k=8-11 so the lamp silhouette briefly vanishes, whereas the real lamp is fully lit by ~k=12; (3) a thin sliver of the rear deck / wing stub is visible along the top edge (builder rear panel ends at z=0.86, frame top is z=0.87)."
+}

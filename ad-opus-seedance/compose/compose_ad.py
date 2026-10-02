@@ -603,6 +603,8 @@ def main():
     ap.add_argument("--fps", type=float, default=None, help="output fps (default 24)")
     ap.add_argument("--duration", type=float, default=None, help="override duration in s (default: shorter input)")
     ap.add_argument("--crf", type=int, default=18, help="x264 CRF (default 18)")
+    ap.add_argument("--instagram", action="store_true",
+                    help="max-quality Reels master: 1080x1920 (scale 1.5), x264 High, CRF 14, preset slow, 24 fps")
     ap.add_argument("--preset", default="medium", help="x264 preset (default medium)")
     ap.add_argument("--src-matrix", default="auto", choices=["auto", "bt709", "bt601"],
                     help="YUV matrix of the inputs when untagged (auto: bt709 for >=720p)")
@@ -613,6 +615,8 @@ def main():
     ap.add_argument("--png-dir", default=".", help="directory for --png-at frames")
     ap.add_argument("--quiet", action="store_true")
     a = ap.parse_args()
+    if a.instagram:
+        a.scale, a.crf, a.preset = 1.5, 14, "slow"
 
     layout = json.load(open(a.layout))
     waves = json.load(open(a.waves))
@@ -652,7 +656,7 @@ def main():
         if a.audio:
             cmd += ["-map", "1:a:0", "-af", "apad", "-c:a", "aac", "-b:a", "192k"]
         cmd += ["-vf", "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p",
-                "-c:v", "libx264", "-preset", a.preset, "-crf", str(a.crf),
+                "-c:v", "libx264", "-profile:v", "high", "-preset", a.preset, "-crf", str(a.crf),
                 "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv",
                 "-t", "%.6f" % duration, "-movflags", "+faststart", a.out]
         enc = subprocess.Popen(cmd, stdin=subprocess.PIPE)

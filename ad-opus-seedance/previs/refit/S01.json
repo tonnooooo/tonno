@@ -1,0 +1,28 @@
+{
+ "id": "S01",
+ "previs": {
+  "cam_from": [
+   0,
+   -18.7,
+   0.48
+  ],
+  "cam_to": [
+   0,
+   -17.4,
+   0.48
+  ],
+  "look_at": [
+   0,
+   40,
+   0.48
+  ],
+  "lens_mm": 25,
+  "car_pos": [
+   -0.1,
+   -9.5,
+   0
+  ],
+  "car_yaw": 90
+ },
+ "notes": "Real clip (window 2.7-3.9 s): locked-off-height, level (horizon at frame centre), straight slow dolly-in down the centre of a hazy garage lane, camera ~0.5 m high, lens ~25 mm equivalent. The coupe sits BROADSIDE across the lane, nose pointing frame-left, centred (car spans 33%->38% of frame width over the window, i.e. ~9.2 m -> ~7.9 m away, roof 0.7 m above the horizon, wheels 0.5 m below). Two rows of fluorescent tubes converge on a centred vanishing point at the horizon, orange-tinted columns stand at the extreme left/right frame edges at about the car's depth, and farther columns sit at ~29% of the width either side of centre. Previs: cam x=0, z=0.48 constant, level aim (look_at 58 m down the lane at the same height), dolly 1.3 m along +Y (y -18.7 -> -17.4), lens 25 mm, car at (-0.1,-9.5) with car_yaw 90 (nose toward -X = frame left). Camera y is chosen so that the builder's tube pair (y=-12, +-3.5 m) lands at the top corners like the real nearest tubes and the column row (y=-8, x=+-7) lands at the frame edges just behind the car; the next column row appears at ~29% either side like the real far columns. Checked with a 50% blend: car nose/tail, wheels, roof, floor line, column edges and the tube rows overlay within a few percent of frame size at all five times. Remaining mismatches: builder flicker recipe keeps the +-3.5 m tubes dark at the start and lights them one by one (the real lights are steady on in this window); builder car, walls, columns share the same grey so the silhouette is low-contrast; builder ceiling beams are heavier than the real thin conduits; bay lines under the car run along Y (they were meant for a nose-on car); garage lights are slightly further apart laterally (3.5 m vs ~3.1 m real)."
+}

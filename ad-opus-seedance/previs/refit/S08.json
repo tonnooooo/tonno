@@ -1,0 +1,34 @@
+{
+ "id": "S08",
+ "previs": {
+  "cam_from": [
+   0.115,
+   1.38,
+   0.335
+  ],
+  "cam_to": [
+   -1.105,
+   1.23,
+   0.366
+  ],
+  "look_at": [
+   3.115,
+   1.429,
+   0.335
+  ],
+  "look_at_to": [
+   1.894,
+   1.1625,
+   0.366
+  ],
+  "lens_mm": 45,
+  "car_pos": [
+   2.4,
+   0,
+   0
+  ],
+  "car_yaw": 0,
+  "speed": 26
+ },
+ "notes": "Real clip (window 0.20-1.33 s, previs frames 202-229): extreme close-up of the car's LEFT-side front wheel (gold multi-spoke, motion-blurred spin) in a tunnel. Camera at the car's left, optical axis ~perpendicular to the flank, at hub height (~0.33-0.38 m, pitch ~0); the car faces frame-LEFT (turn signal / nose at the left edge, door shut-line and lightning livery at the right), wet glossy floor reflections below, warm orange wall bokeh top-left. Start: tyre outer diameter 520 px of 960 (54% of the width, 96% of the height), hub at the frame centre. Over the window the camera pulls straight back, fast and accelerating: tyre diameter 520 / 497 / 432 / 351 / 277 px at 0.20 / 0.48 / 0.76 / 1.04 / 1.33 s (x0.53), i.e. the camera-to-wheel distance roughly doubles (~1.5 m -> ~2.9 m at 45 mm); the hub drifts left from 50% to 39% of the width and down ~3% (camera ends slightly rearward of the wheel), the nose slides right, the door and livery enter, the camera rises ~3 cm. Previs: car at (2.4,0,0) yaw 0 (nose +Y), convoy 26 m/s (wheels roll, 8 deg/frame forward alias); front-left wheel centre plane x=1.64; camera on the car's left (-X) looking +X: cam (0.115,1.38,0.335) -> (-1.105,1.23,0.366) (1.5 m -> 2.7 m from the wheel plane, 0.15 m rearward drift), aim (3.115,1.429,0.335) -> (1.894,1.1625,0.366) (yaw ~+0.9 -> -1.3 deg), lens 45 mm. Wheel numbers at 5 times (previs vs real): tyre outer diameter 568/466/395/343/303 px vs 520/497/432/351/277 (+9/-6/-9/-2/+9%), hub position within 20 px (2% of width) horizontally and 6 px (1% of height) vertically; checked with 50% blends and with a projection of the wheel circle; frame-difference max/median 1.5 (no pop). Remaining mismatches: tyre size error up to ~9% because the builder interpolates the camera linearly while the real pull-back accelerates (convex size curve, see builder_requests); the grey-box car has no wheel arch/fender flare and its nose sits ~0.8 m ahead of the axle (visible real nose ~0.55-0.6 m), so at the end of the window the previs nose is cut by the left frame edge where the real nose is at x ~12%; the body is flat grey with a few dark seam lines (no lights, livery, wheel-arch shadow); the tunnel wall lamps (z=2.0 m) stay just above the 25 deg vertical FOV for the whole window, so the only environment cues are floor lane marks and wall ribs at the edges, while the real shows lamp bokeh top-left; the lens is not constrained by the clip (the view width at the wheel plane is what is matched, a longer lens would just put the camera further away)."
+}
