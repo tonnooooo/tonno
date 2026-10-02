@@ -1,0 +1,411 @@
+{
+  "_commento": "Bozza: 26 tagli con le durate del riferimento (336 frame = 14,0 s). Stesso 'in' sopra (render Blender) e sotto (clip Seedance) perche' il blockout si costruisce sul clip, frame per frame. Gli 'in' sono stimati dai timestamp dei prompt e vanno rifiniti (+-0,5 s) a clip generati. 'crop' e 'fx' sono istruzioni di compositing per entrambi i pannelli: montaggio/render.py oggi li ignora.",
+  "fps": 24,
+  "bpm": 115,
+  "size": [
+    1920,
+    1080
+  ],
+  "audio": {
+    "src": "pubblicita/output/musica/suno.wav",
+    "offset_s": 0
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "frames": 8,
+      "top": {
+        "src": "pubblicita/output/blender/S01.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S01.mp4",
+        "in": 24
+      },
+      "note": "S01 @ 1.00-1.29 s del clip S01 (frame 24-31). Inizio del dolly: campo largo 3/4 frontale nel vicolo di Bukchon, anabbaglianti accesi, pioggia nei fasci."
+    },
+    {
+      "id": "s02",
+      "frames": 6,
+      "top": {
+        "src": "pubblicita/output/blender/S02.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S02.mp4",
+        "in": 24
+      },
+      "note": "S02 @ 1.00-1.21 s del clip S02 (frame 24-29). Lei in piedi, ferma, mani giunte (prima di inginocchiarsi)."
+    },
+    {
+      "id": "s03",
+      "frames": 6,
+      "top": {
+        "src": "pubblicita/output/blender/S03.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S03.mp4",
+        "in": 24
+      },
+      "note": "S03 @ 1.00-1.21 s del clip S03 (frame 24-29). Solo la mano destra appoggiata in cima al volante."
+    },
+    {
+      "id": "s04",
+      "frames": 6,
+      "top": {
+        "src": "pubblicita/output/blender/S04.mp4",
+        "in": 55
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S04.mp4",
+        "in": 55
+      },
+      "note": "S04 @ 2.29-2.50 s del clip S04 (frame 55-60). Gli occhi salgono verso l'obiettivo (6 frame di micro-movimento)."
+    },
+    {
+      "id": "s05",
+      "frames": 14,
+      "top": {
+        "src": "pubblicita/output/blender/S05.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S05.mp4",
+        "in": 24
+      },
+      "note": "S05 @ 1.00-1.54 s del clip S05 (frame 24-37). Di spalle, ferma, l'organza mossa dalla brezza."
+    },
+    {
+      "id": "s06",
+      "frames": 18,
+      "top": {
+        "src": "pubblicita/output/blender/S03.mp4",
+        "in": 53
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S03.mp4",
+        "in": 53
+      },
+      "note": "S03 @ 2.21-2.92 s del clip S03 (frame 53-70). La mano sinistra sale e afferra il volante a ore 9."
+    },
+    {
+      "id": "s07",
+      "frames": 19,
+      "top": {
+        "src": "pubblicita/output/blender/S06.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S06.mp4",
+        "in": 24
+      },
+      "note": "S06 @ 1.00-1.75 s del clip S06 (frame 24-42). Lei ferma con l'ombrello trasparente, i maxischermi cambiano colore."
+    },
+    {
+      "id": "s08",
+      "frames": 10,
+      "top": {
+        "src": "pubblicita/output/blender/S04.mp4",
+        "in": 86
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S04.mp4",
+        "in": 86
+      },
+      "note": "S04 @ 3.58-3.96 s del clip S04 (frame 86-95). Sguardo fisso in camera, battito di ciglia, accenno di sorriso."
+    },
+    {
+      "id": "s09",
+      "frames": 14,
+      "top": {
+        "src": "pubblicita/output/blender/S02.mp4",
+        "in": 97
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S02.mp4",
+        "in": 97
+      },
+      "note": "S02 @ 4.04-4.58 s del clip S02 (frame 97-110). Appena seduta in posa formale, frontale, chima aperta a cerchio, ferma."
+    },
+    {
+      "id": "s10",
+      "frames": 10,
+      "top": {
+        "src": "pubblicita/output/blender/S07.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S07.mp4",
+        "in": 24
+      },
+      "note": "S07 @ 1.00-1.38 s del clip S07 (frame 24-33). Quattro fanali tondi accesi, prima della frenata."
+    },
+    {
+      "id": "s11",
+      "frames": 11,
+      "top": {
+        "src": "pubblicita/output/blender/S08.mp4",
+        "in": 79
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S08.mp4",
+        "in": 79
+      },
+      "note": "S08 @ 3.29-3.71 s del clip S08 (frame 79-89). A meta' della girata: la testa ruota sopra la spalla sinistra verso camera."
+    },
+    {
+      "id": "s12",
+      "frames": 15,
+      "top": {
+        "src": "pubblicita/output/blender/S01.mp4",
+        "in": 55
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S01.mp4",
+        "in": 55
+      },
+      "note": "S01 @ 2.29-2.88 s del clip S01 (frame 55-69). Dolly a meta': il doppio lampeggio degli abbaglianti cade ~3 frame dopo il taglio (sul beat 10)."
+    },
+    {
+      "id": "s13",
+      "frames": 11,
+      "top": {
+        "src": "pubblicita/output/blender/S01.mp4",
+        "in": 125
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S01.mp4",
+        "in": 125
+      },
+      "note": "S01 @ 5.21-5.62 s del clip S01 (frame 125-135). Fine del dolly: il faro riempie il quadro, abbagliante fisso, pioggia in controluce."
+    },
+    {
+      "id": "s14",
+      "frames": 14,
+      "top": {
+        "src": "pubblicita/output/blender/S03.mp4",
+        "in": 94
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S03.mp4",
+        "in": 94
+      },
+      "note": "S03 @ 3.92-4.46 s del clip S03 (frame 94-107). Crop 1,4x sulle mani che stringono il volante e flettono le dita.",
+      "crop": {
+        "zoom": 1.4,
+        "center": [
+          0.55,
+          0.55
+        ],
+        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
+      }
+    },
+    {
+      "id": "s15",
+      "frames": 13,
+      "top": {
+        "src": "pubblicita/output/blender/S08.mp4",
+        "in": 120
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S08.mp4",
+        "in": 120
+      },
+      "note": "S08 @ 5.00-5.50 s del clip S08 (frame 120-132). Crop 1,3x: la mano sinistra sale verso i capelli.",
+      "crop": {
+        "zoom": 1.3,
+        "center": [
+          0.56,
+          0.42
+        ],
+        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
+      }
+    },
+    {
+      "id": "s16",
+      "frames": 10,
+      "top": {
+        "src": "pubblicita/output/blender/S08.mp4",
+        "in": 149
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S08.mp4",
+        "in": 149
+      },
+      "note": "S08 @ 6.21-6.58 s del clip S08 (frame 149-158). Crop 1,6x: si sistema la ciocca dietro l'orecchio, accenno di sorriso.",
+      "crop": {
+        "zoom": 1.6,
+        "center": [
+          0.56,
+          0.33
+        ],
+        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
+      }
+    },
+    {
+      "id": "s17",
+      "frames": 17,
+      "top": {
+        "src": "pubblicita/output/blender/S02.mp4",
+        "in": 122
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S02.mp4",
+        "in": 122
+      },
+      "note": "S02 @ 5.08-5.75 s del clip S02 (frame 122-138). Crop 1,5x: da seduta gira la testa a destra fino al profilo.",
+      "crop": {
+        "zoom": 1.5,
+        "center": [
+          0.5,
+          0.58
+        ],
+        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
+      }
+    },
+    {
+      "id": "s18",
+      "frames": 10,
+      "top": {
+        "src": "pubblicita/output/blender/S09.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S09.mp4",
+        "in": 24
+      },
+      "note": "S09 @ 1.00-1.38 s del clip S09 (frame 24-33). Immobile davanti ai fari, in controluce, occhiali scuri."
+    },
+    {
+      "id": "s19",
+      "frames": 11,
+      "top": {
+        "src": "pubblicita/output/blender/S07.mp4",
+        "in": 72
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S07.mp4",
+        "in": 72
+      },
+      "note": "S07 @ 3.00-3.42 s del clip S07 (frame 72-82). Crop 1,6x in basso a sinistra: fanali in frenata e sbuffo di vapore dallo scarico.",
+      "crop": {
+        "zoom": 1.6,
+        "center": [
+          0.34,
+          0.66
+        ],
+        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
+      }
+    },
+    {
+      "id": "s20",
+      "frames": 11,
+      "top": {
+        "src": "pubblicita/output/blender/S09.mp4",
+        "in": 72
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S09.mp4",
+        "in": 72
+      },
+      "note": "S09 @ 3.00-3.42 s del clip S09 (frame 72-82). La mano destra tocca la stanghetta degli occhiali e li sistema."
+    },
+    {
+      "id": "s21",
+      "frames": 7,
+      "top": {
+        "src": "pubblicita/output/blender/S10.mp4",
+        "in": 53
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S10.mp4",
+        "in": 53
+      },
+      "note": "S10 @ 2.21-2.46 s del clip S10 (frame 53-59). Le scarpe di raso avorio toccano il marciapiede bagnato."
+    },
+    {
+      "id": "s22",
+      "frames": 20,
+      "top": {
+        "src": "pubblicita/output/blender/S05.mp4",
+        "in": 43
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S05.mp4",
+        "in": 43
+      },
+      "note": "S05 @ 1.79-2.58 s del clip S05 (frame 43-62). Ancora di spalle, piu' avanti nel push-in: la brezza solleva l'organza e le nappe."
+    },
+    {
+      "id": "s23",
+      "frames": 15,
+      "top": {
+        "src": "pubblicita/output/blender/S08.mp4",
+        "in": 24
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S08.mp4",
+        "in": 24
+      },
+      "note": "S08 @ 1.00-1.58 s del clip S08 (frame 24-38). Cammina di spalle verso i fanali posteriori."
+    },
+    {
+      "id": "s24",
+      "frames": 13,
+      "top": {
+        "src": "pubblicita/output/blender/S06.mp4",
+        "in": 91
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S06.mp4",
+        "in": 91
+      },
+      "note": "S06 @ 3.79-4.29 s del clip S06 (frame 91-103). I primi ~5 frame coperti dal whip in post (blur direzionale + scie), poi il campo largo: ombrello inclinato, viso verso camera.",
+      "fx": {
+        "whip": {
+          "frames": 5,
+          "tipo": "whip pan in post identico sui due pannelli",
+          "blur": "direzionale orizzontale, intensita' decrescente",
+          "slide": 0.15,
+          "direzione": "da destra verso sinistra",
+          "sfx": "whoosh di 1 beat (suno/sounds, 115 BPM) con picco sul taglio a f276"
+        }
+      }
+    },
+    {
+      "id": "s25",
+      "frames": 25,
+      "top": {
+        "src": "pubblicita/output/blender/S05.mp4",
+        "in": 139
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S05.mp4",
+        "in": 139
+      },
+      "note": "S05 @ 5.79-6.79 s del clip S05 (frame 139-163). Crop 1,3x: frontale dopo la girata, occhiali cat-eye, torre blu dietro, immobile.",
+      "crop": {
+        "zoom": 1.3,
+        "center": [
+          0.45,
+          0.4
+        ],
+        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
+      }
+    },
+    {
+      "id": "s26",
+      "frames": 22,
+      "top": {
+        "src": "pubblicita/output/blender/S11.mp4",
+        "in": 36
+      },
+      "bottom": {
+        "src": "pubblicita/output/seedance/S11.mp4",
+        "in": 36
+      },
+      "note": "S11 @ 1.50-2.38 s del clip S11 (frame 36-57). Push-in lentissimo, lanterne che oscillano appena."
+    }
+  ]
+}

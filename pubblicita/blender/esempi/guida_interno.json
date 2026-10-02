@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "id": "guida_interno",
+    "frames": 24,
+    "resolution": [1280, 720],
+    "samples": 12,
+    "seed": 2,
+    "note": "Primo piano di guida: manichino seduto al volante (guida a destra) visto da dietro la spalla sinistra, pareti di legno che scorrono fuori."
+  },
+  "world": {"preset": "warm_interior", "replace_lights": true, "color": "#1A140F", "strength": 0.4,
+            "lights": [
+              {"light_type": "area", "location": [-1.2, -0.6, 1.9], "look_at": [0, -0.4, 0.9], "color": "#FFE7CC", "energy": 45, "size": 1.2}
+            ]},
+  "camera": {
+    "lens": 35,
+    "location": [-0.75, 0.55, 1.08],
+    "look_at": [0.05, -0.6, 0.86],
+    "handheld": {"amplitude": 0.004, "rotation": 0.2, "frequency": 1.6}
+  },
+  "objects": [
+    {"name": "abitacolo", "type": "car_interior", "drive": "right"},
+    {"name": "pilota", "type": "mannequin", "pose": "driving", "dress": "long", "accessories": ["obi"]},
+    {"name": "muri", "type": "corridor", "location": [-0.5, -30, 0], "length": 60, "width": 5.0, "height": 3.0,
+     "signs": false, "lamps": {"count": 10, "radius": 0.2, "height": 2.2, "light_energy": 25},
+     "keys": [{"f": 0, "location": [-0.5, -30, 0]}, {"f": 23, "location": [-0.5, -26, 0], "ease": "linear"}]}
+  ]
+}

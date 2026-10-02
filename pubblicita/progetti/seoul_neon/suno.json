@@ -1,0 +1,31 @@
+{
+  "model": "suno/music",
+  "input": {
+    "mv": "chirp-v6",
+    "custom": false,
+    "instrumental": true,
+    "title": "Seoul Neon 115",
+    "gpt_description_prompt": "Instrumental only, no vocals. A 115 BPM track in 4/4 for a 14-second night car commercial in rainy Seoul: modern Korean city pop meets nu-disco, elegant, confident and glossy. The groove is full from the very first bar, with no long intro and no fade-in: four-on-the-floor kick, crisp claps on 2 and 4, tight 16th-note hi-hats, a punchy slap bass line locked to the kick, warm Rhodes chords with major-seventh and ninth colors, a bright analog synth lead hook made of short memorable phrases, and a subtle plucked gayageum-like synth motif that answers it, modern Seoul meeting tradition. Energy stays constant: a steady mid-tempo drive with no tempo changes and no half-time breakdowns. Write it so an editor can cut on it. Open with a hard crash and bass hit on the first downbeat. Every two bars, add a short syncopated synth stab and a quick tom fill. At the start of each new 4-bar phrase, put a crash with a deep bass drop. Before the last phrase, a one-beat reverse-cymbal swell leads into a big impact chord on the downbeat. End with a hard stop on a downbeat and a short reverb tail. Minor key, neon and rain atmosphere, polished modern punchy mix, wide stereo, clean tight low end.",
+    "tags": "modern Korean city pop meets nu-disco night drive, instrumental, no vocals, 115 BPM, steady mid-tempo four-on-the-floor groove, crisp claps on 2 and 4, slap electric bass, Rhodes electric piano chords, glossy analog synth lead hook, staccato synth stabs, subtle plucked gayageum-like synth accents, shimmering pads, rain-soaked neon night mood, polished punchy modern mix, full energy from the first bar",
+    "negative_tags": "vocals, singing, rap, spoken word, choir, vocal chops, humming, acoustic guitar, country, orchestral trailer, dubstep, festival EDM, trap hi-hat rolls, lo-fi tape hiss, long ambient intro, fade in, fade out, tempo change, half-time breakdown",
+    "duration": 40,
+    "audio_format": "wav"
+  },
+  "input_alternativo_custom": {
+    "_quando": "Seconda chiamata consigliata (piu' controllo sulla struttura): modalita' custom con soli meta-tag, max_mode (prezzo doppio, 0,16 USD).",
+    "mv": "chirp-v6",
+    "custom": true,
+    "instrumental": true,
+    "title": "Seoul Neon 115 (custom)",
+    "prompt": "[Instrumental]\n[Intro: 2-beat pickup, staccato eighth-note synth stabs]\n[Drop: full groove from the downbeat, crash, slap bass, glossy synth lead hook, gayageum-like pluck answers]\n[Instrumental: groove continues, syncopated synth stab every 2 bars, quick tom fill]\n[Drop: crash and deep bass drop on the downbeat, lead variation]\n[Build-Up: 1-beat reverse cymbal swell]\n[Outro: big impact chord on the downbeat, hard stop, short reverb tail]\n[No Vocals]",
+    "tags": "modern Korean city pop meets nu-disco night drive, instrumental, no vocals, 115 BPM, steady mid-tempo four-on-the-floor groove, crisp claps on 2 and 4, slap electric bass, Rhodes electric piano chords, glossy analog synth lead hook, staccato synth stabs, subtle plucked gayageum-like synth accents, shimmering pads, rain-soaked neon night mood, polished punchy modern mix, full energy from the first bar",
+    "negative_tags": "vocals, singing, rap, spoken word, choir, vocal chops, humming, acoustic guitar, country, orchestral trailer, dubstep, festival EDM, trap hi-hat rolls, lo-fi tape hiss, long ambient intro, fade in, fade out, tempo change, half-time breakdown",
+    "style_weight": 0.8,
+    "weirdness_constraint": 0.25,
+    "variety": "normal",
+    "max_mode": true,
+    "duration": 50,
+    "audio_format": "wav"
+  },
+  "note": "1) Ogni chiamata restituisce 2 take (0,08 USD a chiamata, 0,16 con max_mode). Fare la chiamata 'input' e quella 'input_alternativo_custom', piu' un run con mv 'chirp-v6-wild' se servono alternative. duration 40 (invece di 30) per avere margine nella scelta della finestra. 2) BPM: Suno non lo rispetta come un metronomo. Misurarlo su ogni take (autocorrelazione dello spectral flux o librosa) e correggere con suno/adjust-speed: speed_multiplier = 115 / BPM misurato, keep_pitch true (accettabile entro +-3%). 3) Finestra: 14,00 s (336 frame) che parte su un downbeat del drop. Mettere quel downbeat a ~0,03 s (frame 0-1) del video: edl_bozza.json -> audio.offset_s = istante del downbeat nel file - 0,03 (offset positivo = taglia l'inizio del file). Con questo allineamento 13 tagli su 25 cadono sul beat entro +-1,6 frame. 4) Mappa accenti (frame del video, beat 0 = downbeat): f0 shot 1 crash; f14 shot 3 stab (comparsa del titolo 'Opus' ~0,5 s); f26 shot 5 clap (prima torre); f101 shot 10 downbeat battuta 3, kick + crash (fanali e porta dorata); f125 dentro lo shot 12, beat 10, doppio stab sincronizzato col lampeggio degli abbaglianti; f202 shot 18 downbeat battuta 5, crash + bass drop (accento piu' forte, lei nei fari); f262-276 riser / reverse cymbal; f276 shot 24 beat 22, picco del whoosh sul whip; f289 shot 25 beat 23, sub impact; f314 shot 26 beat 25, accordo finale + filtro passa-basso, coda fino a 14,00 s e stop netto. 5) Rinforzi con suno/sounds (bpm 115, stessa tonalita' del take scelto): whoosh di 1 beat per lo shot 24, sub impact per lo shot 25, hit con coda per lo shot 26, eventuale stab doppio per lo shot 12. Le durate degli shot non si toccano: si sposta solo l'offset del brano. Se il take ha il riser nel punto sbagliato: suno/replace-section solo su quell'intervallo."
+}

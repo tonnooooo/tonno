@@ -1,0 +1,191 @@
+{
+  "_commento": "Esempio con sorgenti finte: 26 tagli che riusano 10 setup (stesso 'in' sopra e sotto, perché il blockout Blender e il clip Seedance sono allineati frame per frame). Le durate sono quelle di ritmo_riferimento.json; in alternativa si può usare \"beats\" al posto di \"frames\".",
+  "fps": 24,
+  "bpm": 115,
+  "size": [1920, 1080],
+  "audio": {"src": null, "offset_s": 0},
+  "shots": [
+    {
+      "id": "s01",
+      "frames": 8,
+      "top": {"src": "pubblicita/output/blender/setup01.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup01.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 01"
+    },
+    {
+      "id": "s02",
+      "frames": 6,
+      "top": {"src": "pubblicita/output/blender/setup02.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup02.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 02"
+    },
+    {
+      "id": "s03",
+      "frames": 6,
+      "top": {"src": "pubblicita/output/blender/setup03.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup03.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 03"
+    },
+    {
+      "id": "s04",
+      "frames": 6,
+      "top": {"src": "pubblicita/output/blender/setup04.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup04.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 04"
+    },
+    {
+      "id": "s05",
+      "frames": 14,
+      "top": {"src": "pubblicita/output/blender/setup01.mp4", "in": 30, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup01.mp4", "in": 30, "speed": 1.0},
+      "note": "setup 01"
+    },
+    {
+      "id": "s06",
+      "frames": 18,
+      "top": {"src": "pubblicita/output/blender/setup05.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup05.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 05"
+    },
+    {
+      "id": "s07",
+      "frames": 19,
+      "top": {"src": "pubblicita/output/blender/setup06.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup06.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 06"
+    },
+    {
+      "id": "s08",
+      "frames": 10,
+      "top": {"src": "pubblicita/output/blender/setup07.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup07.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 07"
+    },
+    {
+      "id": "s09",
+      "frames": 14,
+      "top": {"src": "pubblicita/output/blender/setup05.mp4", "in": 40, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup05.mp4", "in": 40, "speed": 1.0},
+      "note": "setup 05"
+    },
+    {
+      "id": "s10",
+      "frames": 10,
+      "top": {"src": "pubblicita/output/blender/setup08.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup08.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 08"
+    },
+    {
+      "id": "s11",
+      "frames": 11,
+      "top": {"src": "pubblicita/output/blender/setup06.mp4", "in": 40, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup06.mp4", "in": 40, "speed": 1.0},
+      "note": "setup 06"
+    },
+    {
+      "id": "s12",
+      "frames": 15,
+      "top": {"src": "pubblicita/output/blender/setup09.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup09.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 09"
+    },
+    {
+      "id": "s13",
+      "frames": 11,
+      "top": {"src": "pubblicita/output/blender/setup02.mp4", "in": 30, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup02.mp4", "in": 30, "speed": 1.0},
+      "note": "setup 02"
+    },
+    {
+      "id": "s14",
+      "frames": 14,
+      "top": {"src": "pubblicita/output/blender/setup10.mp4", "in": 0, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup10.mp4", "in": 0, "speed": 1.0},
+      "note": "setup 10"
+    },
+    {
+      "id": "s15",
+      "frames": 13,
+      "top": {"src": "pubblicita/output/blender/setup03.mp4", "in": 40, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup03.mp4", "in": 40, "speed": 1.0},
+      "note": "setup 03"
+    },
+    {
+      "id": "s16",
+      "frames": 10,
+      "top": {"src": "pubblicita/output/blender/setup08.mp4", "in": 30, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup08.mp4", "in": 30, "speed": 1.0},
+      "note": "setup 08"
+    },
+    {
+      "id": "s17",
+      "frames": 17,
+      "top": {"src": "pubblicita/output/blender/setup09.mp4", "in": 40, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup09.mp4", "in": 40, "speed": 1.0},
+      "note": "setup 09"
+    },
+    {
+      "id": "s18",
+      "frames": 10,
+      "top": {"src": "pubblicita/output/blender/setup04.mp4", "in": 40, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup04.mp4", "in": 40, "speed": 1.0},
+      "note": "setup 04"
+    },
+    {
+      "id": "s19",
+      "frames": 11,
+      "top": {"src": "pubblicita/output/blender/setup07.mp4", "in": 30, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup07.mp4", "in": 30, "speed": 1.0},
+      "note": "setup 07"
+    },
+    {
+      "id": "s20",
+      "frames": 11,
+      "top": {"src": "pubblicita/output/blender/setup10.mp4", "in": 30, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup10.mp4", "in": 30, "speed": 1.0},
+      "note": "setup 10"
+    },
+    {
+      "id": "s21",
+      "frames": 7,
+      "top": {"src": "pubblicita/output/blender/setup01.mp4", "in": 70, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup01.mp4", "in": 70, "speed": 1.0},
+      "note": "setup 01"
+    },
+    {
+      "id": "s22",
+      "frames": 20,
+      "top": {"src": "pubblicita/output/blender/setup06.mp4", "in": 80, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup06.mp4", "in": 80, "speed": 1.0},
+      "note": "setup 06"
+    },
+    {
+      "id": "s23",
+      "frames": 15,
+      "top": {"src": "pubblicita/output/blender/setup09.mp4", "in": 80, "speed": 1.5},
+      "bottom": {"src": "pubblicita/output/seedance/setup09.mp4", "in": 80, "speed": 1.5},
+      "note": "setup 09 — passaggio whip: accelerato"
+    },
+    {
+      "id": "s24",
+      "frames": 13,
+      "top": {"src": "pubblicita/output/blender/setup02.mp4", "in": 60, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup02.mp4", "in": 60, "speed": 1.0},
+      "note": "setup 02"
+    },
+    {
+      "id": "s25",
+      "frames": 25,
+      "top": {"src": "pubblicita/output/blender/setup05.mp4", "in": 70, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup05.mp4", "in": 70, "speed": 1.0},
+      "note": "setup 05"
+    },
+    {
+      "id": "s26",
+      "frames": 22,
+      "top": {"src": "pubblicita/output/blender/setup10.mp4", "in": 60, "speed": 1.0},
+      "bottom": {"src": "pubblicita/output/seedance/setup10.mp4", "in": 60, "speed": 1.0},
+      "note": "setup 10"
+    }
+  ]
+}

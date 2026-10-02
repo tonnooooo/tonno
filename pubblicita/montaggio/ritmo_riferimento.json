@@ -1,0 +1,11 @@
+{
+  "descrizione": "Ritmo dello spot di riferimento (reel 26 shot, 14.0 s): durate in frame a 24 fps, rilevate con 'montaggio analyze' sul pannello inferiore (crop 1056:594:12:1070, soglia 0.3) e coincidenti con i tagli misurati.",
+  "fps": 24,
+  "bpm": 115,
+  "total_frames": 336,
+  "duration_s": 14.0,
+  "frames": [8, 6, 6, 6, 14, 18, 19, 10, 14, 10, 11, 15, 11, 14, 13, 10, 17, 10, 11, 11, 7, 20, 15, 13, 25, 22],
+  "cuts_s": [0.3333, 0.5833, 0.8333, 1.0833, 1.6667, 2.4167, 3.2083, 3.625, 4.2083, 4.625, 5.0833, 5.7083, 6.1667, 6.75, 7.2917, 7.7083, 8.4167, 8.8333, 9.2917, 9.75, 10.0417, 10.875, 11.5, 12.0417, 13.0833],
+  "beats_equivalenti": [0.639, 0.479, 0.479, 0.479, 1.118, 1.438, 1.517, 0.799, 1.118, 0.799, 0.878, 1.198, 0.878, 1.118, 1.038, 0.799, 1.358, 0.799, 0.878, 0.878, 0.559, 1.597, 1.198, 1.038, 1.997, 1.757],
+  "note": "Il riferimento non e' tagliato esattamente sui battiti a 115 bpm: per riprodurlo al frame usare 'frames', non 'beats'. Al taglio 23 (11.5 s) c'e' un passaggio whip con motion blur."
+}

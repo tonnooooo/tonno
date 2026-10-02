@@ -135,7 +135,8 @@ def _parser() -> argparse.ArgumentParser:
     e.add_argument("--auto-duration", type=float, default=None)
     e.add_argument("--json", action="store_true")
 
-    a = sub.add_parser("asset", parents=[comuni], help="libreria asset (doubao-asset, gratuita)")
+    # le opzioni comuni stanno solo sui sottocomandi foglia: argparse sovrascriverebbe quelle intermedie
+    a = sub.add_parser("asset", help="libreria asset (doubao-asset, gratuita)")
     asub = a.add_subparsers(dest="azione", required=True)
     up = asub.add_parser("upload", parents=[comuni], help="registra un file pubblico come asset")
     up.add_argument("--url", required=True, help="URL pubblico del file")
@@ -169,7 +170,7 @@ class Contesto:
             self.ambiente.get("EPHONE_OUTPUT_DIR") or CARTELLA_OUTPUT)
 
     def api(self, dal_manifest: str | None = None) -> str:
-        return self.args.api or dal_manifest or self.ambiente.get("EPHONE_API_MODE") or "unified"
+        return self.args.api or dal_manifest or self.conf.modo_api or "unified"
 
     def client(self, api: str | None = None) -> ClientEphone:
         chiave = self.conf.richiedi_chiave()
@@ -508,9 +509,9 @@ def main(argv=None, *, sessione=None, sleep=None, ambiente=None) -> int:
     gestore.addFilter(FiltroRedazione())
     gestore.setFormatter(logging.Formatter("%(levelname)s %(message)s"))
     registro = logging.getLogger("pubblicita.ephone")
-    registro.handlers[:] = [gestore]
+    livello_precedente = registro.level
+    registro.addHandler(gestore)
     registro.setLevel(logging.DEBUG if args.verbose else logging.WARNING)
-    registro.propagate = False
     try:
         ctx = Contesto(args, sessione=sessione, sleep=sleep, ambiente=ambiente)
         return COMANDI[args.comando](ctx)
@@ -530,6 +531,9 @@ def main(argv=None, *, sessione=None, sleep=None, ambiente=None) -> int:
     except ValueError as e:
         _err(f"Errore: {redigi(e)}")
         return ESITO_VALIDAZIONE
+    finally:
+        registro.removeHandler(gestore)
+        registro.setLevel(livello_precedente)
 
 
 if __name__ == "__main__":

@@ -146,7 +146,10 @@ class Esecutore:
             voce = self.ledger_per(r.tipo).leggi(r.id) or {}
             stato = voce.get("status")
             if forza:
-                piano.append(Piano(r, "invia", "--force"))
+                motivo = "--force"
+                if voce.get("task_id") and stato in ("queued", "running"):
+                    motivo += f" (il task {voce['task_id']} ancora {stato} viene abbandonato ma resta a pagamento)"
+                piano.append(Piano(r, "invia", motivo))
             elif self.file_output(r).exists():
                 piano.append(Piano(r, "salta", f"output già presente ({self.file_output(r).name})"))
             elif voce.get("task_id") and stato in ("queued", "running", "succeeded", DOWNLOADED):
@@ -172,7 +175,7 @@ class Esecutore:
                 self.notifica(f"[{p.richiesta.id}] saltato: {p.motivo}")
             else:
                 lavori.append((i, p))
-        self._esegui_in_parallelo(lavori, lambda p: self._lavora(p), esiti)
+        self._esegui_in_parallelo(lavori, self._lavora, esiti)
         return [esiti[i] for i in sorted(esiti)]
 
     def _esegui_in_parallelo(self, lavori, funzione, esiti: dict) -> None:
@@ -191,34 +194,47 @@ class Esecutore:
         finally:
             pool.shutdown(wait=True)
 
+    def _protetto(self, job_id: str, tipo: str, funzione) -> Esito:
+        """Esegue ``funzione`` isolando gli errori: un problema su uno shot non ferma gli altri."""
+        try:
+            return funzione()
+        except Interrotto:
+            return Esito(job_id, "interrotto", "interrotto: riprendi con `python3 -m pubblicita.ephone resume`")
+        except Exception as e:
+            log.exception("errore imprevisto su %s", job_id)
+            messaggio = redigi(f"{type(e).__name__}: {e}")
+            self.ledger_per(tipo).aggiorna(job_id, error=messaggio)
+            return Esito(job_id, "errore", messaggio)
+
     def _solo_invio(self, p: Piano) -> Esito:
         r = p.richiesta
         if p.azione == "salta":
             return Esito(r.id, "saltato", p.motivo)
         if p.azione == "riprendi":
             return Esito(r.id, "inviato", p.motivo)
-        esito = self.invia(r)
-        if esito is not None:
-            return esito
-        voce = self.ledger_per(r.tipo).leggi(r.id) or {}
-        if voce.get("status") == DOWNLOADED:  # immagine sincrona: già scaricata
-            return Esito(r.id, "scaricato", "", (voce.get("files") or {}).get("main"))
-        return Esito(r.id, "inviato", f"task {voce.get('task_id')}: scarica più tardi con resume")
+
+        def lavoro():
+            esito = self.invia(r)
+            if esito is not None:
+                return esito
+            voce = self.ledger_per(r.tipo).leggi(r.id) or {}
+            if voce.get("status") == DOWNLOADED:  # immagine sincrona: già scaricata
+                return Esito(r.id, "scaricato", "", (voce.get("files") or {}).get("main"))
+            return Esito(r.id, "inviato", f"task {voce.get('task_id')}: scarica più tardi con resume")
+
+        return self._protetto(r.id, r.tipo, lavoro)
 
     def _lavora(self, p: Piano) -> Esito:
         r = p.richiesta
-        try:
+
+        def lavoro():
             if p.azione == "invia":
                 esito = self.invia(r)
                 if esito is not None:
                     return esito
             return self.attendi(r.id, r.tipo)
-        except Interrotto:
-            return Esito(r.id, "interrotto", "interrotto: riprendi con `python3 -m pubblicita.ephone resume`")
-        except Exception as e:  # un errore su uno shot non deve fermare gli altri
-            log.exception("errore imprevisto su %s", r.id)
-            self.ledger_per(r.tipo).aggiorna(r.id, error=redigi(f"{type(e).__name__}: {e}"))
-            return Esito(r.id, "errore", redigi(f"{type(e).__name__}: {e}"))
+
+        return self._protetto(r.id, r.tipo, lavoro)
 
     def _voce_iniziale(self, r, percorso: str, corpo: dict) -> dict:
         stima = r.stima()
@@ -413,10 +429,7 @@ class Esecutore:
 
         def funzione(elemento):
             job_id, tipo = elemento
-            try:
-                return self.attendi(job_id, tipo)
-            except Interrotto:
-                return Esito(job_id, "interrotto", "interrotto")
+            return self._protetto(job_id, tipo, lambda: self.attendi(job_id, tipo))
 
         self._esegui_in_parallelo(list(enumerate(lavori)), funzione, esiti)
         return [esiti[i] for i in sorted(esiti)]

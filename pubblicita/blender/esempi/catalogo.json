@@ -1,0 +1,458 @@
+{
+  "meta": {
+    "id": "catalogo",
+    "frames": 1,
+    "resolution": [
+      1280,
+      720
+    ],
+    "samples": 12,
+    "note": "Vetrina di tutti i prefab (utile per vedere a colpo d'occhio cosa offre il kit)."
+  },
+  "world": {
+    "preset": "studio"
+  },
+  "render": {
+    "vignette": 0.1
+  },
+  "camera": {
+    "lens": 28,
+    "location": [
+      0,
+      -17,
+      6.5
+    ],
+    "look_at": [
+      0,
+      2,
+      1.2
+    ]
+  },
+  "objects": [
+    {
+      "name": "pavimento",
+      "type": "plane",
+      "size": [
+        80,
+        80
+      ],
+      "material": "concrete:#9C9890"
+    },
+    {
+      "name": "coupe",
+      "type": "car",
+      "style": "coupe_80s",
+      "location": [
+        -9,
+        4,
+        0
+      ],
+      "popup_headlights": true
+    },
+    {
+      "name": "hatch",
+      "type": "car",
+      "style": "hatchback",
+      "location": [
+        -5.5,
+        4,
+        0
+      ],
+      "color": "#B8C4D6"
+    },
+    {
+      "name": "berlina",
+      "type": "car",
+      "style": "sedan",
+      "location": [
+        -2,
+        4,
+        0
+      ],
+      "color": "#2B2D33",
+      "doors_open": "left"
+    },
+    {
+      "name": "sportiva",
+      "type": "car",
+      "style": "sports",
+      "location": [
+        1.5,
+        4,
+        0
+      ],
+      "color": "#C93A32"
+    },
+    {
+      "name": "suv",
+      "type": "car",
+      "style": "suv",
+      "location": [
+        5,
+        4,
+        0
+      ],
+      "color": "#6E7B5A"
+    },
+    {
+      "name": "furgone",
+      "type": "car",
+      "style": "van",
+      "location": [
+        8.7,
+        4,
+        0
+      ]
+    },
+    {
+      "name": "in_piedi",
+      "type": "mannequin",
+      "location": [
+        -6,
+        -1,
+        0
+      ],
+      "accessories": [
+        "hair_bun",
+        "kanzashi",
+        "obi",
+        "flower"
+      ]
+    },
+    {
+      "name": "cammina",
+      "type": "mannequin",
+      "location": [
+        -4.5,
+        -1,
+        0
+      ],
+      "pose": "walking",
+      "dress": "pants",
+      "walk": {
+        "phase": 1.2
+      },
+      "accessories": [
+        "hat",
+        "bag"
+      ]
+    },
+    {
+      "name": "sedia",
+      "type": "chair",
+      "location": [
+        -3,
+        -1,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ]
+    },
+    {
+      "name": "seduta",
+      "type": "mannequin",
+      "location": [
+        -3,
+        -1.1,
+        0
+      ],
+      "pose": "sitting_chair",
+      "dress": "pants"
+    },
+    {
+      "name": "seiza",
+      "type": "mannequin",
+      "location": [
+        -1.5,
+        -1,
+        0
+      ],
+      "pose": "sitting_seiza",
+      "accessories": [
+        "hair_bun",
+        "obi"
+      ]
+    },
+    {
+      "name": "mano",
+      "type": "mannequin",
+      "location": [
+        0,
+        -1,
+        0
+      ],
+      "pose": "hand_raise",
+      "accessories": [
+        "sunglasses"
+      ]
+    },
+    {
+      "name": "ombrello",
+      "type": "mannequin",
+      "location": [
+        1.5,
+        -1,
+        0
+      ],
+      "pose": "holding_umbrella",
+      "accessories": [
+        "umbrella"
+      ]
+    },
+    {
+      "name": "testa",
+      "type": "mannequin",
+      "location": [
+        3,
+        -1,
+        0
+      ],
+      "pose": "turning_head",
+      "dress": "skirt"
+    },
+    {
+      "name": "albero",
+      "type": "tree",
+      "location": [
+        5,
+        -1,
+        0
+      ],
+      "height": 3.5,
+      "radius": 1.0
+    },
+    {
+      "name": "abete",
+      "type": "tree",
+      "location": [
+        7,
+        -1,
+        0
+      ],
+      "style": "cone",
+      "height": 3.5,
+      "radius": 1.0
+    },
+    {
+      "name": "tavolo",
+      "type": "table",
+      "location": [
+        9,
+        -1,
+        0
+      ]
+    },
+    {
+      "name": "lanterna",
+      "type": "lantern",
+      "location": [
+        -8,
+        -1,
+        2.2
+      ],
+      "cord": 0.6
+    },
+    {
+      "name": "cartello",
+      "type": "billboard",
+      "location": [
+        0,
+        7.5,
+        3.2
+      ],
+      "size": [
+        5,
+        2.5
+      ],
+      "color": "#CFF2E3",
+      "frame": "#111111"
+    },
+    {
+      "name": "scritta",
+      "type": "text",
+      "text": "BLOCKOUT",
+      "location": [
+        0,
+        7.3,
+        0.4
+      ],
+      "size": 1.4
+    },
+    {
+      "name": "fondale",
+      "type": "skyline",
+      "location": [
+        -24,
+        14,
+        0
+      ],
+      "count": 6,
+      "spacing": 1,
+      "seed": 4,
+      "panels": {
+        "count": 4,
+        "faces": [
+          "front"
+        ]
+      }
+    },
+    {
+      "name": "torretta",
+      "type": "tower_lattice",
+      "location": [
+        14,
+        16,
+        0
+      ],
+      "height": 12,
+      "base": 4,
+      "levels": 6,
+      "strut": 0.08,
+      "antenna": 2,
+      "emission": 0
+    },
+    {
+      "name": "toro",
+      "type": "torus",
+      "location": [
+        -9.5,
+        -4,
+        0.5
+      ],
+      "rotation": [
+        90,
+        0,
+        0
+      ],
+      "major": 0.4,
+      "minor": 0.1,
+      "material": "metal"
+    },
+    {
+      "name": "capsula",
+      "type": "capsule",
+      "location": [
+        -8.3,
+        -4,
+        0
+      ],
+      "origin": "bottom",
+      "radius": 0.2,
+      "length": 1.0,
+      "material": "clay_dark"
+    },
+    {
+      "name": "cono",
+      "type": "cone",
+      "location": [
+        -7.3,
+        -4,
+        0
+      ],
+      "origin": "bottom",
+      "radius1": 0.4,
+      "depth": 0.9,
+      "material": "#E9C8F0"
+    },
+    {
+      "name": "vaso",
+      "type": "lathe",
+      "location": [
+        -6.2,
+        -4,
+        0
+      ],
+      "profile": [
+        [
+          0,
+          0
+        ],
+        [
+          0.25,
+          0
+        ],
+        [
+          0.35,
+          0.3
+        ],
+        [
+          0.15,
+          0.7
+        ],
+        [
+          0.2,
+          0.9
+        ],
+        [
+          0,
+          0.9
+        ]
+      ],
+      "material": "glossy_black"
+    },
+    {
+      "name": "cuneo",
+      "type": "extrude",
+      "location": [
+        -5,
+        -4,
+        0
+      ],
+      "profile": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          0.5,
+          0
+        ],
+        [
+          0.5,
+          0.2
+        ],
+        [
+          -0.5,
+          0.7
+        ]
+      ],
+      "width": 0.6,
+      "material": "wood"
+    },
+    {
+      "name": "palla",
+      "type": "sphere",
+      "location": [
+        -3.9,
+        -4,
+        0.35
+      ],
+      "radius": 0.35,
+      "material": "chrome"
+    },
+    {
+      "name": "colonnine",
+      "type": "cylinder",
+      "location": [
+        -3,
+        -4,
+        0
+      ],
+      "origin": "bottom",
+      "radius": 0.08,
+      "depth": 0.8,
+      "material": "emissive:#F7BCD8:2",
+      "repeat": {
+        "count": 5,
+        "offset": [
+          0.4,
+          0,
+          0
+        ]
+      }
+    }
+  ]
+}

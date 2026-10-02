@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "id": "corridoio_auto",
+    "frames": 24,
+    "resolution": [
+      1280,
+      720
+    ],
+    "samples": 12,
+    "seed": 7,
+    "note": "Vicolo/corridoio in legno con lanterne sferiche, coupe con fari a scomparsa accesi che avanza lentamente verso la camera bassa (camera sul lato destro, girata a sinistra)."
+  },
+  "world": {
+    "preset": "warm_interior",
+    "replace_lights": true,
+    "color": "#120C08",
+    "strength": 0.2,
+    "lights": []
+  },
+  "render": {
+    "glare": {
+      "type": "Bloom",
+      "threshold": 0.95,
+      "strength": 0.18,
+      "size": 0.5
+    }
+  },
+  "camera": {
+    "lens": 30,
+    "location": [
+      1.0,
+      0.3,
+      0.68
+    ],
+    "look_at": [
+      -1.59,
+      9.96,
+      0.68
+    ],
+    "moves": [
+      {
+        "type": "dolly_in",
+        "distance": 0.3,
+        "ease": "linear"
+      }
+    ]
+  },
+  "objects": [
+    {
+      "name": "vicolo",
+      "type": "corridor",
+      "length": 30,
+      "width": 4.6,
+      "height": 3.2,
+      "floor": "tiles",
+      "lamps": {
+        "count": 14,
+        "side": "both",
+        "radius": 0.2,
+        "height": 2.3,
+        "strength": 6,
+        "light_energy": 22
+      }
+    },
+    {
+      "name": "auto",
+      "type": "car",
+      "style": "coupe_80s",
+      "color": "#E6E2DA",
+      "popup_headlights": true,
+      "lights_on": true,
+      "headlight_strength": 30,
+      "path": {
+        "points": [
+          [
+            -0.4,
+            5.6,
+            0
+          ],
+          [
+            -0.4,
+            4.8,
+            0
+          ]
+        ],
+        "start": 0,
+        "end": 23,
+        "ease": "linear"
+      }
+    }
+  ]
+}

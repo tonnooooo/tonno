@@ -1,0 +1,149 @@
+{
+  "meta": {
+    "id": "torre_notte",
+    "frames": 24,
+    "resolution": [
+      1280,
+      720
+    ],
+    "samples": 12,
+    "seed": 5,
+    "note": "Manichino di spalle con chignon e kanzashi, torre a traliccio bianca sul cielo blu notte, tetto dell'auto in basso a destra. Leggera orbita e micro-mosso."
+  },
+  "world": {
+    "preset": "night_sky"
+  },
+  "camera": {
+    "lens": 40,
+    "location": [
+      -0.2,
+      -2.6,
+      1.55
+    ],
+    "look_at": [
+      0.4,
+      6.0,
+      2.2
+    ],
+    "moves": [
+      {
+        "type": "orbit",
+        "angle": -4,
+        "center": [
+          0,
+          0,
+          1.4
+        ],
+        "ease": "in_out"
+      }
+    ],
+    "handheld": {
+      "amplitude": 0.006,
+      "rotation": 0.15
+    },
+    "dof": {
+      "focus": {
+        "object": "lei",
+        "offset": [
+          0,
+          0,
+          1.5
+        ]
+      },
+      "fstop": 2.8
+    }
+  },
+  "objects": [
+    {
+      "name": "terreno",
+      "type": "street",
+      "size": [
+        200,
+        200
+      ],
+      "wet": 0.4,
+      "color": "#0E1118"
+    },
+    {
+      "name": "torre",
+      "type": "tower_lattice",
+      "location": [
+        9,
+        70,
+        0
+      ],
+      "height": 60,
+      "base": 16,
+      "top": 1.6,
+      "levels": 12,
+      "strut": 0.22,
+      "antenna": 14,
+      "emission": 1.0
+    },
+    {
+      "name": "citta",
+      "type": "skyline",
+      "location": [
+        -60,
+        45,
+        0
+      ],
+      "count": 14,
+      "spacing": 1.5,
+      "width": [
+        5,
+        10
+      ],
+      "depth": [
+        6,
+        10
+      ],
+      "height": [
+        4,
+        14
+      ],
+      "seed": 11,
+      "panels": {
+        "count": 0
+      },
+      "color": "#06080C"
+    },
+    {
+      "name": "auto",
+      "type": "car",
+      "style": "coupe_80s",
+      "location": [
+        1.6,
+        1.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        70
+      ],
+      "lights_on": false
+    },
+    {
+      "name": "lei",
+      "type": "mannequin",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "pose": "standing",
+      "accessories": [
+        "hair_bun",
+        "kanzashi",
+        "flower",
+        "obi"
+      ]
+    }
+  ]
+}

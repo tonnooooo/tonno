@@ -21,6 +21,7 @@ Regole di robustezza:
 """
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import os
@@ -176,6 +177,7 @@ class Configurazione:
     chiave: str | None
     url_base: str
     origine_chiave: str = ""
+    modo_api: str | None = None
 
     def richiedi_chiave(self) -> str:
         if not self.chiave:
@@ -193,8 +195,11 @@ def carica_configurazione(file_env: Path | None = None, ambiente=None) -> Config
     if not chiave:
         chiave, origine = da_file.get("EPHONE_API_KEY", "").strip(), "file .env"
     url = (ambiente.get("EPHONE_BASE_URL") or da_file.get("EPHONE_BASE_URL") or URL_BASE_PREDEFINITO).strip()
+    modo = (ambiente.get("EPHONE_API_MODE") or da_file.get("EPHONE_API_MODE") or "").strip().lower() or None
+    if modo is not None and modo not in API_AMMESSE:
+        raise ErroreConfigurazione(f"EPHONE_API_MODE {modo!r} non valido ({'/'.join(API_AMMESSE)})")
     registra_segreto(chiave)
-    return Configurazione(chiave or None, url.rstrip("/"), origine if chiave else "")
+    return Configurazione(chiave or None, url.rstrip("/"), origine if chiave else "", modo)
 
 
 # --- stato dei task ---------------------------------------------------------------------------
@@ -337,6 +342,9 @@ def analizza_stato(risposta, task_id_atteso: str = "") -> StatoTask:
     sconosciuti = [u for u in outputs if u not in (video, frame) and u not in immagini]
     if video is None and sconosciuti:
         video = sconosciuti[0]
+    if video and frame is None and immagini:
+        # formato unificato: accanto al video, un'immagine è l'ultimo frame (return_last_frame)
+        frame = immagini[0]
 
     usage = dati.get("usage") if isinstance(dati.get("usage"), dict) else None
     errore = _testo_errore(dati.get("error") or dati.get("fail_reason") or dati.get("message")
@@ -365,7 +373,9 @@ def errore_in_corpo(dati) -> ErroreAPI | None:
     """Errori segnalati con HTTP 200 (``success: false``, ``code`` non zero, ``error`` senza task)."""
     if not isinstance(dati, dict):
         return None
-    ha_task = bool({"id", "task_id", "status"} & set(dati)) or isinstance(dati.get("data"), (dict, list, str))
+    interno = dati.get("data")
+    ha_task = (bool({"id", "task_id", "status"} & set(dati)) or isinstance(interno, (dict, list))
+               or (isinstance(interno, str) and bool(interno.strip())))
     meta = dati.get("ResponseMetadata")
     if isinstance(meta, dict) and isinstance(meta.get("Error"), dict):
         e = meta["Error"]
@@ -590,19 +600,20 @@ class ClientEphone:
         destinazione = Path(destinazione)
         destinazione.parent.mkdir(parents=True, exist_ok=True)
         if url.startswith("data:"):
-            import base64
             dati = base64.b64decode(url.split(",", 1)[1])
             _scrivi_atomico(destinazione, dati)
             return len(dati)
         ultimo = None
+        temporaneo = destinazione.with_name(destinazione.name + ".part")
         for tentativo in range(self.tentativi):
-            temporaneo = destinazione.with_name(destinazione.name + ".part")
+            r = None
             try:
                 r = self._http().request("GET", url, headers=self._intestazioni(url, json_atteso=False),
                                          timeout=(self.timeout[0], 300), stream=True)
                 if r.status_code == 429 or r.status_code >= 500:
                     ultimo = f"HTTP {r.status_code}"
-                    self.sleep(self._attesa(tentativo, r))
+                    if tentativo + 1 < self.tentativi:
+                        self.sleep(self._attesa(tentativo, r))
                     continue
                 if r.status_code >= 400:
                     raise ErroreAPI(f"download fallito: HTTP {r.status_code} (link scaduto? gli URL "
@@ -626,6 +637,8 @@ class ClientEphone:
                 if tentativo + 1 < self.tentativi:
                     self.sleep(self._attesa(tentativo))
             finally:
+                if r is not None and hasattr(r, "close"):
+                    r.close()
                 if temporaneo.exists():
                     temporaneo.unlink()
         raise ErroreRete(f"download non riuscito dopo {self.tentativi} tentativi ({ultimo})")
