@@ -1,0 +1,182 @@
+{
+ "S01": {
+  "id": "kz-cgt-19860084267941896488fca18c8cad4dddb6bdd3ec14a2a029",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790906534
+ },
+ "S02": {
+  "id": "kz-cgt-1986021095605535325aef172d0e8a45e18b9c524091980788",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907299
+ },
+ "S03": {
+  "id": "kz-cgt-198602114644049948e80cd73a7fac4c0385b9305a85d39ebd",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907298
+ },
+ "S04": {
+  "id": "kz-cgt-198602117093523540a64777585fd8493b8fec43c655373149",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907304
+ },
+ "S05_ref": {
+  "id": "kz-cgt-198601631678332988e692435ac4b7404a9e8e8d587336c322",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907015
+ },
+ "S06": {
+  "id": "kz-cgt-198602119475888156d5f8aedea66c4a1fac3e00d7a438480d",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907304
+ },
+ "S07": {
+  "id": "kz-cgt-198602121891807292d58619c5147a48168678fb60a37a0c52",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907304
+ },
+ "S08": {
+  "id": "kz-cgt-198602124307726396fee9452d60174224aa54b19374a45fd0",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907304
+ },
+ "S09": {
+  "id": "kz-cgt-1986021270591897946caa2ba67f2e4d1d96a53164150f847e",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907309
+ },
+ "S10": {
+  "id": "kz-cgt-1986021294247773009833640eff2b451ba783d2c969829152",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907309
+ },
+ "S11": {
+  "id": "kz-cgt-19860213179036475643e26be13b9f445b9ec396897811809b",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907309
+ },
+ "S12": {
+  "id": "kz-cgt-1986021341895066446ade3bc0e7084a5eb792c78e1a0ad56e",
+  "model": "doubao-seedance-2-5-260628",
+  "status": "succeeded",
+  "duration": 4,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "framespersecond": 24,
+  "generate_audio": true,
+  "usage": {
+   "total_tokens": 87300,
+   "completion_tokens": 87300
+  },
+  "created_at": 1790907311
+ }
+}
