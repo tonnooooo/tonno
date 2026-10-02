@@ -290,6 +290,34 @@ class Geo:
         faces += [(last, base + (i + 1) % seg, base + i) for i in range(seg)]
         self.add(self.xf(pts, c), faces, True)
 
+    def lathe(self, prof, c, seg=14, rot=None):
+        """solid of revolution about +z: prof = [(z, r), ...] from the base to the tip (r = 0 at the tip is fine)."""
+        ring = [(math.cos(2 * math.pi * i / seg), math.sin(2 * math.pi * i / seg)) for i in range(seg)]
+        pts, faces = [], []
+        for z, r in prof:
+            pts.extend((r * x, r * y, z) for x, y in ring)
+        for j in range(len(prof) - 1):
+            a, b = j * seg, (j + 1) * seg
+            for i in range(seg):
+                faces.append((a + i, a + (i + 1) % seg, b + (i + 1) % seg, b + i))
+        self.add(self.xf(pts, c, rot), faces, False)
+
+    def rrect_y(self, x0, x1, z0, z1, r, y, th, seg=8):
+        """rounded-rectangle plate in the xz plane (x right, z up seen from -Y), thickness th along y centred at y;
+        the visible face looks toward -Y (the camera behind the car)."""
+        r = max(1e-4, min(r, (x1 - x0) / 2, (z1 - z0) / 2))
+        pts = []
+        for (cx, cz, a0) in ((x1 - r, z0 + r, -90.0), (x1 - r, z1 - r, 0.0), (x0 + r, z1 - r, 90.0), (x0 + r, z0 + r, 180.0)):
+            for i in range(seg + 1):
+                a = math.radians(a0 + 90.0 * i / seg)
+                pts.append((cx + r * math.cos(a), cz + r * math.sin(a)))          # counter-clockwise in (x, z)
+        n = len(pts)
+        front = [(px, y - th / 2, pz) for px, pz in pts]
+        back = [(px, y + th / 2, pz) for px, pz in pts]
+        faces = [tuple(range(n)), tuple(reversed(range(n, 2 * n)))]
+        faces += [(i, n + i, n + (i + 1) % n, (i + 1) % n) for i in range(n)]
+        self.add(front + back, faces)
+
     def prism_x(self, pts_yz, xc, w, taper=None):
         """polygon in (y,z) (CCW seen from +x) extruded along x, centred at xc, width w.
         taper=(z0, z1, w1): width goes linearly from w (z<=z0) to w1 (z>=z1)."""
@@ -356,32 +384,59 @@ def make_obj(name, geo, color, parent=None, loc=(0, 0, 0), rot=(0, 0, 0)):
 # --------------------------------------------------------------------------------------
 # hero coupe
 # --------------------------------------------------------------------------------------
-def build_car(tag, parent, pos, yaw_deg, flame=False):
-    """90s sport coupe, forward = +Y, origin on the ground at the centre. Returns dict of handles."""
+FLAME_PROFILE = [(0.0, 0.05), (0.12, 0.085), (0.35, 0.115), (0.62, 0.075), (0.85, 0.035), (1.0, 0.0)]   # unit-length teardrop
+WHEELBASE = 2.78            # default wheelbase (m); axle midpoint stays at y = -0.01 (wheels at +1.38 / -1.40)
+AXLE_MID = -0.01
+CAR_DEFAULTS = dict(
+    spoiler="wing",         # wing (low pearl-white coupe wing) | small (low trunk lip) | none
+    wheelbase=WHEELBASE,
+    lamp_gap=0.0,           # >0: second round lamp per side, this many metres toward the car centre line
+    car_grey=1.0,           # multiplier on the display grey of the body (and wing)
+    macro=False,            # macro rear-panel treatment (S06): dark panel overlay, bezel plate, lens disc
+    panel_grey=0.17,        # display grey of the macro rear panel
+    lamp_outer=None,        # display grey of the taillight outer disc / bezel (None = follows the ignition ramp)
+    lamp_lens=None,         # macro: display grey of the lens disc, a number or [from, to]
+    bezel=None,             # macro: bezel plate [x_right_of_lamp, z_top, corner_radius] (metres) or True
+)
+
+
+def build_car(tag, parent, pos, yaw_deg, flame=False, flame_pipe=0, opts=None):
+    """90s sport coupe, forward = +Y, origin on the ground at the centre. Returns dict of handles.
+    opts: see CAR_DEFAULTS (per-shot keys spoiler, wheelbase, lamp_gap, car_grey, macro...)."""
+    o = dict(CAR_DEFAULTS)
+    o.update({k: v for k, v in (opts or {}).items() if v is not None or k in ("lamp_outer", "lamp_lens", "bezel")})
     root = new_empty(f"{tag}_car", parent, loc=pos, rot=(0, 0, yaw_deg))
     C = Style.col
+    body_col = Style.col(PAL["body"] * Style.grey * float(o["car_grey"]))
     # lower body: wedge side profile
     g = Geo()
     g.prism_x([(-2.2, 0.28), (2.0, 0.28), (2.2, 0.40), (2.1, 0.56), (1.0, 0.74), (-1.7, 0.90), (-2.2, 0.86)], 0.0, 1.76)
     # side skirts / bumpers hints
     g.box((0, 2.12, 0.36), (1.60, 0.14, 0.16))
     g.box((0, -2.14, 0.36), (1.60, 0.14, 0.16))
-    make_obj(f"{tag}_body", g, C("body"), root)
+    make_obj(f"{tag}_body", g, body_col, root)
     # cabin
     g = Geo()
     g.prism_x([(-1.65, 0.70), (1.0, 0.70), (1.0, 0.76), (0.15, 1.22), (-0.95, 1.22), (-1.65, 0.90)], 0.0, 1.56,
               taper=(0.80, 1.22, 1.22))
     g.box((0.90, 0.45, 0.97), (0.14, 0.12, 0.08))     # mirrors
     g.box((-0.90, 0.45, 0.97), (0.14, 0.12, 0.08))
-    make_obj(f"{tag}_cabin", g, C("glass"), root)
-    # rear wing
-    g = Geo()
-    g.box((0, -2.02, 1.29), (1.74, 0.46, 0.05), rot=(-6, 0, 0))
-    g.box((0.60, -2.0, 1.08), (0.07, 0.16, 0.42))
-    g.box((-0.60, -2.0, 1.08), (0.07, 0.16, 0.42))
-    g.box((0.88, -2.02, 1.30), (0.04, 0.52, 0.22))
-    g.box((-0.88, -2.02, 1.30), (0.04, 0.52, 0.22))
-    make_obj(f"{tag}_wing", g, C("body"), root)
+    make_obj(f"{tag}_cabin", g, Style.col(PAL["glass"] * Style.grey * float(o["car_grey"])), root)
+    # rear spoiler: the real pearl-white coupe carries a LOW wing, its top about at roof height and ~1.26 m wide
+    if o["spoiler"] == "wing":
+        g = Geo()
+        g.box((0, -2.05, 1.09), (1.26, 0.40, 0.045), rot=(-6, 0, 0))     # slab, top ~z 1.12
+        g.box((0.36, -2.02, 0.99), (0.06, 0.14, 0.22))                   # two supports standing on the trunk lid
+        g.box((-0.36, -2.02, 0.99), (0.06, 0.14, 0.22))
+        g.box((0.63, -2.04, 1.11), (0.03, 0.44, 0.16))                   # end plates
+        g.box((-0.63, -2.04, 1.11), (0.03, 0.44, 0.16))
+        make_obj(f"{tag}_wing", g, body_col, root)
+    elif o["spoiler"] == "small":
+        g = Geo()
+        g.box((0, -2.10, 0.93), (1.30, 0.20, 0.035), rot=(-8, 0, 0))     # small lip on the trunk lid
+        g.box((0.55, -2.07, 0.90), (0.05, 0.12, 0.08))
+        g.box((-0.55, -2.07, 0.90), (0.05, 0.12, 0.08))
+        make_obj(f"{tag}_wing", g, body_col, root)
     # lights / plate / exhaust
     g = Geo()
     g.box((0.62, 2.2, 0.55), (0.34, 0.06, 0.12))
@@ -396,19 +451,61 @@ def build_car(tag, parent, pos, yaw_deg, flame=False):
         for dy in (-0.75, 0.55):
             g.box((sx * 0.885, dy, 0.64), (0.012, 0.012, 0.40))               # door seams
     make_obj(f"{tag}_dark", g, C("dark"), root)
-    # taillights: two round clusters (outer disc, dark ring, bright centre)
-    outer, ring, core = Geo(), Geo(), Geo()
-    for sx in (-1, 1):
-        outer.cyl((sx * TAIL_X, TAIL_Y + 0.065, TAIL_Z), 0.118, 0.07, axis="y", seg=24, smooth=False)   # -2.245 .. -2.175
-        ring.cyl((sx * TAIL_X, TAIL_Y + 0.055, TAIL_Z), 0.078, 0.08, axis="y", seg=24, smooth=False)    # to -2.255
-        core.cyl((sx * TAIL_X, TAIL_Y + 0.040, TAIL_Z), 0.042, 0.09, axis="y", seg=16, smooth=False)    # to -2.275
-    tail = make_obj(f"{tag}_tail", outer, C("light"), root)
-    make_obj(f"{tag}_tailring", ring, C("dark"), root)
-    tail_core = make_obj(f"{tag}_tailcore", core, C("light"), root)
+    # taillights: round clusters (outer disc, dark ring, bright centre); macro style: bezel disc + lens disc + core
+    lit_c = C("light")
+    outer_c = lit_c if o["lamp_outer"] is None else Style.col(float(o["lamp_outer"]))
+    xs_main = [sx * TAIL_X for sx in (-1, 1)]
+    xs_gap = [sx * (TAIL_X - float(o["lamp_gap"])) for sx in (-1, 1)] if float(o["lamp_gap"]) > 0 else []
+
+    def lamp_set(xs, nm):
+        outer, ring, lens, core = Geo(), Geo(), Geo(), Geo()
+        so, sc = (72, 48) if o["macro"] else (24, 16)            # smoother discs when the lamp fills the frame
+        for x in xs:
+            outer.cyl((x, TAIL_Y + 0.065, TAIL_Z), 0.118, 0.07, axis="y", seg=so, smooth=False)   # -2.245 .. -2.175
+            if o["macro"]:
+                lens.cyl((x, TAIL_Y + 0.058, TAIL_Z), 0.104, 0.07, axis="y", seg=so, smooth=False)  # lens disc inside the bezel
+            else:
+                ring.cyl((x, TAIL_Y + 0.055, TAIL_Z), 0.078, 0.08, axis="y", seg=24, smooth=False)  # to -2.255
+            core.cyl((x, TAIL_Y + 0.040, TAIL_Z), 0.042, 0.09, axis="y", seg=sc, smooth=False)    # to -2.275
+        h = {}
+        h["outer"] = make_obj(f"{tag}_tail{nm}", outer, outer_c, root)
+        if o["macro"]:
+            h["lens"] = make_obj(f"{tag}_taillens{nm}", lens, C(0.12), root)
+        else:
+            make_obj(f"{tag}_tailring{nm}", ring, C("dark"), root)
+        h["core"] = make_obj(f"{tag}_tailcore{nm}", core, lit_c, root)
+        return h
+
+    main = lamp_set(xs_main, "")
+    tail, tail_core = main["outer"], main["core"]
+    gap = lamp_set(xs_gap, "2") if xs_gap else None
+    if o["macro"]:
+        # dark rear panel laid over the real rear face (hides the deck / wing stubs that showed as a dark strip), a lighter
+        # rounded bezel plate round the lamp group with a dark groove and the horizontal slot
+        pc = Style.col(float(o["panel_grey"]))
+        g = Geo()
+        g.box((0, -2.205, 0.80), (1.80, 0.008, 1.10))
+        make_obj(f"{tag}_macropanel", g, pc, root)
+        if o["bezel"]:
+            bz = o["bezel"] if isinstance(o["bezel"], (list, tuple)) else [0.154, 0.865, 0.09]
+            xr, zt, rr = float(bz[0]), float(bz[1]), float(bz[2])
+            x_main = max(xs_main)                               # the lamp that sits on the camera axis
+            x0, x1 = x_main - 0.62, x_main + xr
+            z0, z1 = TAIL_Z - 0.50, zt
+            g = Geo()
+            g.rrect_y(x0 - 0.014, x1 + 0.014, z0 - 0.014, z1 + 0.014, rr + 0.014, -2.2085, 0.004)
+            make_obj(f"{tag}_groove", g, C(0.04), root)
+            g = Geo()
+            g.rrect_y(x0, x1, z0, z1, rr, -2.2125, 0.004)
+            make_obj(f"{tag}_bezelplate", g, Style.col(float(o["panel_grey"]) * 1.35), root)
+            g = Geo()
+            g.box((x1 + 0.12, -2.2150, TAIL_Z - 0.017), (0.30, 0.004, 0.012))
+            make_obj(f"{tag}_slot", g, C(0.04), root)
     # wheels with spokes
     wheels = []
+    wb = float(o["wheelbase"])
     for sx in (-1, 1):
-        for wy in (1.38, -1.40):
+        for wy in (AXLE_MID + wb / 2, AXLE_MID - wb / 2):
             piv = new_empty(f"{tag}_wheel", root, loc=(sx * 0.76, wy, WHEEL_R))
             g = Geo()
             g.cyl((0, 0, 0), WHEEL_R, 0.26, axis="x", seg=24)
@@ -424,14 +521,25 @@ def build_car(tag, parent, pos, yaw_deg, flame=False):
             make_obj(f"{tag}_spokes", g, C("spoke"), piv)
             wheels.append(piv)
     fl = []
-    if flame:
+    if flame is True:                       # legacy cue: thin 0.5 m cones at both pipes, hard-coded timing
         for sx in (-1, 1):
             g = Geo()
             g.cyl((0, 0, 0.25), 0.055, 0.5, r_top=0.0, seg=10, caps=False, smooth=False)
             ob = make_obj(f"{tag}_flame", g, C("light"), root, loc=(sx * 0.36, -2.4, 0.34), rot=(90, 0, 0))
             ob.scale = (1, 1, 0.001)
             fl.append(ob)
-    return dict(root=root, wheels=wheels, tail=tail, tail_core=tail_core, flames=fl)
+    elif flame:                             # flame list: teardrop of unit length, scaled in z by the cue length
+        for sx in (-1, 1):
+            if flame_pipe and sx != flame_pipe:
+                continue
+            g = Geo()
+            g.lathe(FLAME_PROFILE, (0, 0, 0), seg=14)
+            ob = make_obj(f"{tag}_flame", g, C("light"), root, loc=(sx * 0.36, -2.34, 0.34), rot=(90, 0, 0))
+            ob.scale = (1, 1, 0.001)
+            fl.append(ob)
+    return dict(root=root, wheels=wheels, tail=tail, tail_core=tail_core, flames=fl,
+                lens=main.get("lens"), tail2=(gap or {}).get("outer"), core2=(gap or {}).get("core"),
+                lens2=(gap or {}).get("lens"))
 
 
 # --------------------------------------------------------------------------------------
@@ -444,19 +552,22 @@ REST["sh_R"] = (0, -5, 0)
 VISOR_LOC = (0.0, 0.098, 0.138)
 
 
-def build_figure(tag, parent):
+def build_figure(tag, parent, torso_up=0.0, shoulder_w=0.45, visor_w=0.15, visor_h=0.04):
+    """Mannequin, forward = +Y. torso_up (m) raises chest / shoulders / arms relative to the head pivot (shortens the neck:
+    close-up bust preset); shoulder_w (m) = distance between the shoulder joints (default 0.45)."""
     C = Style.col
     root = new_empty(f"{tag}_root", parent)
     lean = new_empty(f"{tag}_lean", root)
     pelvis = new_empty(f"{tag}_pelvis", lean, loc=(0, 0, HIP_Z))
     spine = new_empty(f"{tag}_spine", pelvis)
     J = dict(lean=lean, pelvis=pelvis, spine=spine)
+    tu, hs = float(torso_up), float(shoulder_w) / 2
     g = Geo()
     g.cyl((0, 0, -0.01), 0.165, 0.18, sxy=(1.0, 0.72), seg=20)
-    g.cyl((0, 0, 0.30), 0.180, 0.40, sxy=(1.0, 0.70), seg=20)
-    g.sphere((0.225, 0, 0.455), 0.065, 12, 8)
-    g.sphere((-0.225, 0, 0.455), 0.065, 12, 8)
-    g.cyl((0, 0, 0.53), 0.045, 0.12, seg=10)
+    g.cyl((0, 0, 0.30 + tu / 2), 0.180 * hs / 0.225, 0.40 + tu, sxy=(1.0, 0.70), seg=20)
+    g.sphere((hs, 0, 0.455 + tu), 0.065, 12, 8)
+    g.sphere((-hs, 0, 0.455 + tu), 0.065, 12, 8)
+    g.cyl((0, 0, (0.47 + tu + 0.59) / 2), 0.045, 0.59 - 0.47 - tu, seg=10)
     make_obj(f"{tag}_torso", g, C("body"), spine)
     head = new_empty(f"{tag}_head", spine, loc=(0, 0, 0.57))
     J["head"] = head
@@ -464,7 +575,7 @@ def build_figure(tag, parent):
     g.sphere((0, 0, 0.11), 0.105, 20, 12, s=(0.95, 1.0, 1.08))
     make_obj(f"{tag}_headmesh", g, C("body"), head)
     g = Geo()
-    g.box((0, 0, 0), (0.15, 0.05, 0.04))
+    g.box((0, 0, 0), (float(visor_w), 0.05, float(visor_h)))
     visor = make_obj(f"{tag}_visor", g, C("dark"), head, loc=VISOR_LOC)
     for side, sx in (("L", -1), ("R", 1)):
         hip = new_empty(f"{tag}_hip{side}", pelvis, loc=(sx * 0.095, 0, -0.02))
@@ -478,7 +589,7 @@ def build_figure(tag, parent):
         g.sphere((0, 0, 0), 0.062, 12, 8)
         g.box((0, 0.05, -0.43), (0.10, 0.26, 0.06))
         make_obj(f"{tag}_shin{side}", g, C("body"), knee)
-        sh = new_empty(f"{tag}_sh{side}", spine, loc=(sx * 0.225, 0, 0.455))
+        sh = new_empty(f"{tag}_sh{side}", spine, loc=(sx * hs, 0, 0.455 + tu))
         g = Geo()
         g.cyl((0, 0, -0.15), 0.042, 0.30, seg=12)
         make_obj(f"{tag}_uarm{side}", g, C("body"), sh)
@@ -495,7 +606,7 @@ def build_figure(tag, parent):
     return dict(root=root, j=J, visor=visor)
 
 
-def key_pose(F, frame, pose):
+def key_pose(F, frame, pose, visor_base=0.0):
     full = dict(REST)
     full.update({k: v for k, v in pose.items() if k in REST})
     for name, rot in full.items():
@@ -506,7 +617,7 @@ def key_pose(F, frame, pose):
     p.location = (0, pose.get("pelvis_x", 0.0), pose.get("pelvis_z", HIP_Z))
     p.keyframe_insert("location", frame=frame)
     v = F["visor"]
-    v.location = (VISOR_LOC[0], VISOR_LOC[1], VISOR_LOC[2] + pose.get("visor_dz", 0.0))
+    v.location = (VISOR_LOC[0], VISOR_LOC[1], VISOR_LOC[2] + visor_base + pose.get("visor_dz", 0.0))
     v.keyframe_insert("location", frame=frame)
 
 
@@ -530,8 +641,39 @@ def seated(extra=None):
     return d
 
 
-def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_sign=1.0, appear=None):
-    """Keyframe the mannequin. path = [p_start, p_end] (world-local coordinates)."""
+# named poses of the mannequin (joint -> (x, y, z) degrees; x swings an arm forward, see REST) for the keyed
+# 'figure_poses' list and for the close-up gestures of S05 / S10
+POSE_LIB = {
+    "stand": {},
+    "chin": {"sh_R": (48, 0, 0), "el_R": (126, 0, 51)},                       # S10: right hand on the chin
+    "tilt": {"head": (0, 9, 0)},                                              # head tilted 9 deg to the figure's left
+    "temples": {"sh_R": (62, -34, 0), "el_R": (116, 0, 0), "sh_L": (62, 34, 0), "el_L": (116, 0, 0)},   # S05: fingers at the glasses
+    "temple_R": {"sh_R": (62, -34, 0), "el_R": (116, 0, 0)},
+    "temple_L": {"sh_L": (62, 34, 0), "el_L": (116, 0, 0)},
+    "point_R": {"sh_R": (84, -10, 0), "el_R": (50, 0, 0)},                    # S05: hand stretched toward the lens
+    "point_L": {"sh_L": (84, 10, 0), "el_L": (50, 0, 0)},
+}
+
+
+def resolve_pose(p):
+    """pose spec -> joint dict: a POSE_LIB name, a joint dict, or a list of those merged left to right."""
+    if isinstance(p, str):
+        if p not in POSE_LIB:
+            raise SystemExit(f"unknown pose {p!r} (have {', '.join(POSE_LIB)})")
+        return dict(POSE_LIB[p])
+    if isinstance(p, dict):
+        return {k: (tuple(v) if isinstance(v, (list, tuple)) else v) for k, v in p.items()}
+    d = {}
+    for q in p:
+        d.update(resolve_pose(q))
+    return d
+
+
+def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_sign=1.0, appear=None,
+                   lean_deg=22.0, poses=None, visor_dz=0.0, pose_interp="BEZIER"):
+    """Keyframe the mannequin. path = [p_start, p_end] (world-local coordinates).
+    poses = [[t_s, pose], ...] keyed gesture (see POSE_LIB; any action name is replaced by it); visor_dz = static
+    visor level (m) added for every pose."""
     root = F["root"]
     n = f1 - f0
     T = max(n, 1) / fps
@@ -542,24 +684,26 @@ def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_si
         root.keyframe_insert("location", frame=f0)
         root.location = p1
         root.keyframe_insert("location", frame=f1)
-    if appear is not None:
+    if appear:                                         # None / 0 = visible from the first frame
         with interp("CONSTANT"):
             root.scale = (0.001, 0.001, 0.001)
             root.keyframe_insert("scale", frame=f0)
             root.scale = (1, 1, 1)
             root.keyframe_insert("scale", frame=f0 + max(1, rnd(appear * fps)))
     dist = math.dist(p0, p1)
-    if action == "walk":
+    if action == "walk" and not poses:
         speed = dist / T if T > 0 else 0.0
         cps = min(2.3, max(0.8, speed / 1.45))
         with interp("LINEAR"):
             for f in range(f0, f1 + 1):
                 t = (f - f0) / fps
-                key_pose(F, f, walk_pose(2 * math.pi * cps * t, lean_fwd=3.0 + min(speed, 3.0) * 1.2))
+                key_pose(F, f, walk_pose(2 * math.pi * cps * t, lean_fwd=3.0 + min(speed, 3.0) * 1.2), visor_dz)
         return
     sec = lambda t: f0 + rnd(t * fps)  # noqa: E731
-    with interp("BEZIER"):
-        if action == "flick":
+    with interp(pose_interp if poses else "BEZIER"):
+        if poses:
+            seq = [(float(t_), resolve_pose(p_)) for t_, p_ in poses]
+        elif action == "flick":
             up = {"sh_R": (78, -8, 0), "el_R": (112, 0, 0), "head": (-4, 0, -4)}
             seq = [
                 (0.00, {"head": (3, 0, 0)}),
@@ -580,54 +724,77 @@ def animate_figure(F, action, f0, f1, fps, path, yaw, seated_flag=False, lean_si
             seq = [(0.00, lap), (0.12, lap), (0.26, pA), (0.52, pA), (0.64, pB), (0.90, pB), (1.02, pC), (1.40, pC)]
             seq = [(t * T / 1.4, p) for t, p in seq]
         elif action == "lean":
-            base = {"lean": (0, 22.0 * lean_sign, 0), "sh_L": (28, 4, 0), "sh_R": (28, -4, 0),
+            base = {"lean": (0, lean_deg * lean_sign, 0), "sh_L": (28, 4, 0), "sh_R": (28, -4, 0),
                     "el_L": (100, 0, 0), "el_R": (100, 0, 0), "knee_R": (-14, 0, 0), "hip_R": (8, 0, 0),
                     "head": (0, 4 * lean_sign, 0)}
             seq = [(0.0, base), (T * 0.5, dict(base, head=(-3, 4 * lean_sign, 0))), (T, base)]
+        elif action == "lean_pockets":      # 'lean' with the arms down and the hands near the front pockets
+            base = {"lean": (0, lean_deg * lean_sign, 0), "sh_L": (8, 4, 0), "sh_R": (8, -4, 0),
+                    "el_L": (50, 0, 0), "el_R": (50, 0, 0), "knee_R": (-14, 0, 0), "hip_R": (8, 0, 0),
+                    "head": (0, 4 * lean_sign, 0)}
+            seq = [(0.0, base), (T * 0.5, dict(base, head=(-3, 4 * lean_sign, 0))), (T, base)]
+        elif action == "chin":              # S10: right hand on the chin for ~0.4 s, then both arms down and the head tilts
+            chin, tilt = POSE_LIB["chin"], POSE_LIB["tilt"]
+            seq = [(0.0, chin), (0.38, chin), (0.55, tilt), (T, tilt)]
         else:  # stand
             seq = [(0.0, {}), (T, {})]
         for t, pose in seq:
             fr = f0 + min(n, max(0, rnd(t * fps)))
             if seated_flag:
                 pose = seated(pose)
-            key_pose(F, fr, pose)
+            key_pose(F, fr, pose, visor_dz)
 
 
 # --------------------------------------------------------------------------------------
 # environments (all geometry merged into a handful of meshes)
 # --------------------------------------------------------------------------------------
-def build_garage(tag, world, car_xy, flicker):
+def build_garage(tag, world, car_xy, flicker, opts=None):
+    """Underground garage. opts (all optional, defaults = the original look): beams (0 = none, 1 = 0.56 m deep,
+    float <1 = thinner), bay_lines (0/1), columns [[x,y],...] (explicit list replaces the grid), tubes
+    [[x,y,length,yaw_deg],...] (explicit list replaces the grid), tube_w (m), ceiling_grey (display grey of the
+    ceiling slab), structure_grey (multiplier on the grey of walls / columns / beams)."""
+    opts = opts or {}
     C = Style.col
+    sg = float(opts.get("structure_grey", 1.0))
+    struct_c = Style.col(PAL["body"] * Style.grey * sg)
     cx, cy = car_xy
     g = Geo()   # floor
     g.box((0, 10, -0.1), (50, 110, 0.2))
     make_obj(f"{tag}_floor", g, C("floor"), world)
     g = Geo()   # ceiling
     g.box((0, 10, 3.15), (50, 110, 0.3))
-    make_obj(f"{tag}_ceiling", g, C("ceiling"), world)
+    make_obj(f"{tag}_ceiling", g, C(opts["ceiling_grey"]) if "ceiling_grey" in opts else C("ceiling"), world)
     g = Geo()   # walls
     for sx in (-1, 1):
         g.box((sx * 25.25, 10, 1.65), (0.5, 110.5, 3.3))
     g.box((0, -45.25, 1.65), (50.5, 0.5, 3.3))
     g.box((0, 65.25, 1.65), (50.5, 0.5, 3.3))
-    make_obj(f"{tag}_walls", g, C("body"), world)
+    make_obj(f"{tag}_walls", g, struct_c, world)
     g = Geo()   # columns + beams
     xs = (-21.0, -7.0, 7.0, 21.0)
     ys = [-40.0 + 8 * k for k in range(14)]          # column rows every 8 m: y = -40 .. 64
-    for x in xs:
+    cols = opts.get("columns")
+    cols = [(x, y) for x in xs for y in ys] if cols is None else cols
+    for x, y in cols:
+        g.box((x, y, 1.5), (0.8, 0.8, 3.0))
+    bm = opts.get("beams", 1)
+    bm = 1.0 if bm is True else (0.0 if bm is False else float(bm))
+    if bm > 0:
+        bd = 0.56 * bm                                # beam depth (and width scales with it for thin conduit-like beams)
+        bw = 0.5 * min(1.0, max(bm, 0.25))
         for y in ys:
-            g.box((x, y, 1.5), (0.8, 0.8, 3.0))
-    for y in ys:
-        g.box((0, y, 2.72), (50, 0.5, 0.56))
-    for x in xs:
-        g.box((x, 10, 2.72), (0.5, 110, 0.56))
-    make_obj(f"{tag}_cols", g, C("body"), world)
+            g.box((0, y, 3.0 - bd / 2), (50, bw, bd))
+        for x in xs:
+            g.box((x, 10, 3.0 - bd / 2), (bw, 110, bd))
+    if g.verts:
+        make_obj(f"{tag}_cols", g, struct_c, world)
     # parking bay lines around the car (bays 2.8 m wide, the car sits in the bay centred on x=0)
-    g = Geo()
-    for k in range(-6, 6):
-        g.box((1.4 + 2.8 * k, cy, 0.006), (0.10, 5.8, 0.012))
-    g.box((0, cy + 2.9, 0.006), (33.6, 0.10, 0.012))
-    make_obj(f"{tag}_lines", g, C("line"), world)
+    if opts.get("bay_lines", 1):
+        g = Geo()
+        for k in range(-6, 6):
+            g.box((1.4 + 2.8 * k, cy, 0.006), (0.10, 5.8, 0.012))
+        g.box((0, cy + 2.9, 0.006), (33.6, 0.10, 0.012))
+        make_obj(f"{tag}_lines", g, C("line"), world)
     # aisle dashes along Y (left of the bays) for depth cue
     g = Geo()
     for k in range(-8, 12):
@@ -635,60 +802,82 @@ def build_garage(tag, world, car_xy, flicker):
     make_obj(f"{tag}_dash", g, C("line"), world)
     # ceiling light tubes
     tubes = []
+    tw = float(opts.get("tube_w", 0.12))
     ty = [-44.0 + 4 * k for k in range(27)]
-    if flicker:
+    explicit = opts.get("tubes")
+    if flicker and not explicit:
         for x in (-3.5, 3.5):
             for y in ty:
                 gg = Geo()
-                gg.box((0, 0, 0), (0.12, 1.7, 0.06))
+                gg.box((0, 0, 0), (tw, 1.7, 0.06))
                 tubes.append(make_obj(f"{tag}_tube", gg, C("light"), world, loc=(x, y, 2.95)))
         xs2 = (-10.5, 10.5)
     else:
         xs2 = (-10.5, -3.5, 3.5, 10.5)
     g = Geo()
-    for x in xs2:
-        for y in ty:
-            g.box((x, y, 2.95), (0.12, 1.7, 0.06))
+    if explicit:                                  # explicit tubes [[x, y, length, yaw_deg], ...]
+        for t in explicit:
+            g.box((t[0], t[1], 2.93), (tw, t[2], 0.06), rot=(0, 0, t[3] if len(t) > 3 else 0.0))
+    else:
+        for x in xs2:
+            for y in ty:
+                g.box((x, y, 2.95), (tw, 1.7, 0.06))
     make_obj(f"{tag}_tubes", g, C("light"), world)
     return tubes
 
 
-def build_highway(tag, world):
+def build_highway(tag, world, opts=None):
+    """Night highway. opts (all optional, defaults = the original look): skyline (scale of the background tower
+    heights, 0 = no towers), poles / gantry / lanes / rails (0 hides that group), open (1 = empty airfield: only an
+    endless flat ground, no road structure at all), horizon_lights {x:[x0,x1], y:dist, z:height, n:count, size:m}
+    (a low string of small lights, e.g. S12)."""
+    opts = opts or {}
     C = Style.col
+    is_open = bool(opts.get("open", 0))
+    on = lambda k: bool(opts.get(k, 1)) and not is_open   # noqa: E731
     g = Geo()
-    g.box((0, 120, -0.55), (400, 540, 0.8))
+    if is_open:
+        g.box((0, 120, -0.55), (4000, 4000, 0.8))          # endless ground (the far clip plane is the horizon)
+    else:
+        g.box((0, 120, -0.55), (400, 540, 0.8))
     make_obj(f"{tag}_ground", g, C("ground"), world)
-    g = Geo()
-    g.box((0, 120, -0.15), (16, 540, 0.3))
-    make_obj(f"{tag}_road", g, C("floor"), world)
-    g = Geo()
-    for y in range(-140, 390, 6):
-        for x in (-1.75, 1.75):
-            g.box((x, y + 1.5, 0.012), (0.15, 3.0, 0.024))
-    for x in (-5.5, 5.5):
-        g.box((x, 120, 0.012), (0.18, 540, 0.024))
-    make_obj(f"{tag}_lanes", g, C("line"), world)
-    g = Geo()
-    for sx in (-1, 1):
-        g.box((sx * 8.8, 120, 0.72), (0.12, 540, 0.34))
-        for y in range(-140, 390, 4):
-            g.box((sx * 8.8, y, 0.4), (0.10, 0.10, 0.8))
-    make_obj(f"{tag}_rails", g, C("body"), world)
-    g = Geo()
-    for y in range(-140, 390, 30):
+    if on("lanes") or on("rails") or on("poles") or on("gantry"):
+        g = Geo()
+        g.box((0, 120, -0.15), (16, 540, 0.3))
+        make_obj(f"{tag}_road", g, C("floor"), world)
+    if on("lanes"):
+        g = Geo()
+        for y in range(-140, 390, 6):
+            for x in (-1.75, 1.75):
+                g.box((x, y + 1.5, 0.012), (0.15, 3.0, 0.024))
+        for x in (-5.5, 5.5):
+            g.box((x, 120, 0.012), (0.18, 540, 0.024))
+        make_obj(f"{tag}_lanes", g, C("line"), world)
+    if on("rails"):
+        g = Geo()
         for sx in (-1, 1):
-            g.box((sx * 10.5, y, 4.8), (0.2, 0.2, 9.6))
-            g.box((sx * 8.8, y, 9.5), (3.4, 0.14, 0.14))
-            g.box((sx * 7.2, y, 9.38), (0.9, 0.5, 0.14))
-    make_obj(f"{tag}_poles", g, C("body"), world)
-    g = Geo()
-    for y in (70, 190, 310, -50):
-        for sx in (-1, 1):
-            g.box((sx * 9.6, y, 3.8), (0.55, 0.55, 7.6))
-        g.box((0, y, 7.5), (19.8, 0.6, 0.7))
-        g.box((-3.0, y - 0.35, 5.9), (6.2, 0.2, 2.2))
-        g.box((4.2, y - 0.35, 5.9), (4.2, 0.2, 2.2))
-    make_obj(f"{tag}_gantry", g, C("line"), world)
+            g.box((sx * 8.8, 120, 0.72), (0.12, 540, 0.34))
+            for y in range(-140, 390, 4):
+                g.box((sx * 8.8, y, 0.4), (0.10, 0.10, 0.8))
+        make_obj(f"{tag}_rails", g, C("body"), world)
+    if on("poles"):
+        g = Geo()
+        for y in range(-140, 390, 30):
+            for sx in (-1, 1):
+                g.box((sx * 10.5, y, 4.8), (0.2, 0.2, 9.6))
+                g.box((sx * 8.8, y, 9.5), (3.4, 0.14, 0.14))
+                g.box((sx * 7.2, y, 9.38), (0.9, 0.5, 0.14))
+        make_obj(f"{tag}_poles", g, C("body"), world)
+    if on("gantry"):
+        g = Geo()
+        for y in (70, 190, 310, -50):
+            for sx in (-1, 1):
+                g.box((sx * 9.6, y, 3.8), (0.55, 0.55, 7.6))
+            g.box((0, y, 7.5), (19.8, 0.6, 0.7))
+            g.box((-3.0, y - 0.35, 5.9), (6.2, 0.2, 2.2))
+            g.box((4.2, y - 0.35, 5.9), (4.2, 0.2, 2.2))
+        make_obj(f"{tag}_gantry", g, C("line"), world)
+    sky = 0.0 if is_open else float(opts.get("skyline", 1.0))
     rng = random.Random(11)
     g = Geo()
     for _ in range(80):
@@ -696,13 +885,23 @@ def build_highway(tag, world):
         x = side * rng.uniform(45, 170)
         y = rng.uniform(-100, 380)
         w, d, h = rng.uniform(10, 28), rng.uniform(10, 28), rng.uniform(12, 90)
-        g.box((x, y, h / 2), (w, d, h))
+        g.box((x, y, h * sky / 2), (w, d, h * sky))
     for _ in range(40):
         x = rng.uniform(-190, 190)
         y = rng.uniform(395, 430)
         w, d, h = rng.uniform(10, 26), rng.uniform(10, 24), rng.uniform(25, 120)
-        g.box((x, y, h / 2), (w, d, h))
-    make_obj(f"{tag}_skyline", g, C("ground"), world)
+        g.box((x, y, h * sky / 2), (w, d, h * sky))
+    if sky > 0:                              # skyline 0 = no background towers (the real night sky is black)
+        make_obj(f"{tag}_skyline", g, C("ground"), world)
+    hl = opts.get("horizon_lights")
+    if hl:
+        g = Geo()
+        x0, x1 = hl.get("x", [-50.0, -8.0])
+        nl = max(2, int(hl.get("n", 10)))
+        sz = float(hl.get("size", 0.8))
+        for i in range(nl):
+            g.box((x0 + (x1 - x0) * i / (nl - 1), float(hl.get("y", 120.0)), float(hl.get("z", 1.0))), (sz, sz, sz))
+        make_obj(f"{tag}_horizon_lights", g, C("light"), world)
 
 
 def tunnel_profile(inset=0.0, half_w=5.8, wall_h=3.0, arch_h=5.6, n=14):
@@ -716,46 +915,77 @@ def tunnel_profile(inset=0.0, half_w=5.8, wall_h=3.0, arch_h=5.6, n=14):
     return pts
 
 
-def build_tunnel(tag, world):
+def build_tunnel(tag, world, opts=None):
+    """Road tunnel. opts (all optional, defaults = the original look): half_w (5.8), wall_h (3.0), arch_h (5.6),
+    ribs (1/0) + rib_step (4.0), lamp_x (4.0), lamp_z (6.82), lamp_len (1.3), lamp_w (0.55), strip (1 = continuous
+    ceiling lamp strip instead of single lamps), wall_lamps (1/0), dash_x (1.9), dash_len (3.0), dash_period (6.0),
+    edge_x (4.4, or [left, right] offsets of the solid edge lines), kerb (1/0), exit (1 = bright tunnel exit slab)."""
+    opts = opts or {}
     C = Style.col
     y0, y1 = -60.0, 220.0
+    hw = float(opts.get("half_w", 5.8))
+    wh, ah = float(opts.get("wall_h", 3.0)), float(opts.get("arch_h", 5.6))
+    prof = lambda inset=0.0: tunnel_profile(inset, hw, wh, ah)   # noqa: E731
     g = Geo()
-    g.box((0, (y0 + y1) / 2, -0.15), (11.8, y1 - y0, 0.3))
+    g.box((0, (y0 + y1) / 2, -0.15), (2 * hw + 0.2, y1 - y0, 0.3))
     make_obj(f"{tag}_road", g, C("floor"), world)
     g = Geo()
-    g.tube_y(tunnel_profile(), y0, y1)
+    g.tube_y(prof(), y0, y1)
     make_obj(f"{tag}_shell", g, C("ground"), world)
+    if opts.get("ribs", 1):
+        g = Geo()
+        outer, inner = prof(), prof(0.4)
+        step = float(opts.get("rib_step", 4.0))
+        y = y0
+        while y <= y1:
+            g.tube_y(inner, y - 0.25, y + 0.25)
+            g.ribbon(outer, inner, y - 0.25)
+            g.ribbon(outer, inner, y + 0.25)
+            y += step
+        make_obj(f"{tag}_ribs", g, C("body"), world)
     g = Geo()
-    outer, inner = tunnel_profile(), tunnel_profile(inset=0.4)
-    y = y0
-    while y <= y1:
-        g.tube_y(inner, y - 0.25, y + 0.25)
-        g.ribbon(outer, inner, y - 0.25)
-        g.ribbon(outer, inner, y + 0.25)
-        y += 4.0
-    make_obj(f"{tag}_ribs", g, C("body"), world)
-    g = Geo()
-    for yy in range(int(y0), int(y1), 4):
+    lx, lz = float(opts.get("lamp_x", 4.0)), float(opts.get("lamp_z", 6.82))
+    if opts.get("strip"):
         for sx in (-1, 1):
-            g.box((sx * 4.0, yy + 2.0, 6.82), (0.55, 1.3, 0.14))
+            g.box((sx * lx, (y0 + y1) / 2, lz), (0.30, y1 - y0, 0.14))
+    else:
+        ll, lw = float(opts.get("lamp_len", 1.3)), float(opts.get("lamp_w", 0.55))
+        for yy in range(int(y0), int(y1), 4):
+            for sx in (-1, 1):
+                g.box((sx * lx, yy + 2.0, lz), (lw, ll, 0.14))
     make_obj(f"{tag}_lamps", g, C("light"), world)
-    g = Geo()   # wall-mounted lamp boxes every 6 m (offset so they never sit on a rib): they give the
-    for yy in range(int(y0), int(y1), 6):   # lamp rhythm in the low S08 wheel close-up, where the ceiling is out of frame
-        for sx in (-1, 1):
-            g.box((sx * 5.70, yy + 3.0, WALL_LAMP_Z), (0.14, 1.1, 0.22))
-    make_obj(f"{tag}_walllamps", g, C("light"), world)
+    if opts.get("wall_lamps", 1):
+        g = Geo()   # wall-mounted lamp boxes every 6 m (offset so they never sit on a rib): they give the
+        for yy in range(int(y0), int(y1), 6):   # lamp rhythm in the low S08 wheel close-up, where the ceiling is out of frame
+            for sx in (-1, 1):
+                g.box((sx * (hw - 0.10), yy + 3.0, WALL_LAMP_Z), (0.14, 1.1, 0.22))
+        make_obj(f"{tag}_walllamps", g, C("light"), world)
     g = Geo()
-    for yy in range(int(y0), int(y1), 6):
-        for x in (-1.9, 1.9):
-            g.box((x, yy + 1.5, 0.012), (0.15, 3.0, 0.024))
-    for x in (-4.4, 4.4):
+    dx, dl, dp = float(opts.get("dash_x", 1.9)), float(opts.get("dash_len", 3.0)), float(opts.get("dash_period", 6.0))
+    yy = float(y0)
+    while yy < y1:
+        for x in (-dx, dx):
+            g.box((x, yy + dl / 2, 0.012), (0.15, dl, 0.024))
+        yy += dp
+    ex = opts.get("edge_x", 4.4)
+    exl, exr = (ex if isinstance(ex, (list, tuple)) else (ex, ex))
+    for x in (-abs(exl), abs(exr)):
         g.box((x, (y0 + y1) / 2, 0.012), (0.18, y1 - y0, 0.024))
-    for sx in (-1, 1):
-        g.box((sx * 5.3, (y0 + y1) / 2, 0.2), (1.0, y1 - y0, 0.4))
+    if opts.get("kerb", 1):
+        for sx in (-1, 1):
+            g.box((sx * (hw - 0.5), (y0 + y1) / 2, 0.2), (1.0, y1 - y0, 0.4))
     make_obj(f"{tag}_lanes", g, C("line"), world)
+    if opts.get("exit"):                      # bright tunnel exit: a lit slab filling the far opening
+        g = Geo()
+        g.box((0, y1 - 0.3, (wh + ah) / 2 * 0.9), (2 * hw - 0.6, 0.2, (wh + ah) * 0.85))
+        make_obj(f"{tag}_exit", g, C("light"), world)
 
 
-def build_booth(tag, world):
+def build_booth(tag, world, opts=None):
+    """Photo booth. opts (optional): window (0/1, default 1: the 0.3 m camera window behind the head), arch
+    [x_c, z_c, half_w, sag(, thickness)] (a smile-shaped light ribbon on the back wall), strips [[x, width], ...]
+    (full-height light strips at the back wall)."""
+    opts = opts or {}
     C = Style.col
     g = Geo()
     g.box((0, 2, -0.1), (30, 30, 0.2))
@@ -784,7 +1014,8 @@ def build_booth(tag, world):
         g.box((sx * 0.66, -0.28, 1.05), (0.52, 0.05, 1.7))
     make_obj(f"{tag}_curtain", g, C("glass"), world)
     g = Geo()   # camera window, stool, foot rest
-    g.box((0, 1.06, 1.5), (0.3, 0.04, 0.3))
+    if opts.get("window", 1):
+        g.box((0, 1.06, 1.5), (0.3, 0.04, 0.3))
     g.cyl((0, 0.4, SEAT_Z - 0.025), 0.20, 0.05, seg=20)
     g.cyl((0, 0.4, 0.27), 0.035, 0.54, seg=10)
     g.cyl((0, 0.4, 0.015), 0.20, 0.03, seg=20)
@@ -792,6 +1023,17 @@ def build_booth(tag, world):
     for sx in (-1, 1):
         g.box((sx * 0.26, 0.86, 0.09), (0.03, 0.03, 0.15))
     make_obj(f"{tag}_stool", g, C("dark"), world)
+    g = Geo()   # neon: curved arch over the back wall (smile: lowest at x_c) + vertical strips at the wall corners
+    if opts.get("arch"):
+        xc, zc, hw_, sag = opts["arch"][:4]
+        th = opts["arch"][4] if len(opts["arch"]) > 4 else 0.06
+        n_ = 24
+        lo = [(xc - hw_ + 2 * hw_ * i / n_, zc + sag * ((2 * i / n_ - 1) ** 2)) for i in range(n_ + 1)]
+        g.ribbon(lo, [(x, z + th) for x, z in lo], 1.055)
+    for sx_, w_ in opts.get("strips") or []:
+        g.box((sx_, 1.05, 1.2), (w_, 0.04, 2.4))
+    if g.verts:
+        make_obj(f"{tag}_neon", g, C("light"), world)
 
 
 # --------------------------------------------------------------------------------------
@@ -867,15 +1109,15 @@ def key_flash(scene, f0, f1, fps, times_s):
 
 
 def resolve_car(sid, pv, recipe, cam, look):
-    """-> None or (pos, yaw_deg)."""
+    """-> None or (pos, yaw_deg).  The shot's own "car" key ("none" | origin | at_lookat | pos:x,y | ...) overrides the recipe."""
+    if str(pv.get("car", recipe.get("car", ""))) == "none":
+        return None
     if "car_pos" in pv:
         return list(pv["car_pos"]), float(pv.get("car_yaw", 0.0))
     if "car_path" in pv:
         return list(pv["car_path"][0]), float(pv.get("car_yaw", 0.0))
-    mode = recipe.get("car", "origin")
+    mode = pv.get("car", recipe.get("car", "origin"))
     yaw = float(pv.get("car_yaw", 0.0))
-    if mode == "none":
-        return None
     if mode in ("origin", "path"):
         return [0.0, 0.0, 0.0], yaw
     if mode == "at_lookat":
@@ -902,6 +1144,66 @@ def resolve_car(sid, pv, recipe, cam, look):
     raise SystemExit(f"unknown car mode {mode!r} for {sid}")
 
 
+def key_taillight(car, mode, pv, f0, f1, fps):
+    """Taillight colour cue. mode: lit | off | ignite | ignite_quick (per-shot key "taillight").
+    ignite: the core (and, unless lamp_outer fixes it, the outer disc) ramps from display grey ignite_from to ignite_to
+    over ignite_s seconds (default = the whole shot) with ease-out exponent ignite_pow (1 = linear), keyed every
+    frame in DISPLAY space so the screen luma rises smoothly; the macro lens disc follows lamp_lens [from, to];
+    neighbour lamps (lamp_gap) stay dark during ignition."""
+    n = f1 - f0
+    lit_disp = min(PAL["light"] * Style.grey, 0.98)
+    c_from = float(pv.get("ignite_from", 0.10))
+    c_to = float(pv.get("ignite_to", lit_disp))
+    lens_spec = pv.get("lamp_lens")
+    if lens_spec is not None and not isinstance(lens_spec, (list, tuple)):
+        lens_spec = [lens_spec, lens_spec]
+    outer_fixed = pv.get("lamp_outer") is not None
+    dim = Style.col(c_from)
+
+    def setc(ob, col, frame=None):
+        if ob is None:
+            return
+        ob.color = col
+        if frame is not None:
+            ob.keyframe_insert("color", frame=frame)
+
+    if lens_spec is not None:                                    # constant starting colour of the lens discs
+        for ob in (car.get("lens"), car.get("lens2")):
+            setc(ob, Style.col(float(lens_spec[0])))
+    if mode == "off" or mode.startswith("ignite"):
+        for ob in (car.get("tail2"), car.get("core2")):          # neighbour lamps stay dark while the main one ignites
+            setc(ob, dim)
+    if mode == "lit":
+        if lens_spec is not None:
+            setc(car.get("lens"), Style.col(float(lens_spec[1])))
+        return
+    ramped = [car["tail_core"]] + ([] if outer_fixed else [car["tail"]])
+    if mode == "off":
+        for ob in ramped:
+            setc(ob, dim)
+        return
+    if mode == "ignite_quick":                                   # legacy: flickers on at +0.3 s (colour keys in linear light)
+        lit = Style.col("light")
+        t_on = f0 + rnd(0.30 * fps)
+        for ob in ramped:
+            setc(ob, dim, f0)
+            for k, c_ in ((t_on - 4, dim), (t_on - 3, lit), (t_on - 2, dim), (t_on, lit)):
+                setc(ob, c_, max(f0, k))
+            setc(ob, lit, min(f1, t_on))
+        return
+    if mode != "ignite":
+        raise SystemExit(f"unknown taillight mode {mode!r} (lit | ignite | ignite_quick | off)")
+    ign_s = float(pv.get("ignite_s", n / fps if n else 1.0))
+    pw = float(pv.get("ignite_pow", 1.0))
+    for f in range(f0, f1 + 1):
+        u = min(1.0, ((f - f0) / fps) / max(1e-6, ign_s))
+        e = 1.0 - (1.0 - u) ** pw
+        for ob in ramped:
+            setc(ob, Style.col(c_from + (c_to - c_from) * e), f)
+        if lens_spec is not None:
+            setc(car.get("lens"), Style.col(float(lens_spec[0]) + (float(lens_spec[1]) - float(lens_spec[0])) * e), f)
+
+
 def build_shot(shot, idx_in_env, f0, f1, fps):
     sid, env = shot["id"], shot["env"]
     if env not in ENV_X:
@@ -909,14 +1211,22 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
     pv = shot["previs"]
     recipe = dict(RECIPES.get(sid, dict(lens=32, car="at_lookat")))
     for k_json, k_rec in (("lens_mm", "lens"), ("speed", "speed"), ("handheld", "handheld"),
-                          ("car_ease", "ease")):
+                          ("car_ease", "ease"), ("taillight", "taillight"), ("flicker", "flicker")):
         if k_json in pv:
             recipe[k_rec] = pv[k_json]
+    if "lights_on" in pv:                                      # alias: lights_on true = no flicker-on cue
+        recipe["flicker"] = not bool(pv["lights_on"])
     fig_rec = dict(recipe.get("figure") or {})
-    if "figure_path" in pv and not fig_rec:
+    if ("figure_path" in pv or "figure_poses" in pv) and not fig_rec:
         fig_rec = dict(action="stand")
     if "figure_action" in pv:
         fig_rec["action"] = pv["figure_action"]
+    if "figure_appear" in pv:                                  # seconds until the figure shows up; 0 / null = from frame 0
+        fig_rec["appear"] = pv["figure_appear"]
+    env_opts = dict(pv.get("env_opts") or {})
+    for k_ in ("skyline", "poles"):                            # top-level aliases of the highway env_opts
+        if k_ in pv:
+            env_opts.setdefault(k_, pv[k_])
     origin = (ENV_X[env], SHOT_Y_STEP * idx_in_env, 0.0)
     world = new_empty(f"{sid}_world", None, loc=origin)
     n = f1 - f0                       # key distance (last frame index - first frame index)
@@ -924,6 +1234,7 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
     cam_from, cam_to = pv["cam_from"], pv["cam_to"]
     look_from = pv["look_at"]
     look_to = pv.get("look_at_to", look_from)
+    cam_ease = float(pv.get("cam_ease", 1.0))
     speed = 0.0 if "car_path" in pv else float(recipe.get("speed", 0.0))
     car_def = resolve_car(sid, pv, recipe, cam_from, look_from)
     car_xy = (car_def[0][0], car_def[0][1]) if car_def else (0.0, 0.0)
@@ -931,13 +1242,13 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
     # --- environment
     tubes = []
     if env == "garage":
-        tubes = build_garage(sid, world, car_xy, recipe.get("flicker", False))
+        tubes = build_garage(sid, world, car_xy, recipe.get("flicker", False), env_opts)
     elif env == "highway":
-        build_highway(sid, world)
+        build_highway(sid, world, env_opts)
     elif env == "tunnel":
-        build_tunnel(sid, world)
+        build_tunnel(sid, world, env_opts)
     elif env == "booth":
-        build_booth(sid, world)
+        build_booth(sid, world, env_opts)
 
     def conv(f):
         return speed * (f - f0) / fps
@@ -946,17 +1257,25 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
     car = None
     if car_def:
         pos, yaw = car_def
-        car = build_car(sid, world, pos, yaw, flame=bool(recipe.get("flame")))
+        flame_cue = pv.get("flame")
+        copts = {k_: pv[k_] for k_ in ("spoiler", "wheelbase", "lamp_gap", "car_grey", "panel_grey", "lamp_outer",
+                                      "bezel") if k_ in pv}
+        copts["macro"] = bool(pv.get("macro", recipe.get("car") == "macro_taillight" or pv.get("car") == "macro_taillight"))
+        car = build_car(sid, world, pos, yaw, flame=(flame_cue if flame_cue else bool(recipe.get("flame"))),
+                        flame_pipe=int(pv.get("flame_pipe", 0)), opts=copts)
         root = car["root"]
         with interp("LINEAR"):
             if "car_path" in pv:
                 pts = pv["car_path"]
                 ease = float(recipe.get("ease", pv.get("car_ease", 1.0)))
+                v0 = float(pv.get("car_v0", 0.0))             # initial speed (m/s): d(t) = v0 t + (L - v0 T) u^ease
                 seg_len = [math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]
                 total = sum(seg_len) or 1.0
+                v0T = min(max(0.0, v0) * T, total)
                 for f in range(f0, f1 + 1):
-                    u = ((f - f0) / n) ** ease if n else 0.0
-                    d = u * total
+                    uu = (f - f0) / n if n else 0.0
+                    d = v0T * uu + (total - v0T) * uu ** ease
+                    u = d / total
                     i = 0
                     while i < len(seg_len) - 1 and d > seg_len[i]:
                         d -= seg_len[i]
@@ -977,23 +1296,24 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
                     w.keyframe_insert("rotation_euler", frame=f0)
                     w.rotation_euler = (-conv(f1) / WHEEL_R, 0, 0)
                     w.keyframe_insert("rotation_euler", frame=f1)
-            # taillight ignition
-            tl = recipe.get("taillight", "lit")
-            if tl.startswith("ignite"):
-                dim, lit = Style.col(0.10), Style.col("light")
-                t_on = f0 + (rnd(0.30 * fps) if tl == "ignite_quick" else rnd(0.85 * n))
-                for ob in (car["tail"], car["tail_core"]):
-                    ob.color = dim
-                    ob.keyframe_insert("color", frame=f0)
-                    if tl == "ignite_quick":     # flicker on
-                        for k, c_ in ((t_on - 4, dim), (t_on - 3, lit), (t_on - 2, dim), (t_on, lit)):
-                            ob.color = c_
-                            ob.keyframe_insert("color", frame=max(f0, k))
-                    ob.color = lit
-                    ob.keyframe_insert("color", frame=min(f1, t_on) if tl == "ignite_quick" else f0 + n)
+            key_taillight(car, str(recipe.get("taillight", "lit")), pv, f0, f1, fps)
         if car["flames"]:
             with interp("CONSTANT"):
                 for ob in car["flames"]:
+                    if isinstance(flame_cue, list) and flame_cue:           # [[t_on, t_off, length_m(, width_m)], ...] in seconds
+                        keys = {f0: (0.001, 0.0)}
+                        for item in flame_cue:
+                            t_on, t_off, length = item[0], item[1], item[2]
+                            width = item[3] if len(item) > 3 else 0.0
+                            a_, b_ = f0 + min(n, max(0, rnd(t_on * fps))), f0 + min(n, max(0, rnd(t_off * fps)))
+                            keys[a_] = (float(length), float(width))
+                            keys.setdefault(b_, (0.001, 0.0))
+                        for fr in sorted(keys):
+                            L_, W_ = keys[fr]
+                            sw = (W_ / 0.23) if W_ else max(1.0, 0.6 + 0.4 * L_)    # W_ = max diameter in m (optional 4th item)
+                            ob.scale = (sw, sw, L_)
+                            ob.keyframe_insert("scale", frame=fr)
+                        continue
                     for k, sc_ in ((0, 0.001), (0.50, 1.0), (0.62, 0.001), (0.78, 0.7), (0.86, 0.001)):
                         ob.scale = (1, 1, sc_)
                         ob.keyframe_insert("scale", frame=f0 + rnd(k * n))
@@ -1012,12 +1332,22 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
                 dvec = (cam_from[0] - path[0][0], cam_from[1] - path[0][1])
             yaw = math.degrees(math.atan2(-dvec[0], dvec[1]))
         lean_sign = 1.0
-        if action == "lean" and car_def:
+        if action in ("lean", "lean_pockets") and car_def:
             rx = (math.cos(math.radians(yaw)), math.sin(math.radians(yaw)))
             lean_sign = 1.0 if (rx[0] * (car_def[0][0] - path[0][0]) + rx[1] * (car_def[0][1] - path[0][1])) > 0 else -1.0
-        fig = build_figure(sid + "_man", world)
+        fig = build_figure(sid + "_man", world, torso_up=float(pv.get("torso_up", 0.0)),
+                           shoulder_w=float(pv.get("shoulder_w", 0.45)), visor_w=float(pv.get("visor_w", 0.15)),
+                           visor_h=float(pv.get("visor_h", 0.04)))
         animate_figure(fig, action, f0, f1, fps, path, yaw, seated_flag=bool(fig_rec.get("seated")),
-                       lean_sign=lean_sign, appear=fig_rec.get("appear"))
+                       lean_sign=lean_sign, appear=fig_rec.get("appear"),
+                       lean_deg=float(pv.get("figure_lean_deg", 22.0)), poses=pv.get("figure_poses"),
+                       visor_dz=float(pv.get("visor_dz", 0.0)), pose_interp=str(pv.get("figure_pose_interp", "BEZIER")).upper())
+        if "figure_scale" in pv:                           # about the root, on the lean empty (the root scale is the 'appear' cue)
+            fs_ = float(pv["figure_scale"])
+            fig["j"]["lean"].scale = (fs_, fs_, fs_)
+        if "head_scale" in pv:
+            hs_ = float(pv["head_scale"])
+            fig["j"]["head"].scale = (hs_, hs_, hs_)
     # --- garage lights flicker on one by one
     if tubes:
         dim, lit = Style.col(0.12), Style.col("light")
@@ -1048,7 +1378,8 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
 
     def aim_vec(u):
         """camera -> look target at normalised shot time u (the convoy offset moves both, so it cancels)."""
-        c_, l_ = lerp(cam_from, cam_to, u), lerp(look_from, look_to, u)
+        uc = u ** cam_ease
+        c_, l_ = lerp(cam_from, cam_to, uc), lerp(look_from, look_to, uc)
         return [l_[i] - c_[i] for i in range(3)]
 
     # Does the aim pass (nearly) straight down? Track-To (up = +Y) flips its roll by 180 degrees at the zenith,
@@ -1065,14 +1396,15 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
         con.up_axis = "UP_Y"
     rng = random.Random(sid)
     ph = [[rng.uniform(0, 6.28) for _ in range(2)] for _ in range(6)]
-    frames_keyed = list(range(f0, f1 + 1)) if (hh > 0 or explicit_rot) else [f0, f1]
+    frames_keyed = list(range(f0, f1 + 1)) if (hh > 0 or explicit_rot or cam_ease != 1.0) else [f0, f1]
     prev_rot = None
     with interp("LINEAR"):
         for f in frames_keyed:
             u = (f - f0) / n if n else 0.0
+            uc = u ** cam_ease
             t = (f - f0) / fps
-            c = lerp(cam_from, cam_to, u)
-            lk = lerp(look_from, look_to, u)
+            c = lerp(cam_from, cam_to, uc)
+            lk = lerp(look_from, look_to, uc)
             c[1] += conv(f)
             lk[1] += conv(f)
             if hh > 0:
