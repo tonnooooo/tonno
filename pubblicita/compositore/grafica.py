@@ -42,11 +42,20 @@ def sdf_round_rect(px, py, x, y, w, h, r):
     return np.hypot(np.maximum(qx, 0), np.maximum(qy, 0)) + np.minimum(np.maximum(qx, qy), 0) - r
 
 
-def round_rect_mask(w: int, h: int, r: float, ss: int = 4, inset: float = 0.0) -> np.ndarray:
-    """Copertura antialias (H, W) di un rettangolo arrotondato che riempie il riquadro."""
-    px, py = _grid(0, 0, w, h, ss)
-    d = sdf_round_rect(px, py, inset, inset, w - 2 * inset, h - 2 * inset, max(r - inset, 0))
-    return _downsample(_cov(d, ss), h, w, ss)
+def round_rect_mask(w: int, h: int, r: float, ss: int = 4) -> np.ndarray:
+    """Copertura antialias (H, W) di un rettangolo arrotondato che riempie il riquadro.
+
+    Solo i quattro angoli richiedono il supercampionamento: il resto vale 1.
+    """
+    mask = np.ones((h, w), np.float32)
+    c = min(int(math.ceil(r)) + 1, w // 2, h // 2)
+    if r <= 0 or c <= 0:
+        return mask
+    for x0, y0 in ((0, 0), (w - c, 0), (0, h - c), (w - c, h - c)):
+        px, py = _grid(x0, y0, c, c, ss)
+        d = sdf_round_rect(px, py, 0, 0, w, h, r)
+        mask[y0:y0 + c, x0:x0 + c] = _downsample(_cov(d, ss), c, c, ss)
+    return mask
 
 
 def sdf_uneven_capsule(px, py, ax, ay, bx, by, r1, r2):
@@ -156,7 +165,9 @@ def mark_layer(cfg: dict, cx: float, cy: float, box: int, scale: float = 1.0,
     dx, dy = px - cx, py - cy
     lx = ct * dx + st * dy
     ly = -st * dx + ct * dy
-    sq = sdf_round_rect(lx, ly, -size / 2, -size / 2, size, size, cfg.get("radius", 0) * scale)
+    sw = cfg.get("width", cfg["size"]) * scale   # il quadrato può avere lati leggermente diversi
+    sh = cfg.get("height", cfg["size"]) * scale
+    sq = sdf_round_rect(lx, ly, -sw / 2, -sh / 2, sw, sh, cfg.get("radius", 0) * scale)
     cov_sq = _cov(sq, ss)
     star = cfg["star"]
     k = size  # le misure dell'asterisco sono frazioni del lato
@@ -296,15 +307,19 @@ def _paint(layers):
     return rgb, acc
 
 
-def _icon_orbita(u, v, size, o):
-    """Anello arancio con perno blu: icona generica «3D / blockout»."""
-    r = np.hypot(u - 0.56, v - 0.55)
-    ring = (np.abs(r - 0.27) <= 0.09).astype(np.float32)
-    arm = ((np.abs((v - 0.42) + 0.55 * (u - 0.30)) <= 0.07) & (u > 0.06) & (u < 0.45)).astype(np.float32)
-    core = (r <= 0.13).astype(np.float32)
-    hole = (r <= 0.18).astype(np.float32)
-    return _paint([(o.get("color", (234, 118, 0)), np.maximum(ring, arm)),
-                   ((255, 255, 255), hole * (1 - core)), (o.get("accent", (38, 87, 146)), core)])
+def _icon_cubo(u, v, size, o):
+    """Cubo isometrico a tre facce: icona generica «3D / blockout»."""
+    c = np.asarray(o.get("color", (234, 118, 0)), np.float32)
+    x, y = u - 0.5, v - 0.5
+    h = 0.40  # mezza altezza dell'esagono
+    w = h * 0.866
+    # esagono regolare con vertici in alto e in basso
+    inside = (np.abs(x) <= w) & (np.abs(y) <= h - np.abs(x) * 0.577)
+    top = inside & (y < 0) & (-y >= np.abs(x) * 0.577)  # rombo superiore
+    left = inside & ~top & (x < 0)
+    right = inside & ~top & (x >= 0)
+    return _paint([(np.minimum(c * 1.25, 255), top.astype(np.float32)),
+                   (c, left.astype(np.float32)), (c * 0.72, right.astype(np.float32))])
 
 
 def _icon_spark(u, v, size, o):
@@ -326,7 +341,7 @@ def _icon_dot(u, v, size, o):
     return _paint([(o.get("color", (233, 133, 26)), c)])
 
 
-_ICONS = {"orbita": _icon_orbita, "spark": _icon_spark, "play": _icon_play, "dot": _icon_dot}
+_ICONS = {"cubo": _icon_cubo, "spark": _icon_spark, "play": _icon_play, "dot": _icon_dot}
 
 
 # ---------------------------------------------------------------- etichetta a pillola

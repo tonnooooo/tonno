@@ -1,0 +1,231 @@
+{
+ "meta": {
+  "id": "c1_strada",
+  "frames": 120,
+  "resolution": [
+   1280,
+   720
+  ],
+  "samples": 10,
+  "seed": 3,
+  "note": "Seoul: ragazza con ombrello trasparente accanto alla R34, dolly-in"
+ },
+ "world": {
+  "preset": "night_city"
+ },
+ "render": {
+  "vignette": 0.25
+ },
+ "camera": {
+  "lens": 32,
+  "location": [
+   0.3,
+   -5.4,
+   1.3
+  ],
+  "look_at": [
+   0.3,
+   -0.1,
+   1.25
+  ],
+  "moves": [
+   {
+    "type": "dolly_in",
+    "distance": 1.8,
+    "ease": "in_out"
+   }
+  ],
+  "dof": {
+   "focus": "ragazza",
+   "fstop": 5.6
+  }
+ },
+ "objects": [
+  {
+   "name": "strada",
+   "type": "street",
+   "size": [
+    60,
+    60
+   ],
+   "wet": 0.9
+  },
+  {
+   "name": "fondale",
+   "type": "building_block",
+   "location": [
+    0,
+    9,
+    0
+   ],
+   "size": [
+    36,
+    4,
+    16
+   ],
+   "panels": [
+    {
+     "face": "front",
+     "x": -6.05,
+     "z": 2.4,
+     "w": 2.85,
+     "h": 1.7,
+     "color": "#E9C8F0",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": 2.55,
+     "z": 2.45,
+     "w": 3.0,
+     "h": 1.75,
+     "color": "#CFF2E3",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": 0.85,
+     "z": 5.4,
+     "w": 1.1,
+     "h": 0.9,
+     "color": "#F2E6D8",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": 2.55,
+     "z": 5.4,
+     "w": 1.1,
+     "h": 0.9,
+     "color": "#F2E6D8",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": 4.2,
+     "z": 5.4,
+     "w": 1.1,
+     "h": 0.9,
+     "color": "#F2E6D8",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": 5.85,
+     "z": 5.4,
+     "w": 1.1,
+     "h": 0.9,
+     "color": "#F2E6D8",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": -5.4,
+     "z": 5.95,
+     "w": 4.6,
+     "h": 0.6,
+     "color": "#C4E4F8",
+     "strength": 1.0
+    },
+    {
+     "face": "front",
+     "x": 7.9,
+     "z": 5.0,
+     "w": 0.7,
+     "h": 1.6,
+     "color": "#E9C8F0",
+     "strength": 1.0
+    }
+   ]
+  },
+  {
+   "name": "colonna_a",
+   "type": "box",
+   "origin": "bottom",
+   "location": [
+    -1.9,
+    6.6,
+    0
+   ],
+   "size": [
+    0.6,
+    0.6,
+    12
+   ],
+   "material": "building:#07080B"
+  },
+  {
+   "name": "colonna_b",
+   "type": "box",
+   "origin": "bottom",
+   "location": [
+    6.9,
+    6.6,
+    0
+   ],
+   "size": [
+    0.7,
+    0.7,
+    12
+   ],
+   "material": "building:#07080B"
+  },
+  {
+   "name": "auto",
+   "type": "car",
+   "style": "sports",
+   "location": [
+    -1.7,
+    0.3,
+    0
+   ],
+   "rotation": [
+    0,
+    0,
+    -75
+   ],
+   "color": "#2B58B0",
+   "popup_headlights": false,
+   "lights_on": false,
+   "taillights_on": true
+  },
+  {
+   "name": "ragazza",
+   "type": "mannequin",
+   "location": [
+    1.3,
+    -0.7,
+    0
+   ],
+   "rotation": [
+    0,
+    0,
+    10
+   ],
+   "pose": "standing",
+   "dress": "long",
+   "accessories": [
+    "hair_bun",
+    "umbrella"
+   ],
+   "pose_keys": [
+    {
+     "f": 0,
+     "pose": "standing"
+    },
+    {
+     "f": 70,
+     "pose": "standing",
+     "joints": {
+      "head": [
+       0,
+       0,
+       -25
+      ]
+     },
+     "ease": "in_out"
+    }
+   ]
+  }
+ ]
+}

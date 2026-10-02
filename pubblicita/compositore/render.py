@@ -196,7 +196,10 @@ def _encoder(out: Path, W: int, H: int, fps: int, duration: float, audio: str | 
     cmd += ["-map", "0:v:0"]
     if amap:
         cmd += ["-map", amap]
-    cmd += ["-vf", "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p",
+    # RGB → YUV 4:2:0 BT.709; il filtro del sottocampionamento della crominanza è nel config
+    # («gauss» è quello che si avvicina di più al riferimento sui bordi colorati sottili)
+    cflt = enc.get("chroma_filter", "gauss")
+    cmd += ["-vf", f"scale=out_color_matrix=bt709:out_range=tv:flags={cflt},format=yuv420p",
             "-c:v", "libx264", "-preset", enc.get("preset", "medium"), "-crf", str(enc.get("crf", 16)),
             "-pix_fmt", "yuv420p", "-profile:v", "high", *media.COLOR_TAGS]
     if amap:

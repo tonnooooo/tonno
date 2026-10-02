@@ -1,0 +1,1071 @@
+{
+  "_info": "Analisi dello spot di riferimento (reel @themira.creators '26 shots, cut to 115 BPM'): solo dati testuali, nessun media. Vedi ANALISI.md.",
+  "fps": 24,
+  "bpm": 115,
+  "frame_per_battito": 12.5217,
+  "total_frames": 336,
+  "duration_s": 14.0,
+  "canvas": [
+    1080,
+    1920
+  ],
+  "pannelli": {
+    "top": [
+      12,
+      336,
+      1056,
+      594
+    ],
+    "bottom": [
+      12,
+      1070,
+      1056,
+      594
+    ]
+  },
+  "tagli_s": [
+    0.3333,
+    0.5833,
+    0.8333,
+    1.0833,
+    1.6667,
+    2.4167,
+    3.2083,
+    3.625,
+    4.2083,
+    4.625,
+    5.0833,
+    5.7083,
+    6.1667,
+    6.75,
+    7.2917,
+    7.7083,
+    8.4167,
+    8.8333,
+    9.2917,
+    9.75,
+    10.0417,
+    10.875,
+    11.5,
+    12.0417,
+    13.0833
+  ],
+  "tagli_frame": [
+    8,
+    14,
+    20,
+    26,
+    40,
+    58,
+    77,
+    87,
+    101,
+    111,
+    122,
+    137,
+    148,
+    162,
+    175,
+    185,
+    202,
+    212,
+    223,
+    234,
+    241,
+    261,
+    276,
+    289,
+    314
+  ],
+  "sfasamenti": [
+    {
+      "taglio": 21,
+      "frame_bottom": 241,
+      "frame_top": 242,
+      "nota": "nel riferimento il pannello superiore taglia 1 frame dopo; nel nostro spot i due pannelli tagliano insieme"
+    }
+  ],
+  "shots": [
+    {
+      "n": 1,
+      "start_frame": 0,
+      "frames": 8,
+      "start_s": 0.0,
+      "dur_s": 0.3333,
+      "beats": 0.639,
+      "setup": "S01",
+      "luogo": "L1",
+      "scala": "campo medio (auto intera)",
+      "top": "Auto low-poly bianca e nera (coupe' squadrata) vista di 3/4 anteriore, fari come blocchi bianchi emissivi, nel vicolo stretto con pareti a doghe di legno e lanterne sferiche; pavimento a piastrelle lucide con riflessi.",
+      "bottom": "AE86 Trueno bianca e nera con fari e fendinebbia gialli accesi in un vicolo di Kyoto sotto la pioggia; asfalto bagnato con riflessi gialli, toni freddi blu-verdi con accenti caldi.",
+      "camera": "Camera bassa di 3/4 anteriore; push-in lento (+2-3% di scala in 8 frame) in entrambi.",
+      "differenze": "Inquadratura quasi identica; il finale e' un po' piu' largo e piu' basso.",
+      "movimento_misurato": "top: scala 1.019; bottom: scala 1.027"
+    },
+    {
+      "n": 2,
+      "start_frame": 8,
+      "frames": 6,
+      "start_s": 0.3333,
+      "dur_s": 0.25,
+      "beats": 0.479,
+      "setup": "S06",
+      "luogo": "L2",
+      "scala": "figura intera",
+      "top": "Manichino avorio stilizzato (corpo a capsula, fascia obi scura, chignon nero con bacchette) in piedi, frontale e centrato davanti a pareti shoji crema; tatami.",
+      "bottom": "Ragazza in kimono crema e oro con obi nero ricamato e fiore bianco tra i capelli, in piedi davanti a fusuma dipinti a inchiostro; luce calda di tungsteno.",
+      "camera": "Frontale all'altezza del busto, praticamente statica.",
+      "differenze": "Nel finale la figura e' spostata a destra e guarda in basso; nel blockout e' centrata.",
+      "movimento_misurato": "top: scala 1.023; bottom: scala 1.011"
+    },
+    {
+      "n": 3,
+      "start_frame": 14,
+      "frames": 6,
+      "start_s": 0.5833,
+      "dur_s": 0.25,
+      "beats": 0.479,
+      "setup": "S09",
+      "luogo": "L3",
+      "scala": "dettaglio over-the-shoulder",
+      "top": "Over-the-shoulder da dietro a destra: busto beige liscio del manichino con braccio cilindrico e mano sul volante, cruscotto scuro, doghe di legno oltre il parabrezza.",
+      "bottom": "Over-the-shoulder: mano della ragazza con anelli sul volante, strumenti analogici arancioni accesi, bokeh di luci cittadine oltre il parabrezza bagnato.",
+      "camera": "OTS da dietro-destra; lieve push nel blockout (+2.7%), finale quasi fermo.",
+      "differenze": "Composizione equivalente; nel finale la camera e' piu' alta e la mano piu' in vista.",
+      "movimento_misurato": "top: scala 1.027; bottom: scala 1.004"
+    },
+    {
+      "n": 4,
+      "start_frame": 20,
+      "frames": 6,
+      "start_s": 0.8333,
+      "dur_s": 0.25,
+      "beats": 0.479,
+      "setup": "S10",
+      "luogo": "L4",
+      "scala": "primo piano",
+      "top": "Primo piano frontale di una testa ovoidale avorio su collo cilindrico, accenni di capelli neri ai lati, fondo crema uniforme.",
+      "bottom": "Primo piano frontale della ragazza: chignon nero, fiore bianco e kanzashi dorati, orecchini pendenti d'oro; fondo caldo oliva-marrone.",
+      "camera": "Frontale all'altezza degli occhi, statica.",
+      "differenze": "Il fondo del blockout e' crema chiaro, quello del finale caldo e scuro: salto di luminosita' tra i pannelli.",
+      "movimento_misurato": "top: scala 1.042; bottom: scala 1.002"
+    },
+    {
+      "n": 5,
+      "start_frame": 26,
+      "frames": 14,
+      "start_s": 1.0833,
+      "dur_s": 0.5833,
+      "beats": 1.118,
+      "setup": "S11",
+      "luogo": "L5",
+      "scala": "mezza figura di spalle",
+      "top": "Manichino di spalle (chignon con bacchette e fiore bianco) centrato; a destra torre a traliccio wireframe bianca, skyline a blocchi neri, cielo blu notte, riflessi verticali.",
+      "bottom": "Ragazza di spalle (obi nero a fiori) sul lato sinistro accanto al tetto dell'AE86 bianca; Tokyo Tower illuminata d'arancio al centro-destra, notte.",
+      "camera": "Altezza spalle, di spalle; nel finale lieve carrello laterale e push (+3%).",
+      "differenze": "Blockout: figura centrata, torre a destra, nessuna auto. Finale: figura a sinistra, auto in basso a sinistra, torre piu' centrale. Corrisponde l'idea (figura di spalle + torre), non la composizione.",
+      "movimento_misurato": "top: scala 1.002; bottom: scala 1.029, dx +2%"
+    },
+    {
+      "n": 6,
+      "start_frame": 40,
+      "frames": 18,
+      "start_s": 1.6667,
+      "dur_s": 0.75,
+      "beats": 1.438,
+      "setup": "S09",
+      "luogo": "L3",
+      "scala": "dettaglio over-the-shoulder",
+      "top": "Stessa clip blockout dello shot 3 (gli stessi frame vengono riusati nello shot 14).",
+      "bottom": "Stessa ripresa dello shot 3 in un altro momento: la mano scorre sulla corona del volante.",
+      "camera": "OTS; push lento (+3%) in entrambi.",
+      "differenze": "Il blockout e' lo stesso dello shot 14, mentre il finale cambia (vedi shot 14).",
+      "movimento_misurato": "top: scala 1.032; bottom: scala 1.027"
+    },
+    {
+      "n": 7,
+      "start_frame": 58,
+      "frames": 19,
+      "start_s": 2.4167,
+      "dur_s": 0.7917,
+      "beats": 1.517,
+      "setup": "S13",
+      "luogo": "L6",
+      "scala": "campo lungo",
+      "top": "Auto low-poly grigia di profilo su strada scura e bagnata, manichino con ombrello conico davanti; edifici neri con cartelloni emissivi pastello (rosa, menta) e finestre bianche quadrate.",
+      "bottom": "Incrocio stile Shibuya sotto la pioggia: AE86 di profilo, ragazza in kimono con ombrello nero davanti alla portiera, insegne al neon e maxischermi.",
+      "camera": "Frontale al profilo, altezza uomo; blockout con push lento (+4%, accelera e frena), finale con carrello laterale lento.",
+      "differenze": "Disposizione identica (auto di profilo, figura davanti con ombrello); il finale aggiunge pioggia, luci e insegne.",
+      "movimento_misurato": "top: scala 1.039; bottom: dx -4% (carrello)"
+    },
+    {
+      "n": 8,
+      "start_frame": 77,
+      "frames": 10,
+      "start_s": 3.2083,
+      "dur_s": 0.4167,
+      "beats": 0.799,
+      "setup": "S10",
+      "luogo": "L4",
+      "scala": "primissimo piano",
+      "top": "Testa ovoidale piu' grande: primissimo piano con la fronte tagliata.",
+      "bottom": "Primissimo piano del viso con la fronte tagliata, sguardo in camera.",
+      "camera": "Frontale, statica: e' il punch-in dello shot 4.",
+      "differenze": "Coerenti.",
+      "movimento_misurato": "top: scala 1.052; bottom: scala 0.993"
+    },
+    {
+      "n": 9,
+      "start_frame": 87,
+      "frames": 14,
+      "start_s": 3.625,
+      "dur_s": 0.5833,
+      "beats": 1.118,
+      "setup": "S06",
+      "luogo": "L2",
+      "scala": "figura intera seduta",
+      "top": "Manichino inginocchiato (seiza) frontale e centrato; shoji crema con montanti blu scuro, tatami.",
+      "bottom": "Ragazza inginocchiata in seiza davanti ai fusuma dipinti, mani in grembo, sguardo in camera.",
+      "camera": "Frontale; blockout con push-in morbido (+6%, ease in/out), finale fermo.",
+      "differenze": "Il blockout si muove, il finale no.",
+      "movimento_misurato": "top: scala 1.061; bottom: scala 1.008"
+    },
+    {
+      "n": 10,
+      "start_frame": 101,
+      "frames": 10,
+      "start_s": 4.2083,
+      "dur_s": 0.4167,
+      "beats": 0.799,
+      "setup": "S02",
+      "luogo": "L1",
+      "scala": "campo medio",
+      "top": "Posteriore dell'auto low-poly centrato (fanali come rettangoli rosa emissivi), vicolo con lanterne, cielo blu notte in fondo; camera bassa.",
+      "bottom": "3/4 posteriore ravvicinato dell'AE86: fanali rossi accesi, targa, vicolo bagnato.",
+      "camera": "Bassa, posteriore; push lieve nel blockout (+2%), finale fermo.",
+      "differenze": "Il finale e' piu' stretto e di 3/4, il blockout perfettamente frontale.",
+      "movimento_misurato": "top: scala 1.018; bottom: scala 0.984"
+    },
+    {
+      "n": 11,
+      "start_frame": 111,
+      "frames": 11,
+      "start_s": 4.625,
+      "dur_s": 0.4583,
+      "beats": 0.878,
+      "setup": "S14",
+      "luogo": "L6",
+      "scala": "mezza figura",
+      "top": "Manichino grigio di 3/4 di spalle accanto al posteriore dell'auto (fanali rosa); edificio nero con cartelloni rosa, lilla e crema.",
+      "bottom": "Ragazza in piedi dietro l'AE86 che guarda in camera da sopra la spalla; neon sfocati dell'incrocio, pioggia.",
+      "camera": "Altezza spalle; nel finale carrello laterale (~3% della larghezza).",
+      "differenze": "Nel blockout la figura non si volta e la camera e' piu' lontana: lo sguardo in camera esiste solo nel finale.",
+      "movimento_misurato": "top: scala 1.024; bottom: dx -3.4% (carrello)"
+    },
+    {
+      "n": 12,
+      "start_frame": 122,
+      "frames": 15,
+      "start_s": 5.0833,
+      "dur_s": 0.625,
+      "beats": 1.198,
+      "setup": "S03",
+      "luogo": "L1",
+      "scala": "campo medio ravvicinato",
+      "top": "Auto low-poly di 3/4 anteriore, camera bassa, nel vicolo: i fari a scomparsa si alzano e si accendono.",
+      "bottom": "AE86 di 3/4 anteriore, camera bassa, nel vicolo bagnato: i fari a scomparsa si sollevano e si accendono; fendinebbia gialli.",
+      "camera": "Bassa di 3/4; push-in (+6% sopra, +3.6% sotto).",
+      "differenze": "Azione e tempi coincidono: e' lo shot di corrispondenza piu' forte.",
+      "movimento_misurato": "top: scala 1.062; bottom: scala 1.036"
+    },
+    {
+      "n": 13,
+      "start_frame": 137,
+      "frames": 11,
+      "start_s": 5.7083,
+      "dur_s": 0.4583,
+      "beats": 0.878,
+      "setup": "S03",
+      "luogo": "L1",
+      "scala": "dettaglio",
+      "top": "Dettaglio del faro a scomparsa del blockout, gia' acceso e sovraesposto; doghe di legno sullo sfondo.",
+      "bottom": "Macro sul faro a scomparsa che si accende (spento al primo frame, pieno al terzo), gocce di pioggia.",
+      "camera": "Dettaglio; leggero spostamento laterale.",
+      "differenze": "Nel blockout il faro e' acceso fin dall'inizio: l'accensione esiste solo nel finale.",
+      "movimento_misurato": "top: scala 1.021, dx -1%; bottom: scala 1.002"
+    },
+    {
+      "n": 14,
+      "start_frame": 148,
+      "frames": 14,
+      "start_s": 6.1667,
+      "dur_s": 0.5833,
+      "beats": 1.118,
+      "setup": "S09",
+      "luogo": "L3",
+      "scala": "dettaglio over-the-shoulder",
+      "top": "Identico allo shot 6 (stessi frame, riprodotti a circa 1.3x).",
+      "bottom": "Composizione diversa: due mani sul volante, camera piu' dietro e piu' vicina, anelli in evidenza.",
+      "camera": "OTS ravvicinato; push lieve (+2.5%).",
+      "differenze": "Massima divergenza della serie abitacolo: blockout riusato, finale con una nuova composizione.",
+      "movimento_misurato": "top: scala 1.028; bottom: scala 1.024"
+    },
+    {
+      "n": 15,
+      "start_frame": 162,
+      "frames": 13,
+      "start_s": 6.75,
+      "dur_s": 0.5417,
+      "beats": 1.038,
+      "setup": "S15",
+      "luogo": "L7",
+      "scala": "piano americano",
+      "top": "Manichino di spalle in piedi accanto al cofano dell'auto (a sinistra), cartelloni menta, rosa e bianchi su edificio nero, pavimento riflettente.",
+      "bottom": "Ragazza in piedi accanto al cofano dell'AE86, rivolta verso la camera, mano tra i capelli; Tokyo Tower e citta' sfocate sullo sfondo, pioggia.",
+      "camera": "Altezza auto con la carrozzeria in primo piano; quasi statica.",
+      "differenze": "Orientamento opposto (di spalle sopra, frontale sotto); il finale aggiunge la torre.",
+      "movimento_misurato": "top: scala 1.010; bottom: dx +0.7%"
+    },
+    {
+      "n": 16,
+      "start_frame": 175,
+      "frames": 10,
+      "start_s": 7.2917,
+      "dur_s": 0.4167,
+      "beats": 0.799,
+      "setup": "S15",
+      "luogo": "L7",
+      "scala": "mezza figura",
+      "top": "Stesso set piu' stretto: testa e spalle del manichino di spalle, cartellone menta.",
+      "bottom": "Mezza figura della ragazza che si sistema i capelli, torre sfocata a sinistra.",
+      "camera": "Punch-in dello shot 15; blockout fermo, nel finale si muove solo il soggetto.",
+      "differenze": "Come lo shot 15.",
+      "movimento_misurato": "top: scala 1.003; bottom: scala 0.998"
+    },
+    {
+      "n": 17,
+      "start_frame": 185,
+      "frames": 17,
+      "start_s": 7.7083,
+      "dur_s": 0.7083,
+      "beats": 1.358,
+      "setup": "S07",
+      "luogo": "L2",
+      "scala": "figura intera seduta",
+      "top": "Manichino inginocchiato di 3/4 di spalle in una stanza con shoji crema e pilastro blu scuro; testa girata verso la camera.",
+      "bottom": "Ragazza inginocchiata di 3/4 di spalle che si volta a guardare in camera; tokonoma con rotolo dipinto e tatami sullo sfondo.",
+      "camera": "Altezza del soggetto seduto; push +4% in entrambi.",
+      "differenze": "Coerenti; nel finale la rotazione della testa e' l'azione dello shot.",
+      "movimento_misurato": "top: scala 1.044; bottom: scala 1.036"
+    },
+    {
+      "n": 18,
+      "start_frame": 202,
+      "frames": 10,
+      "start_s": 8.4167,
+      "dur_s": 0.4167,
+      "beats": 0.799,
+      "setup": "S04",
+      "luogo": "L1",
+      "scala": "figura intera",
+      "top": "Manichino seduto sul cofano dell'auto, frontale, fari accesi come blocchi bianchi; vicolo con lanterne in prospettiva centrale.",
+      "bottom": "Ragazza seduta sul cofano dell'AE86 a fari accesi, kimono aperto sulla gamba, vicolo sotto la pioggia; frontale e simmetrico.",
+      "camera": "Frontale centrale all'altezza del cofano; quasi statica (lieve salita nel blockout).",
+      "differenze": "Corrispondenza molto alta: simmetria, fari, posa.",
+      "movimento_misurato": "top: scala 1.013; bottom: scala 1.010"
+    },
+    {
+      "n": 19,
+      "start_frame": 212,
+      "frames": 11,
+      "start_s": 8.8333,
+      "dur_s": 0.4583,
+      "beats": 0.878,
+      "setup": "S02",
+      "luogo": "L1",
+      "scala": "dettaglio",
+      "top": "Dettaglio basso del posteriore low-poly: fanali rosa, targa grigia, paraurti nero.",
+      "bottom": "Dettaglio basso del posteriore: fanali accesi, targa, fumo che esce dallo scarico.",
+      "camera": "Camera a terra; push-in (+5-7%) in entrambi.",
+      "differenze": "Il fumo dello scarico esiste solo nel finale.",
+      "movimento_misurato": "top: scala 1.068; bottom: scala 1.054"
+    },
+    {
+      "n": 20,
+      "start_frame": 223,
+      "frames": 11,
+      "start_s": 9.2917,
+      "dur_s": 0.4583,
+      "beats": 0.878,
+      "setup": "S04",
+      "luogo": "L1",
+      "scala": "piano americano",
+      "top": "Manichino in piedi davanti all'auto nel vicolo, frontale, con occhiali da sole a blocchi neri; lanterne ai lati.",
+      "bottom": "Ragazza in piedi davanti all'AE86 a fari accesi che abbassa gli occhiali da sole con due mani; pioggia.",
+      "camera": "Frontale; nel finale lieve discesa e push (+3%).",
+      "differenze": "Il blockout e' una mezza figura statica, il finale un piano americano con un gesto.",
+      "movimento_misurato": "top: scala 1.007; bottom: scala 1.030"
+    },
+    {
+      "n": 21,
+      "start_frame": 234,
+      "frames": 7,
+      "start_s": 9.75,
+      "dur_s": 0.2917,
+      "beats": 0.559,
+      "setup": "S05",
+      "luogo": "L1",
+      "scala": "dettaglio laterale",
+      "top": "Fiancata dell'auto low-poly con la portiera aperta, gambe del manichino che escono; vicolo.",
+      "bottom": "Fiancata dell'AE86 con la portiera aperta: la ragazza scende, gamba con tacco fuori dalla portiera.",
+      "camera": "Laterale bassa, statica.",
+      "differenze": "Coerenti. Nel riferimento il taglio sotto cade al frame 241, sopra al 242 (sfasamento di 1 frame).",
+      "movimento_misurato": "top: scala 1.022; bottom: n/d"
+    },
+    {
+      "n": 22,
+      "start_frame": 241,
+      "frames": 20,
+      "start_s": 10.0417,
+      "dur_s": 0.8333,
+      "beats": 1.597,
+      "setup": "S11",
+      "luogo": "L5",
+      "scala": "mezza figura di spalle",
+      "top": "Versione piu' stretta dello shot 5: chignon grande in primo piano, torre wireframe a destra.",
+      "bottom": "Quasi la stessa inquadratura dello shot 5 (probabilmente la stessa clip in un altro momento), con lieve orbita e push (+4.7%).",
+      "camera": "Di spalle; nel finale orbita lenta.",
+      "differenze": "Il blockout e' piu' stretto del finale, che ripete l'inquadratura dello shot 5.",
+      "movimento_misurato": "top: scala 1.001; bottom: scala 1.047, dx +3%"
+    },
+    {
+      "n": 23,
+      "start_frame": 261,
+      "frames": 15,
+      "start_s": 10.875,
+      "dur_s": 0.625,
+      "beats": 1.198,
+      "setup": "S14",
+      "luogo": "L6",
+      "scala": "mezza figura di spalle",
+      "top": "Manichino grigio di spalle dietro il posteriore dell'auto (fanali rosa a sinistra), cartellone menta.",
+      "bottom": "Ragazza di spalle dietro l'AE86 (fanali rossi), neon sfocati dell'incrocio.",
+      "camera": "Mezza figura di spalle, quasi statica.",
+      "differenze": "Coerenti; e' lo shot che precede il whip.",
+      "movimento_misurato": "top: scala 1.029; bottom: scala 1.004"
+    },
+    {
+      "n": 24,
+      "start_frame": 276,
+      "frames": 13,
+      "start_s": 11.5,
+      "dur_s": 0.5417,
+      "beats": 1.038,
+      "setup": "S14",
+      "luogo": "L6",
+      "scala": "campo lungo",
+      "top": "Panoramica rapida (whip) verso destra senza motion blur: dalle strisce pedonali all'auto low-poly vista da dietro, con il manichino in piedi a destra; cartelloni pastello.",
+      "bottom": "Whip con forte motion blur orizzontale per 7 frame (276-282), poi campo lungo: ragazza di spalle dietro l'AE86 in mezzo all'incrocio bagnato, maxischermi.",
+      "camera": "Whip pan di circa 0.25 s che decelera, poi camera ferma.",
+      "differenze": "Sotto il whip e' una sfocatura di transizione, sopra un vero movimento di camera; la figura e' accanto all'auto sopra, dietro l'auto sotto.",
+      "movimento_misurato": "top: dx -37% (whip); bottom: whip"
+    },
+    {
+      "n": 25,
+      "start_frame": 289,
+      "frames": 25,
+      "start_s": 12.0417,
+      "dur_s": 1.0417,
+      "beats": 1.997,
+      "setup": "S12",
+      "luogo": "L5",
+      "scala": "mezzo primo piano dal basso",
+      "top": "Testa del manichino dal basso con occhiali grigi rettangolari e chignon con bacchette; torre wireframe a sinistra, cielo blu notte.",
+      "bottom": "Mezzo primo piano dal basso della ragazza con occhiali da sole a gatto, fiore e kanzashi; Tokyo Tower sfocata a sinistra.",
+      "camera": "Dal basso; leggera deriva.",
+      "differenze": "Coerenti: torre a sinistra, soggetto a destra del centro.",
+      "movimento_misurato": "top: scala 1.015; bottom: scala 0.993"
+    },
+    {
+      "n": 26,
+      "start_frame": 314,
+      "frames": 22,
+      "start_s": 13.0833,
+      "dur_s": 0.9167,
+      "beats": 1.757,
+      "setup": "S08",
+      "luogo": "L2",
+      "scala": "campo lungo simmetrico",
+      "top": "Quadro nel quadro simmetrico: corridoio con pareti marroni e due lanterne sferiche; in fondo la stanza tatami illuminata con una piccola figura inginocchiata al centro.",
+      "bottom": "Ingresso di una machiya in legno scuro con due lanterne di carta; in fondo la stanza tatami calda con la ragazza inginocchiata; pavimento di pietra bagnato.",
+      "camera": "Frontale simmetrica, statica; il finale si ferma su un fermo immagine dopo circa 4 frame.",
+      "differenze": "Coerenti; chiusura calma.",
+      "movimento_misurato": "top: fermo; bottom: fermo (frame identici)"
+    }
+  ],
+  "setups": {
+    "S01": {
+      "nome": "vicolo_auto_frontale",
+      "luogo": "L1",
+      "descrizione": "Auto eroe di 3/4 anteriore, camera bassa, fari accesi nel vicolo notturno.",
+      "shots": [
+        1
+      ],
+      "frames_totali": 8
+    },
+    "S02": {
+      "nome": "vicolo_posteriore",
+      "luogo": "L1",
+      "descrizione": "Posteriore dell'auto, camera bassa: prima campo medio (10), poi dettaglio con fumo dello scarico (19).",
+      "shots": [
+        10,
+        19
+      ],
+      "frames_totali": 21
+    },
+    "S03": {
+      "nome": "fari_scomparsa",
+      "luogo": "L1",
+      "descrizione": "Azione firma dell'auto: fari a scomparsa che si alzano (12) e macro sul faro che si accende (13).",
+      "shots": [
+        12,
+        13
+      ],
+      "frames_totali": 26
+    },
+    "S04": {
+      "nome": "vicolo_posa_auto",
+      "luogo": "L1",
+      "descrizione": "Protagonista con l'auto, frontale e simmetrica: seduta sul cofano (18), in piedi che abbassa gli occhiali (20).",
+      "shots": [
+        18,
+        20
+      ],
+      "frames_totali": 21
+    },
+    "S05": {
+      "nome": "vicolo_portiera",
+      "luogo": "L1",
+      "descrizione": "Dettaglio laterale: la protagonista scende dall'auto.",
+      "shots": [
+        21
+      ],
+      "frames_totali": 7
+    },
+    "S06": {
+      "nome": "tatami_frontale",
+      "luogo": "L2",
+      "descrizione": "Protagonista frontale e centrata nella stanza tatami: in piedi (2) e in seiza (9).",
+      "shots": [
+        2,
+        9
+      ],
+      "frames_totali": 20
+    },
+    "S07": {
+      "nome": "tatami_tre_quarti",
+      "luogo": "L2",
+      "descrizione": "Protagonista inginocchiata di 3/4 di spalle che si volta verso la camera.",
+      "shots": [
+        17
+      ],
+      "frames_totali": 17
+    },
+    "S08": {
+      "nome": "ingresso_finale",
+      "luogo": "L2",
+      "descrizione": "Chiusura: quadro nel quadro simmetrico dall'ingresso verso la stanza, protagonista piccola al centro.",
+      "shots": [
+        26
+      ],
+      "frames_totali": 22
+    },
+    "S09": {
+      "nome": "abitacolo_volante",
+      "luogo": "L3",
+      "descrizione": "Over-the-shoulder sulle mani al volante: tre ritorni (3, 6, 14); il blockout e' lo stesso, il finale varia.",
+      "shots": [
+        3,
+        6,
+        14
+      ],
+      "frames_totali": 38
+    },
+    "S10": {
+      "nome": "ritratto",
+      "luogo": "L4",
+      "descrizione": "Ritratto frontale su fondo neutro: primo piano (4) e primissimo (8).",
+      "shots": [
+        4,
+        8
+      ],
+      "frames_totali": 16
+    },
+    "S11": {
+      "nome": "torre_spalle",
+      "luogo": "L5",
+      "descrizione": "Protagonista di spalle con l'auto e la torre illuminata (5, 22): il motivo che apre e riapre la parte centrale.",
+      "shots": [
+        5,
+        22
+      ],
+      "frames_totali": 34
+    },
+    "S12": {
+      "nome": "torre_occhiali",
+      "luogo": "L5",
+      "descrizione": "Mezzo primo piano dal basso con occhiali da sole e torre sfocata: l'accento prima della chiusura.",
+      "shots": [
+        25
+      ],
+      "frames_totali": 25
+    },
+    "S13": {
+      "nome": "incrocio_profilo",
+      "luogo": "L6",
+      "descrizione": "Campo lungo dell'incrocio: auto di profilo e protagonista con ombrello.",
+      "shots": [
+        7
+      ],
+      "frames_totali": 19
+    },
+    "S14": {
+      "nome": "incrocio_dietro_auto",
+      "luogo": "L6",
+      "descrizione": "Protagonista dietro il posteriore dell'auto all'incrocio: si volta (11), di spalle (23), whip verso il campo lungo (24).",
+      "shots": [
+        11,
+        23,
+        24
+      ],
+      "frames_totali": 39
+    },
+    "S15": {
+      "nome": "citta_accanto_auto",
+      "luogo": "L7",
+      "descrizione": "Protagonista accanto al cofano, torre sfocata dietro: piano americano (15) e mezza figura (16).",
+      "shots": [
+        15,
+        16
+      ],
+      "frames_totali": 23
+    }
+  },
+  "luoghi": {
+    "L1": "vicolo notturno di Kyoto sotto la pioggia (blockout: doghe di legno, lanterne sferiche, piastrelle lucide)",
+    "L2": "stanza tatami con fusuma dipinti, luce calda (blockout: shoji crema, montanti blu scuro)",
+    "L3": "abitacolo dell'auto di notte (blockout: busto beige, volante, cruscotto scuro)",
+    "L4": "ritratto su fondo neutro caldo (blockout: fondo crema uniforme)",
+    "L5": "belvedere con la torre illuminata (blockout: traliccio wireframe bianco, skyline a blocchi, cielo blu notte)",
+    "L6": "incrocio stile Shibuya sotto la pioggia, neon (blockout: edifici neri con cartelloni pastello emissivi)",
+    "L7": "marciapiede cittadino con la torre sfocata sullo sfondo (blockout: cartelloni pastello)"
+  },
+  "musica": {
+    "bpm_stimato": 114.8,
+    "fase_battito_s": 0.114,
+    "battere_battute_s": [
+      0.636,
+      2.723,
+      4.81,
+      6.897,
+      8.984,
+      11.071,
+      13.157
+    ],
+    "loudness_integrata_lufs": -14.1,
+    "lra_lu": 1.3,
+    "true_peak_dbfs": -3.9,
+    "anticipo_medio_tagli_frame": 3.5,
+    "nota": "i tagli seguono il tempo in media (1 taglio ogni ~1.03 battiti) ma non sono agganciati alla griglia; ogni battere di battuta ha un taglio 1-7 frame prima"
+  },
+  "ricetta": {
+    "_info": "Schema indipendente dal soggetto: 12 setup (10 principali + accento + chiusura) che coprono i 26 slot del riferimento.",
+    "setups": {
+      "R01": {
+        "nome": "eroe_oggetto",
+        "descrizione": "Oggetto eroe di 3/4 anteriore, camera bassa, luci accese, esterno notte bagnato.",
+        "da_setup_riferimento": [
+          "S01"
+        ],
+        "slot": [
+          1
+        ],
+        "frames_usati": 8,
+        "durata_clip_consigliata_s": 5,
+        "movimento_camera": "push-in lento"
+      },
+      "R02": {
+        "nome": "protagonista_interno",
+        "descrizione": "Protagonista nell'interno calmo: frontale e centrata, poi un gesto (si siede, si volta).",
+        "da_setup_riferimento": [
+          "S06",
+          "S07"
+        ],
+        "slot": [
+          2,
+          9,
+          17
+        ],
+        "frames_usati": 37,
+        "durata_clip_consigliata_s": 8,
+        "movimento_camera": "statica o push-in morbido"
+      },
+      "R03": {
+        "nome": "interazione",
+        "descrizione": "Mani della protagonista che usano l'oggetto (over-the-shoulder), luci della citta' sfocate.",
+        "da_setup_riferimento": [
+          "S09"
+        ],
+        "slot": [
+          3,
+          6,
+          14
+        ],
+        "frames_usati": 38,
+        "durata_clip_consigliata_s": 8,
+        "movimento_camera": "quasi statica, micro-movimento delle mani"
+      },
+      "R04": {
+        "nome": "ritratto",
+        "descrizione": "Ritratto frontale su fondo neutro, sguardo in camera.",
+        "da_setup_riferimento": [
+          "S10"
+        ],
+        "slot": [
+          4,
+          8
+        ],
+        "frames_usati": 16,
+        "durata_clip_consigliata_s": 5,
+        "movimento_camera": "push-in lento continuo (primo piano -> primissimo)"
+      },
+      "R05": {
+        "nome": "landmark_spalle",
+        "descrizione": "Protagonista di spalle accanto all'oggetto, landmark illuminato sullo sfondo.",
+        "da_setup_riferimento": [
+          "S11"
+        ],
+        "slot": [
+          5,
+          22
+        ],
+        "frames_usati": 34,
+        "durata_clip_consigliata_s": 6,
+        "movimento_camera": "carrello o orbita lenta"
+      },
+      "R06": {
+        "nome": "campo_largo_urbano",
+        "descrizione": "Campo lungo urbano notturno: oggetto di profilo, protagonista con un oggetto di scena (ombrello).",
+        "da_setup_riferimento": [
+          "S13",
+          "S14"
+        ],
+        "slot": [
+          7,
+          24
+        ],
+        "frames_usati": 32,
+        "durata_clip_consigliata_s": 6,
+        "movimento_camera": "carrello laterale lento"
+      },
+      "R07": {
+        "nome": "oggetto_lato_b",
+        "descrizione": "Secondo lato dell'oggetto (posteriore, luci, dettaglio vivo come fumo o vapore).",
+        "da_setup_riferimento": [
+          "S02"
+        ],
+        "slot": [
+          10,
+          19
+        ],
+        "frames_usati": 21,
+        "durata_clip_consigliata_s": 5,
+        "movimento_camera": "push-in dal campo medio al dettaglio"
+      },
+      "R08": {
+        "nome": "sguardo_con_oggetto",
+        "descrizione": "Protagonista accanto o dietro l'oggetto che si volta verso la camera.",
+        "da_setup_riferimento": [
+          "S14",
+          "S15"
+        ],
+        "slot": [
+          11,
+          15,
+          16,
+          23
+        ],
+        "frames_usati": 49,
+        "durata_clip_consigliata_s": 8,
+        "movimento_camera": "carrello laterale lento"
+      },
+      "R09": {
+        "nome": "azione_firma",
+        "descrizione": "Azione firma dell'oggetto (si accende, si apre, si trasforma): campo medio e dettaglio.",
+        "da_setup_riferimento": [
+          "S03"
+        ],
+        "slot": [
+          12,
+          13
+        ],
+        "frames_usati": 26,
+        "durata_clip_consigliata_s": 6,
+        "movimento_camera": "push-in; meglio clip multi-shot campo medio -> macro"
+      },
+      "R10": {
+        "nome": "posa_iconica",
+        "descrizione": "Protagonista con l'oggetto, frontale e simmetrica: posa, gesto con un accessorio, discesa dall'oggetto.",
+        "da_setup_riferimento": [
+          "S04",
+          "S05"
+        ],
+        "slot": [
+          18,
+          20,
+          21
+        ],
+        "frames_usati": 28,
+        "durata_clip_consigliata_s": 8,
+        "movimento_camera": "frontale quasi statica"
+      },
+      "R11": {
+        "nome": "accento_dal_basso",
+        "descrizione": "Mezzo primo piano dal basso con accessorio, landmark sfocato (puo' venire da R05 con un'altra camera).",
+        "da_setup_riferimento": [
+          "S12"
+        ],
+        "slot": [
+          25
+        ],
+        "frames_usati": 25,
+        "durata_clip_consigliata_s": 4,
+        "movimento_camera": "deriva lenta"
+      },
+      "R12": {
+        "nome": "chiusura",
+        "descrizione": "Campo lungo simmetrico, quadro nel quadro, protagonista piccola al centro; si chiude su un fermo immagine.",
+        "da_setup_riferimento": [
+          "S08"
+        ],
+        "slot": [
+          26
+        ],
+        "frames_usati": 22,
+        "durata_clip_consigliata_s": 4,
+        "movimento_camera": "statica"
+      }
+    },
+    "slot": [
+      {
+        "n": 1,
+        "ruolo": "apertura: l'oggetto eroe",
+        "setup_ricetta": "R01",
+        "frames_riferimento": 8,
+        "frames_mezzi_battiti": 6,
+        "beats_mezzi_battiti": 0.5
+      },
+      {
+        "n": 2,
+        "ruolo": "apertura: la protagonista",
+        "setup_ricetta": "R02",
+        "frames_riferimento": 6,
+        "frames_mezzi_battiti": 7,
+        "beats_mezzi_battiti": 0.5
+      },
+      {
+        "n": 3,
+        "ruolo": "apertura: l'interazione",
+        "setup_ricetta": "R03",
+        "frames_riferimento": 6,
+        "frames_mezzi_battiti": 6,
+        "beats_mezzi_battiti": 0.5
+      },
+      {
+        "n": 4,
+        "ruolo": "apertura: il volto",
+        "setup_ricetta": "R04",
+        "frames_riferimento": 6,
+        "frames_mezzi_battiti": 6,
+        "beats_mezzi_battiti": 0.5
+      },
+      {
+        "n": 5,
+        "ruolo": "primo respiro: il landmark",
+        "setup_ricetta": "R05",
+        "frames_riferimento": 14,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 6,
+        "ruolo": "ritorno all'interazione",
+        "setup_ricetta": "R03",
+        "frames_riferimento": 18,
+        "frames_mezzi_battiti": 18,
+        "beats_mezzi_battiti": 1.5
+      },
+      {
+        "n": 7,
+        "ruolo": "campo largo: il mondo",
+        "setup_ricetta": "R06",
+        "frames_riferimento": 19,
+        "frames_mezzi_battiti": 19,
+        "beats_mezzi_battiti": 1.5
+      },
+      {
+        "n": 8,
+        "ruolo": "ritorno al volto, piu' stretto",
+        "setup_ricetta": "R04",
+        "frames_riferimento": 10,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 9,
+        "ruolo": "ritorno all'interno",
+        "setup_ricetta": "R02",
+        "frames_riferimento": 14,
+        "frames_mezzi_battiti": 12,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 10,
+        "ruolo": "l'oggetto dall'altro lato",
+        "setup_ricetta": "R07",
+        "frames_riferimento": 10,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 11,
+        "ruolo": "sguardo in camera",
+        "setup_ricetta": "R08",
+        "frames_riferimento": 11,
+        "frames_mezzi_battiti": 12,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 12,
+        "ruolo": "azione firma",
+        "setup_ricetta": "R09",
+        "frames_riferimento": 15,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 13,
+        "ruolo": "azione firma, dettaglio",
+        "setup_ricetta": "R09",
+        "frames_riferimento": 11,
+        "frames_mezzi_battiti": 12,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 14,
+        "ruolo": "interazione, nuova composizione",
+        "setup_ricetta": "R03",
+        "frames_riferimento": 14,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 15,
+        "ruolo": "protagonista e oggetto",
+        "setup_ricetta": "R08",
+        "frames_riferimento": 13,
+        "frames_mezzi_battiti": 12,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 16,
+        "ruolo": "punch-in",
+        "setup_ricetta": "R08",
+        "frames_riferimento": 10,
+        "frames_mezzi_battiti": 7,
+        "beats_mezzi_battiti": 0.5
+      },
+      {
+        "n": 17,
+        "ruolo": "il gesto nell'interno",
+        "setup_ricetta": "R02",
+        "frames_riferimento": 17,
+        "frames_mezzi_battiti": 18,
+        "beats_mezzi_battiti": 1.5
+      },
+      {
+        "n": 18,
+        "ruolo": "posa iconica (picco)",
+        "setup_ricetta": "R10",
+        "frames_riferimento": 10,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 19,
+        "ruolo": "dettaglio vivo dell'oggetto",
+        "setup_ricetta": "R07",
+        "frames_riferimento": 11,
+        "frames_mezzi_battiti": 12,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 20,
+        "ruolo": "gesto con accessorio",
+        "setup_ricetta": "R10",
+        "frames_riferimento": 11,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 21,
+        "ruolo": "discesa dall'oggetto",
+        "setup_ricetta": "R10",
+        "frames_riferimento": 7,
+        "frames_mezzi_battiti": 6,
+        "beats_mezzi_battiti": 0.5
+      },
+      {
+        "n": 22,
+        "ruolo": "ritorno al landmark",
+        "setup_ricetta": "R05",
+        "frames_riferimento": 20,
+        "frames_mezzi_battiti": 19,
+        "beats_mezzi_battiti": 1.5
+      },
+      {
+        "n": 23,
+        "ruolo": "attesa prima del whip",
+        "setup_ricetta": "R08",
+        "frames_riferimento": 15,
+        "frames_mezzi_battiti": 12,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 24,
+        "ruolo": "whip -> campo largo",
+        "setup_ricetta": "R06",
+        "frames_riferimento": 13,
+        "frames_mezzi_battiti": 13,
+        "beats_mezzi_battiti": 1.0
+      },
+      {
+        "n": 25,
+        "ruolo": "accento finale",
+        "setup_ricetta": "R11",
+        "frames_riferimento": 25,
+        "frames_mezzi_battiti": 25,
+        "beats_mezzi_battiti": 2.0
+      },
+      {
+        "n": 26,
+        "ruolo": "chiusura calma",
+        "setup_ricetta": "R12",
+        "frames_riferimento": 22,
+        "frames_mezzi_battiti": 23,
+        "beats_mezzi_battiti": null
+      }
+    ],
+    "frames_mezzi_battiti_totale": 336
+  }
+}

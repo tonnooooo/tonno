@@ -1,15 +1,16 @@
 {
   "titolo": "Seoul neon - clip Seedance 2.5 (modalita' first_frame)",
-  "descrizione": "11 setup, un clip per setup, 1080p muti a 24 fps; totale 62 s (circa 3,0 M token, circa 209 CNY / 30 USD per una take).",
+  "descrizione": "13 setup, un clip per setup, 1080p muti a 24 fps; totale 67 s (circa 3,26 M token, circa 226 CNY / 32 USD per una take), piu' il test S04_t480 (~0,43 USD).",
   "_note": [
-    "Prompt in inglese: descrivono movimento, camera e luce; l'immagine la porta il keyframe. Una sola ripresa, un solo movimento camera, beat d'azione con timestamp.",
-    "Percorsi relativi alla radice del repo (/home/user/tonno). ATTENZIONE: 'python3 -m pubblicita.ephone batch' risolve i percorsi rispetto alla cartella del manifest; per usarlo cosi' com'e' copiare il file nella radice del repo (cp pubblicita/progetti/seoul_neon/seedance_manifest.json ./) oppure riscrivere i percorsi come ../../output/seedream/...",
-    "Ordine consigliato = ordine degli shot qui sotto: S04 per primo (test di moderazione dei volti a 480p/4 s: --only S04 dopo aver messo resolution 480p e duration 4 in una copia), poi i setup senza volto (S01, S07, S03, S10, S11), poi gli altri.",
+    "Prompt in inglese: descrivono movimento, camera e luce; l'aspetto lo porta il keyframe (first_frame). Una sola ripresa, beat d'azione con timestamp, camera fissa su treppiede tranne il dolly di S01 (il micro push-in si fa in post, sui due pannelli).",
+    "Percorsi relativi alla cartella di questo manifest (../../output/seedream/<id>.png = pubblicita/output/seedream/<id>.png), come li risolve 'python3 -m pubblicita.ephone batch'. Si lancia cosi' com'e', da qualsiasi cartella: python3 -m pubblicita.ephone batch pubblicita/progetti/seoul_neon/seedance_manifest.json --only S04_t480 --yes",
+    "Ordine: 1) S04_t480 da solo (--only S04_t480): test di moderazione dei volti e del prompt a 480p/5 s, scrive S04_t480.mp4 e non tocca S04.mp4; il batch completo poi lo salta perche' l'output esiste. 2) setup senza volto: S01, S07, S03, S10, S11, S05a. 3) S04 e i setup con volto: S02, S06, S09, S05b, S08a, S08b (S08a ha il volto solo nel clip, non nel first_frame: va dopo S04 per confrontarlo).",
     "Seedance 2.5 non accetta seed: un retake non riproduce lo stesso take. I test a 480p servono solo a validare prompt e moderazione.",
-    "Gli output (URL validi 24 h) vengono scaricati in pubblicita/output/seedance/<id>.mp4 + <id>_last.png: i nomi coincidono con quelli usati in edl_bozza.json.",
-    "aspect_ratio 'adaptive' sugli shot: la documentazione ePhone di Seedance 2.5 chiede adaptive nei casi first_frame; i keyframe sono 2560x1440, quindi l'uscita resta 16:9. Il default 16:9 resta per eventuali shot solo testo.",
-    "S05 e S08 usano anche last_frame (posa finale col volto dopo la girata). Se la transizione 'morpha', rigenerare senza last_frame.",
-    "Moderazione volti (S02, S04, S05, S06, S08, S09): se il first_frame con volto viene rifiutato (400, non addebitato) -> 'python3 -m pubblicita.ephone asset upload --url <URL pubblico del png> --type image --name kf_S04' e usare asset://<ID> come first_frame/last_frame. Se viene rifiutato anche come asset -> seedance_manifest_omni.json, piano C."
+    "Gli output (URL validi 24 h) vengono scaricati in pubblicita/output/seedance/<id>.mp4 + <id>_last.png + <id>.json (sidecar con ffprobe): i nomi degli shot (non dei test) coincidono con quelli di edl_bozza.json.",
+    "aspect_ratio 'adaptive' sugli shot: la documentazione ePhone di Seedance 2.5 lo chiede nei casi first_frame; i keyframe sono 16:9, quindi l'uscita attesa e' 1920x1080. PRIMA del blockout controllare larghezza e altezza nel sidecar <id>.json di ogni clip: se non e' 1920x1080, montaggio/render.py lo adatterebbe in silenzio e crop e camera Blender non tornerebbero piu' (rigenerare o rifare il blockout sulle misure vere).",
+    "S02 usa first_frame + last_frame (lf_S02, modifica di kf_S02). Se la transizione 'morpha', rigenerare senza last_frame oppure partire da lf_S02 come first_frame (ripiego gia' seduta).",
+    "Moderazione volti in input (S04, S02, S06, S09, S05b, S08b; S08a solo se si aggiunge lf_S08a): se il first_frame con volto viene rifiutato (400, non addebitato) -> 'python3 -m pubblicita.ephone asset upload --url <URL pubblico del png> --type image --name kf_S04' e usare asset://<ID> come first_frame/last_frame. Se viene rifiutato anche come asset -> seedance_manifest_omni.json, piano C.",
+    "S08a parte di spalle: il volto della girata (shot 11) lo inventa Seedance. Se non coincide con S04: generare lf_S08a (job opzionale in seedream.json), aggiungere qui \"last_frame\": \"../../output/seedream/lf_S08a.png\" e rilanciare con --only S08a --force; oppure usare S08a_omni."
   ],
   "defaults": {
     "model": "doubao-seedance-2-5-260628",
@@ -22,29 +23,43 @@
   },
   "shots": [
     {
+      "id": "S04_t480",
+      "_setup": "Primo piano beauty: clip ancora d'identita' (rif. shot 4, 8)",
+      "_shot": [
+        4,
+        8
+      ],
+      "prompt": "Single continuous shot, no cuts. Beauty close-up of THE WOMAN (the same Korean woman in her mid-20s from the first frame). [0s-2.0s] She looks slightly down and to the left, perfectly still. [2.0s-3.0s] She slowly lifts her eyes straight into the lens. [3.0s-5.0s] She holds eye contact, one slow blink, a faint smile forms; her gold drop earrings sway slightly. Static camera on a tripod, no camera movement, eye level, 85mm, shallow depth of field. Soft warm frontal light as in the first frame, warm paper wall behind. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Natural skin texture, zero identity drift. Cinematic film look, fine grain. No text, no logos.",
+      "duration": 5,
+      "aspect_ratio": "adaptive",
+      "first_frame": "../../output/seedream/kf_S04.png",
+      "_scopo": "Test di moderazione dei volti e del prompt di S04 a 480p/5 s (~0,43 USD). Lanciare per primo con --only S04_t480: scrive S04_t480.mp4, mai S04.mp4. Il batch completo poi lo salta (output gia' presente).",
+      "resolution": "480p"
+    },
+    {
       "id": "S04",
       "_setup": "Primo piano beauty: clip ancora d'identita' (rif. shot 4, 8)",
       "_shot": [
         4,
         8
       ],
-      "prompt": "Single continuous shot, no cuts. Beauty close-up of THE WOMAN (the same Korean woman in her mid-20s from the first frame). [0s-2.0s] She looks slightly down and to the left, perfectly still. [2.0s-3.0s] She slowly lifts her eyes straight into the lens. [3.0s-5.0s] She holds eye contact, one slow blink, a faint smile forms; her gold drop earrings sway slightly. Camera: locked-off at eye level, 85mm, shallow depth of field, a very slow push-in of a few centimeters. Soft warm frontal light as in the first frame, warm paper wall behind. Face, low chignon with silver binyeo and ivory hanbok unchanged. Natural skin texture, zero identity drift. Cinematic film look, fine grain. No text, no logos.",
+      "prompt": "Single continuous shot, no cuts. Beauty close-up of THE WOMAN (the same Korean woman in her mid-20s from the first frame). [0s-2.0s] She looks slightly down and to the left, perfectly still. [2.0s-3.0s] She slowly lifts her eyes straight into the lens. [3.0s-5.0s] She holds eye contact, one slow blink, a faint smile forms; her gold drop earrings sway slightly. Static camera on a tripod, no camera movement, eye level, 85mm, shallow depth of field. Soft warm frontal light as in the first frame, warm paper wall behind. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Natural skin texture, zero identity drift. Cinematic film look, fine grain. No text, no logos.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S04.png"
+      "first_frame": "../../output/seedream/kf_S04.png"
     },
     {
       "id": "S01",
-      "_setup": "Vicolo di Bukchon: R34 3/4 frontale, abbaglianti (rif. shot 1, 12, 13)",
+      "_setup": "Vicolo di Bukchon: R34 quasi frontale, abbaglianti (rif. shot 1, 12, 13)",
       "_shot": [
         1,
         12,
         13
       ],
-      "prompt": "Single continuous shot, no cuts. Light rain falls through the headlight beams; lantern light shimmers on the wet stones. [0s-2.3s] THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) stands still, headlights on low beam. [2.4s] The high beams flash twice, then switch on and stay on, the beams stretching brighter through the rain. Camera: one smooth continuous dolly push-in at bumper height, from the wide three-quarter view to a close detail of the nearer headlight, easing in and out, machine-smooth, no shake. Lighting as in the first frame: teal night, warm amber lanterns, crisp white beams. Car shape, Bayside Blue paint and four round taillights unchanged, blank license plate. No people, no other cars. Cinematic film look, natural 24fps motion blur, fine grain. No text, no logos.",
+      "prompt": "Single continuous shot, no cuts. Light rain falls through the headlight beams; lantern light shimmers on the wet stones. [0s-2.3s] THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) stands still, headlights on low beam. [2.4s] The high beams flash twice, then switch on and stay on, the beams stretching brighter through the rain. Camera: one smooth continuous dolly push-in at bumper height, easing in and out, machine-smooth, no shake, from the wide view to a close detail where the nearer headlight (right of frame) fills about two thirds of the frame by 5.0s; [5.0s-6.0s] the camera holds on the headlight. Lighting as in the first frame: teal night, warm amber lanterns, crisp white beams. Car shape, Bayside Blue paint, angular headlights and front intake unchanged, blank license plate. No people, no other cars. Cinematic film look, natural 24fps motion blur, fine grain. No text, no logos.",
       "duration": 6,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S01.png"
+      "first_frame": "../../output/seedream/kf_S01.png"
     },
     {
       "id": "S07",
@@ -53,10 +68,10 @@
         10,
         19
       ],
-      "prompt": "Single continuous shot, no cuts. Night after rain on the wide empty boulevard before the gold-lit palace gate. [0s-1.5s] THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) stands still, seen from behind, its four round taillights glowing red, thin exhaust vapor curling. [1.5s] The brake lights flare brighter, red light washing across the wet asphalt. [1.5s-5.0s] A soft puff of exhaust vapor rises and spreads through the red glow; light mist drifts; gold and red reflections ripple on the road. Camera: locked-off at waist height, 50mm, perfectly symmetrical, a very slow push-in. Lighting as in the first frame. Car shape, Bayside Blue paint and four round taillights unchanged, blank license plate. No people, no other cars. Cinematic film look, natural motion blur, fine grain. No text, no logos.",
+      "prompt": "Single continuous shot, no cuts. Night after rain on the wide empty boulevard before the gold-lit palace gate. [0s-1.5s] THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) stands still, seen from behind, its four round taillights glowing red, thin exhaust vapor curling. [1.5s] The brake lights flare brighter, red light washing across the wet asphalt. [1.5s-5.0s] A soft puff of exhaust vapor rises and spreads through the red glow; light mist drifts; gold and red reflections ripple on the road. Static camera on a tripod, no camera movement, centered on the road axis 70 cm high, 50mm, perfectly symmetrical. Lighting as in the first frame. Car shape, Bayside Blue paint and four round taillights unchanged, blank license plate. No people, no other cars. Cinematic film look, natural motion blur, fine grain. No text, no logos.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S07.png"
+      "first_frame": "../../output/seedream/kf_S07.png"
     },
     {
       "id": "S03",
@@ -66,10 +81,10 @@
         6,
         14
       ],
-      "prompt": "Single continuous shot, no cuts. Night drive in the rain inside THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame). [0s-1.6s] The right hand of THE WOMAN (the same Korean woman in her mid-20s from the first frame) rests on top of the steering wheel. [1.6s-3.2s] Her left hand rises and grips the wheel at nine o'clock. [3.2s-5.0s] Both hands tighten, fingers flexing, a small steering correction. Neon bokeh slides slowly left across the rain-beaded windshield; the gauges glow steadily. Camera: locked-off over her left shoulder, rigidly mounted to the car, 50mm, shallow focus on hands and wheel rim, only faint road vibration. Lighting as in the first frame: dark cabin, warm instrument glow on her fingers. Natural hands, five fingers each, stable anatomy. Her face stays out of frame. Cinematic film look, natural motion blur, fine grain. No readable text or numbers, no logos.",
+      "prompt": "Single continuous shot, no cuts. Night drive in the rain inside THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame). [0s-1.6s] Only the right hand of THE WOMAN (the same Korean woman in her mid-20s from the first frame) rests on top of the steering wheel, bare right wrist. [1.6s-3.2s] Her left hand, the slim jade bangle on its wrist, rises into frame and grips the wheel at nine o'clock. [3.2s-5.0s] Both hands tighten, fingers flexing, a small steering correction. Neon bokeh slides slowly left across the rain-beaded windshield; the gauges glow steadily. Static car-mounted camera over her left shoulder, no camera movement, 50mm, shallow focus on hands and wheel rim, only faint road vibration. Lighting as in the first frame: dark cabin, warm instrument glow on her fingers. Natural hands, five fingers each, stable anatomy. Her face stays out of frame. Cinematic film look, natural motion blur, fine grain. No readable text or numbers, no logos.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S03.png"
+      "first_frame": "../../output/seedream/kf_S03.png"
     },
     {
       "id": "S10",
@@ -77,10 +92,10 @@
       "_shot": [
         21
       ],
-      "prompt": "Single continuous shot, no cuts. Rainy night at the curb in front of a glowing convenience store. The driver's door of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) is open, warm cabin light on. [0s-1.5s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) sits turned toward the door, one hand on the door frame, her face in the shadow of the cabin. [1.5s-3.5s] Gathering her chima hem, she swings her feet out one after the other; her ivory satin heels step down onto the wet pavement, a small ripple in a puddle. [3.5s-5.0s] She begins to rise, leaning out of the doorway. Elegant, unhurried. Camera: locked-off, low at sill height, 35mm. Cold white store light as in the first frame. Hanbok unchanged; natural hands and feet. Cinematic film look, natural motion blur, fine grain. No text, no logos, no brand names, blank license plate.",
+      "prompt": "Single continuous shot, no cuts. Rainy night at the curb in front of a glowing convenience store. The right-hand driver's door of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) is open toward the camera; the cabin is dark, only a faint warm footwell glow. [0s-1.5s] The lower half of THE WOMAN (the same woman from the first frame) is seated sideways in the doorway, one hand gathering the full ivory chima. [1.5s-3.5s] She swings her feet out one after the other; her ivory satin heels step down onto the wet asphalt, a small ripple in a puddle. [3.5s-5.0s] Both heels rest on the wet asphalt, the chima hem settles; she stays seated and her head never enters the frame. Elegant, unhurried. Static camera on a tripod, no camera movement, low at sill height in the road, 35mm. Cold white store light as in the first frame. Hanbok unchanged; natural hands and feet. Car shape, Bayside Blue paint, rear wing and dark wheels unchanged, blank license plate. Cinematic film look, natural motion blur, fine grain. No text, no logos, no brand names.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S10.png"
+      "first_frame": "../../output/seedream/kf_S10.png"
     },
     {
       "id": "S11",
@@ -88,10 +103,22 @@
       "_shot": [
         26
       ],
-      "prompt": "Single continuous shot, no cuts. Calm night in a palace corridor. Paper lanterns sway very gently; rain drips from the eaves on both sides; faint mist drifts over the wet stone floor. At the far end, in the warmly lit hanok room, THE WOMAN (the same Korean woman in her mid-20s from the first frame) remains perfectly still, kneeling in a formal seated pose. Camera: locked-off, perfectly symmetrical at eye height, 24mm, an extremely slow push-in of a few centimeters. Lighting as in the first frame: warm amber lanterns, deep brown wood, glowing room. Cinematic film look, fine grain. No text, no logos, no other people.",
+      "prompt": "Single continuous shot, no cuts. Calm night in a palace corridor. Paper lanterns sway very gently; rain drips from the eaves on both sides; faint mist drifts over the wet stone floor. At the far end, in the warmly lit hanok room, THE WOMAN (the same Korean woman in her mid-20s from the first frame) remains perfectly still, kneeling in a formal seated pose, eyes lowered, features not discernible at this distance. Static camera on a tripod, no camera movement, perfectly symmetrical at eye height, 24mm. Lighting as in the first frame: warm amber lanterns, deep brown wood, glowing room. Cinematic film look, fine grain. No text, no logos, no other people.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S11.png"
+      "first_frame": "../../output/seedream/kf_S11.png"
+    },
+    {
+      "id": "S05a",
+      "_setup": "Di spalle con la N Seoul Tower, immobile nella brezza (rif. shot 5, 22)",
+      "_shot": [
+        5,
+        22
+      ],
+      "prompt": "Single continuous shot, no cuts. Night breeze on a hillside overlook above Seoul. THE WOMAN (the same woman from the first frame) stands perfectly still with her back to the camera, looking at the distant blue-lit N Seoul Tower; the breeze slowly lifts the sheer organza overcoat and sways the norigae tassels; city lights twinkle. She never turns around; her face stays hidden. Static camera on a tripod, no camera movement, 85mm at chest height, shallow depth of field. Lighting as in the first frame. Chignon with silver binyeo and ivory peony, peony medallion and ivory hanbok unchanged. Car shape and Bayside Blue paint unchanged. Cinematic film look, fine grain. No text, no logos.",
+      "duration": 5,
+      "aspect_ratio": "adaptive",
+      "first_frame": "../../output/seedream/kf_S05a.png"
     },
     {
       "id": "S02",
@@ -101,22 +128,23 @@
         9,
         17
       ],
-      "prompt": "Single continuous shot, no cuts. Warm stillness, the hanji doors glow softly. [0s-1.8s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands still at the center, hands folded at her waist, breathing calmly. [1.8s-4.0s] She slowly and gracefully kneels into a formal seated pose, back straight, the full chima settling in a wide circle on the glossy floor, hands resting on her knees. [4.0s-4.8s] Still, eyes to the lens. [4.8s-6.0s] She slowly turns her head to her right into profile, toward the glowing paper door. Camera: locked-off, frontal and symmetrical at waist height, 35mm, a very slow push-in of a few centimeters. Lighting unchanged. Face, low chignon with silver binyeo and ivory hanbok unchanged. Natural hands. Cinematic film look, fine grain. No text, no logos, no other people.",
-      "duration": 6,
+      "prompt": "Single continuous shot, no cuts. Warm stillness, the hanji doors glow softly. [0s-1.8s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands still at the center, hands folded at her waist, breathing calmly. [1.8s-4.0s] She slowly and gracefully kneels into a formal seated pose, back straight, the full chima settling in a wide circle on the glossy floor, hands resting on her knees. [4.0s-5.2s] Still, eyes to the lens. [5.2s-6.4s] She slowly turns her head to her right (screen-left) into a clean profile, looking along the room. [6.4s-7.0s] She holds the profile. Static camera on a tripod, no camera movement, frontal and symmetrical at waist height, 35mm. Lighting unchanged. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Natural hands. Cinematic film look, fine grain. No text, no logos, no other people.",
+      "duration": 7,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S02.png"
+      "first_frame": "../../output/seedream/kf_S02.png",
+      "last_frame": "../../output/seedream/lf_S02.png"
     },
     {
       "id": "S06",
-      "_setup": "Gangnam-daero: campo largo con ombrello trasparente (rif. shot 7, 24)",
+      "_setup": "Gangnam-daero: campo largo con ombrello nero (rif. shot 7, 24)",
       "_shot": [
         7,
         24
       ],
-      "prompt": "Single continuous shot, no cuts. Heavy rain on a wide Gangnam boulevard at night. [0s-2.5s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands beside the front fender of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame), holding a clear umbrella; raindrops bounce on the wet asphalt; giant LED screens slowly shift abstract colors; distant traffic leaves soft light streaks. [2.5s-5.0s] She tilts the umbrella slightly back and turns her face toward the camera. Camera: locked-off wide at knee height, 35mm, deep focus, a very slow push-in. Neon reflections ripple on the road. Face, low chignon with silver binyeo and ivory hanbok unchanged. Cinematic film look, natural motion blur, fine grain. No text, no logos, blank license plate. No other people in the foreground.",
+      "prompt": "Single continuous shot, no cuts. Heavy rain on a wide Gangnam boulevard at night. [0s-2.5s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands beside the front fender of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame), holding a black umbrella; raindrops bounce on the wet asphalt; the LED screens behind slowly shift abstract color fields; distant traffic leaves soft light streaks. [2.5s-5.0s] She tilts the umbrella slightly back and turns her face toward the camera. Static camera on a tripod, no camera movement, wide at knee height, 35mm, moderate depth of field: THE CAR and THE WOMAN sharp, the towers and LED screens behind softly out of focus; the screens show only abstract color fields, no letters, no faces, no people. Neon reflections ripple on the road. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Car shape, Bayside Blue paint, rear wing and dark wheels unchanged, blank license plate. Cinematic film look, natural motion blur, fine grain. No text, no logos. No other people in the foreground.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S06.png"
+      "first_frame": "../../output/seedream/kf_S06.png"
     },
     {
       "id": "S09",
@@ -125,39 +153,45 @@
         18,
         20
       ],
-      "prompt": "Single continuous shot, no cuts. Rain in the hanok alley at night; THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) faces the camera, headlights blazing behind THE WOMAN (the same Korean woman in her mid-20s from the first frame), who stands in front of its nose wearing dark cat-eye sunglasses. [0s-2.5s] She stands still, backlit, rain glowing in the beams, the norigae tassels swaying. [2.6s-4.0s] She raises her right hand, lightly touches the frame of her sunglasses at the temple to adjust them, then lowers her hand. [4.0s-5.0s] She holds still, facing the lens. Camera: locked-off, symmetrical, waist height, 35mm, a very slow push-in. Lighting as in the first frame. Face, low chignon with silver binyeo and ivory hanbok unchanged. Natural hand, five fingers. Cinematic film look, gentle bloom, fine grain. No text, no logos, blank license plate.",
+      "prompt": "Single continuous shot, no cuts. Rain in the hanok alley at night; THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame) faces the camera, headlights blazing behind THE WOMAN (the same Korean woman in her mid-20s from the first frame), who stands in front of its nose wearing dark cat-eye sunglasses. [0s-2.5s] She stands still, backlit, rain glowing in the beams, the norigae tassels swaying. [2.6s-4.0s] She raises her right hand, lightly touches the frame of her sunglasses at the temple to adjust them, then lowers her hand. [4.0s-5.0s] She holds still, facing the lens. Static camera on a tripod, no camera movement, symmetrical, waist height, 35mm. Lighting as in the first frame. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Car shape, Bayside Blue paint, angular headlights and front intake unchanged, blank license plate. Natural hand, five fingers. Cinematic film look, gentle bloom, fine grain. No text, no logos.",
       "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S09.png"
+      "first_frame": "../../output/seedream/kf_S09.png"
     },
     {
-      "id": "S05",
-      "_setup": "Di spalle con la N Seoul Tower, poi si gira con gli occhiali (rif. shot 5, 22, 25)",
+      "id": "S05b",
+      "_setup": "Frontale dal basso con occhiali, torre a sinistra (rif. shot 25)",
       "_shot": [
-        5,
-        22,
         25
       ],
-      "prompt": "Single continuous shot, no cuts. Night breeze on a hillside overlook above Seoul. [0s-2.8s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands with her back to the camera, looking at the distant blue-lit N Seoul Tower; the breeze lifts her sheer organza overcoat and sways the norigae tassels. [2.8s-5.2s] She slowly turns around in place to face the camera, wearing dark cat-eye sunglasses. [5.2s-7.0s] She holds still, chin slightly raised, the tower glowing behind her. Camera: locked-off at chest height, 85mm, a very slow push-in. Lighting as in the first frame. Face, low chignon with silver binyeo and ivory hanbok unchanged. Cinematic film look, natural motion blur, fine grain. No text, no logos, blank license plate.",
-      "duration": 7,
+      "prompt": "Single continuous shot, no cuts. THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands still facing the lens in dark cat-eye sunglasses. [0s-2.0s] The night breeze moves the loose strands and her gold earrings. [2.0s-4.0s] She lifts her chin slightly, a barely visible smile; the blue tower glows steadily behind her. Static camera on a tripod, no camera movement, low angle, 85mm. Lighting as in the first frame. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Cinematic film look, fine grain. No text, no logos.",
+      "duration": 4,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S05.png",
-      "last_frame": "pubblicita/output/seedream/lf_S05.png"
+      "first_frame": "../../output/seedream/kf_S05b.png"
     },
     {
-      "id": "S08",
-      "_setup": "Gangnam: cammina verso i fanali, si volta, mano ai capelli (rif. shot 11, 15, 16, 23)",
+      "id": "S08a",
+      "_setup": "Gangnam: cammina verso i fanali e si volta (rif. shot 11, 23)",
       "_shot": [
         11,
-        15,
-        16,
         23
       ],
-      "prompt": "Single continuous shot, no cuts. Rainy Gangnam night, neon bokeh behind. [0s-2.6s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) walks slowly away from the camera, two steps toward the rear of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame); her sheer organza overcoat sways, the peony medallion on her back catching neon. [2.8s-4.2s] She stops beside the rear fender and turns her head over her left shoulder to look into the lens. [4.6s-7.0s] She raises her left hand and tucks a loose strand of hair behind her left ear, a faint smile. [7.0s-8.0s] She holds the pose. Camera: locked-off at chest height, 50mm, shallow depth of field. Face, low chignon with silver binyeo and ivory hanbok unchanged. Natural hand, five fingers. Cinematic film look, natural motion blur, fine grain. No text, no logos, blank license plate.",
-      "duration": 8,
+      "prompt": "Single continuous shot, no cuts. Rainy Gangnam night, neon bokeh behind. [0s-2.5s] THE WOMAN (the same Korean woman in her mid-20s from the first frame) walks slowly away from the camera toward the rear of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame), organza overcoat swaying, the peony medallion catching neon; she becomes smaller in frame. [2.5s-3.5s] She stops just behind the car, between its taillights. [3.5s-5.0s] She turns her head over her left shoulder and looks back into the lens, body still facing away, hands relaxed at her sides. Static camera on a tripod, no camera movement, 50mm at chest height, shallow depth of field. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Car shape, Bayside Blue paint and four round taillights unchanged, blank license plate. Cinematic film look, natural motion blur, fine grain. No text, no logos.",
+      "duration": 5,
       "aspect_ratio": "adaptive",
-      "first_frame": "pubblicita/output/seedream/kf_S08.png",
-      "last_frame": "pubblicita/output/seedream/lf_S08.png"
+      "first_frame": "../../output/seedream/kf_S08a.png"
+    },
+    {
+      "id": "S08b",
+      "_setup": "Gangnam: frontale accanto al cofano, mano ai capelli (rif. shot 15, 16)",
+      "_shot": [
+        15,
+        16
+      ],
+      "prompt": "Single continuous shot, no cuts. Rainy Gangnam night. THE WOMAN (the same Korean woman in her mid-20s from the first frame) stands beside the front fender of THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame), facing the camera, the wet blue hood in the left foreground. [0s-1.5s] She looks off to the right. [1.5s-3.5s] She raises her left hand, lightly tucks a loose strand behind her left ear with slim natural fingers, then lowers the hand. [3.5s-5.0s] She looks into the lens with a faint smile. Static camera on a tripod, no camera movement, 50mm at chest height, shallow depth of field. Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged. Car shape and Bayside Blue paint unchanged. Natural hand, five fingers. Cinematic film look, fine grain. No text, no logos.",
+      "duration": 5,
+      "aspect_ratio": "adaptive",
+      "first_frame": "../../output/seedream/kf_S08b.png"
     }
   ]
 }

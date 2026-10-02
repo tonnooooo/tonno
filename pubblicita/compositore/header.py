@@ -104,7 +104,7 @@ class Header:
         self.mark = m
         if m:
             self.mcx = m["center_x"]
-            self.mcy = m["top"] + m["size"] / 2
+            self.mcy = m["top"] + m.get("height", m["size"]) / 2
             self.mbox = int(math.ceil(m["size"] * 1.6)) + 8
             self.mark_static = grafica.mark_layer(m, self.mcx, self.mcy, self.mbox)
         ti = cfg.get("title")

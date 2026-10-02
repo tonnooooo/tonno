@@ -48,7 +48,10 @@ def base_image(cfg: dict, width: int, height: int) -> np.ndarray:
     grid = np.asarray(tint["rgb"], np.float32).reshape(ny, nx, 3)
     bx = _bspline_basis(np.arange(width) / (width - 1), nx).astype(np.float32)
     by = _bspline_basis(np.arange(height) / (height - 1), ny).astype(np.float32)
-    return np.einsum("yi,ijc,xj->yxc", by, grid, bx).astype(np.float32)
+    out = np.empty((height, width, 3), np.float32)
+    for c in range(3):
+        out[..., c] = (by @ grid[:, :, c]) @ bx.T
+    return out
 
 
 # ---------------------------------------------------------------- linee

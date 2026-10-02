@@ -1,0 +1,161 @@
+{
+ "meta": {
+  "id": "c2_torre",
+  "frames": 96,
+  "resolution": [
+   1280,
+   720
+  ],
+  "samples": 10,
+  "seed": 5,
+  "note": "Seoul: ragazza di spalle, torre sullo sfondo, lenta spinta"
+ },
+ "world": {
+  "preset": "night_sky"
+ },
+ "camera": {
+  "lens": 40,
+  "location": [
+   -0.1,
+   -3.4,
+   1.5
+  ],
+  "look_at": [
+   0.4,
+   6.0,
+   2.2
+  ],
+  "moves": [
+   {
+    "type": "dolly_in",
+    "distance": 0.7,
+    "ease": "in_out"
+   }
+  ],
+  "handheld": {
+   "amplitude": 0.006,
+   "rotation": 0.15
+  },
+  "dof": {
+   "focus": {
+    "object": "lei",
+    "offset": [
+     0,
+     0,
+     1.5
+    ]
+   },
+   "fstop": 2.8
+  }
+ },
+ "objects": [
+  {
+   "name": "terreno",
+   "type": "street",
+   "size": [
+    200,
+    200
+   ],
+   "wet": 0.4,
+   "color": "#0E1118"
+  },
+  {
+   "name": "torre",
+   "type": "tower_lattice",
+   "location": [
+    9,
+    70,
+    0
+   ],
+   "height": 60,
+   "base": 16,
+   "top": 1.6,
+   "levels": 12,
+   "strut": 0.22,
+   "antenna": 14,
+   "emission": 1.0
+  },
+  {
+   "name": "citta",
+   "type": "skyline",
+   "location": [
+    -60,
+    45,
+    0
+   ],
+   "count": 14,
+   "spacing": 1.5,
+   "width": [
+    5,
+    10
+   ],
+   "depth": [
+    6,
+    10
+   ],
+   "height": [
+    4,
+    14
+   ],
+   "seed": 11,
+   "panels": {
+    "count": 0
+   },
+   "color": "#06080C"
+  },
+  {
+   "name": "auto",
+   "type": "car",
+   "style": "sports",
+   "location": [
+    2.4,
+    1.0,
+    0
+   ],
+   "rotation": [
+    0,
+    0,
+    80
+   ],
+   "lights_on": false,
+   "color": "#2B58B0",
+   "taillights_on": true
+  },
+  {
+   "name": "lei",
+   "type": "mannequin",
+   "location": [
+    0,
+    0,
+    0
+   ],
+   "rotation": [
+    0,
+    0,
+    180
+   ],
+   "pose": "standing",
+   "accessories": [
+    "hair_bun"
+   ],
+   "pose_keys": [
+    {
+     "f": 0,
+     "pose": "standing"
+    },
+    {
+     "f": 60,
+     "pose": "standing",
+     "joints": {
+      "head": [
+       0,
+       0,
+       50
+      ]
+     },
+     "ease": "in_out"
+    }
+   ]
+  }
+ ]
+}

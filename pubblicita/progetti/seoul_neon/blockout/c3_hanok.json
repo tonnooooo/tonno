@@ -1,0 +1,108 @@
+{
+ "meta": {
+  "id": "c3_hanok",
+  "frames": 96,
+  "resolution": [
+   1280,
+   720
+  ],
+  "samples": 10,
+  "seed": 1,
+  "note": "Seoul: stanza hanok, ragazza seduta, spinta lenta"
+ },
+ "world": {
+  "preset": "warm_interior",
+  "lights": [
+   {
+    "light_type": "area",
+    "location": [
+     0.5,
+     -3.2,
+     1.5
+    ],
+    "look_at": [
+     0,
+     1.7,
+     1.0
+    ],
+    "color": "#FFF4E8",
+    "energy": 55,
+    "size": 2.0
+   }
+  ]
+ },
+ "camera": {
+  "lens": 50,
+  "location": [
+   0,
+   -1.4,
+   0.8
+  ],
+  "look_at": [
+   0,
+   1.9,
+   0.85
+  ],
+  "moves": [
+   {
+    "type": "dolly_in",
+    "distance": 0.5,
+    "ease": "in_out"
+   }
+  ],
+  "dof": {
+   "focus": "donna",
+   "fstop": 5.6
+  }
+ },
+ "objects": [
+  {
+   "name": "stanza",
+   "type": "room",
+   "size": [
+    7.14,
+    4.4,
+    2.5
+   ],
+   "lintel": 1.8,
+   "walls": [
+    "back",
+    "left",
+    "right"
+   ],
+   "wall_style": "shoji",
+   "floor": "tatami",
+   "panel_width": 2.38
+  },
+  {
+   "name": "rotolo",
+   "type": "box",
+   "location": [
+    1.37,
+    2.14,
+    1.18
+   ],
+   "size": [
+    0.44,
+    0.02,
+    1.1
+   ],
+   "material": "paper:#DCD6CA"
+  },
+  {
+   "name": "donna",
+   "type": "mannequin",
+   "location": [
+    0,
+    1.9,
+    0
+   ],
+   "height": 1.6,
+   "pose": "sitting_seiza",
+   "dress": "long",
+   "accessories": [
+    "hair_bun"
+   ]
+  }
+ ]
+}

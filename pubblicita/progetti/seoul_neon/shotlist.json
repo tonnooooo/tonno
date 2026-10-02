@@ -3,177 +3,252 @@
   "bpm": 115,
   "total_frames": 336,
   "titolo": "Seoul neon - R34 GT-R Bayside Blue e hanbok moderno (formato Blender vs Seedance 2.5)",
-  "character": "THE WOMAN: an adult Korean woman in her mid-20s, slim and poised, oval face with soft cheekbones, calm dark-brown almond eyes, straight natural brows, real skin texture, muted coral-rose lips, minimal makeup. Glossy jet-black hair parted in the center and gathered into a low chignon at the nape, two fine loose strands framing her face, one long horizontal silver binyeo hairpin with jade tips through the knot and a small ivory silk peony tucked beside it. Long gold drop earrings, a slim green jade bangle on her left wrist. She wears a modern Korean hanbok: a short cropped ivory silk jeogori jacket with a crisp white dongjeong collar crossing in a Y, gently curved sleeves and a long coral otgoreum ribbon tied in a bow on the chest; a high-waisted, full, ankle-length ivory silk chima skirt with a fine gold-leaf peony pattern along the hem; a sheer ivory silk-organza durumagi overcoat worn open, with a large coral-and-gold embroidered peony medallion between the shoulder blades; a coral-and-plum norigae tassel hanging from the ribbon; ivory satin heels. Korean hanbok, not a kimono: no obi belt, no wide kimono sleeves.",
-  "car": "THE CAR: one single late-1990s Nissan Skyline R34 GT-R two-door coupe in Bayside Blue, a vivid metallic mid-blue with a deep glossy clearcoat that mirrors every light. Boxy wedge-shaped body, short overhangs, pumped wheel arches, sharp angular projector headlights, aggressive front bumper with a wide mesh intake showing the intercooler, carbon front splitter and carbon hood vent; tall adjustable rear wing, four round taillights (two large outer, two smaller inner), rear diffuser; dark gunmetal multi-spoke 18-inch wheels. Right-hand-drive interior: black three-spoke steering wheel, analog gauges, small central multi-function display, six-speed shifter. Blank white license plate, no badges, no readable lettering. Not an AE86, not a Supra, not an R35.",
+  "character": "THE WOMAN: an adult Korean woman in her mid-20s, oval face, soft cheekbones, calm dark-brown almond eyes, straight natural brows, muted coral-rose lips, minimal makeup, real skin texture with visible pores. Glossy jet-black hair parted in the center and swept into a low chignon at the nape, two fine loose strands framing her face, a long horizontal silver binyeo hairpin with jade tips through the knot, a large ivory silk peony pinned at the left side of the chignon just behind her left ear, long gold drop earrings. Modern Korean hanbok: short cropped ivory silk jeogori with a crisp white Y-shaped dongjeong collar and a long coral otgoreum ribbon bow on the chest; high-waisted, full, ankle-length ivory silk chima with a gold-leaf peony hem; a sheer ivory silk-organza durumagi worn open; a coral-and-plum norigae tassel at the ribbon; a slim jade bangle on her left wrist; ivory satin heels. The durumagi carries a large coral-and-gold embroidered peony medallion between the shoulder blades. Authentic Korean hanbok silhouette: short jeogori, high-waisted chima, narrow curved sleeves.",
+  "car": "THE CAR: one late-1990s Nissan Skyline R34 GT-R coupe in Bayside Blue, vivid metallic mid-blue with a deep glossy clearcoat; boxy wedge body, pumped arches, sharp angular fixed projector headlights (no pop-up headlights), wide mesh front intake showing the intercooler, carbon splitter and hood vent, tall rear wing visible above the roof, dark gunmetal wheels, blank white plate, no badges. Rear: tall rear wing on two uprights, four round red taillights across the black rear panel, rear diffuser, a single large exhaust tip. Inside the right-hand-drive R34 GT-R: black three-spoke steering wheel on the right, round analog gauges in a binnacle, a small display high on the center dash, six-speed shifter, black bucket seats; every gauge and screen soft and unreadable.",
+  "prompt_modules": {
+    "_nota": "Moduli per vista: nei keyframe Seedream prima la composizione, poi solo i moduli di cio' che si vede (tabella in TRATTAMENTO §4).",
+    "W_FACE": "THE WOMAN: an adult Korean woman in her mid-20s, oval face, soft cheekbones, calm dark-brown almond eyes, straight natural brows, muted coral-rose lips, minimal makeup, real skin texture with visible pores.",
+    "W_HAIR": "Glossy jet-black hair parted in the center and swept into a low chignon at the nape, two fine loose strands framing her face, a long horizontal silver binyeo hairpin with jade tips through the knot, a large ivory silk peony pinned at the left side of the chignon just behind her left ear, long gold drop earrings.",
+    "W_FRONT": "Modern Korean hanbok: short cropped ivory silk jeogori with a crisp white Y-shaped dongjeong collar and a long coral otgoreum ribbon bow on the chest; high-waisted, full, ankle-length ivory silk chima with a gold-leaf peony hem; a sheer ivory silk-organza durumagi worn open; a coral-and-plum norigae tassel at the ribbon; a slim jade bangle on her left wrist; ivory satin heels.",
+    "W_BACK": "Seen from behind, her face never visible: the low black chignon with the horizontal silver binyeo and the large ivory peony, the sheer ivory organza durumagi with a large coral-and-gold embroidered peony medallion between the shoulder blades, the full ankle-length ivory chima with its gold-leaf hem.",
+    "W_COLLAR": "Ivory silk jeogori with a crisp white Y-shaped dongjeong collar and a long coral otgoreum ribbon bow on the chest.",
+    "HANBOK_SIL": "Authentic Korean hanbok silhouette: short jeogori, high-waisted chima, narrow curved sleeves.",
+    "C_FRONT": "THE CAR: one late-1990s Nissan Skyline R34 GT-R coupe in Bayside Blue, vivid metallic mid-blue with a deep glossy clearcoat; boxy wedge body, pumped arches, sharp angular fixed projector headlights (no pop-up headlights), wide mesh front intake showing the intercooler, carbon splitter and hood vent, tall rear wing visible above the roof, dark gunmetal wheels, blank white plate, no badges.",
+    "C_REAR": "THE CAR from behind: one late-1990s Nissan Skyline R34 GT-R coupe in Bayside Blue; tall rear wing on two uprights, four round red taillights across the black rear panel, rear diffuser, a single large exhaust tip, blank white plate, no badges.",
+    "C_SIDE": "THE CAR from the side: one late-1990s Nissan Skyline R34 GT-R coupe in Bayside Blue; boxy wedge profile, short overhangs, pumped arches, tall rear wing, dark gunmetal wheels, no badges.",
+    "C_INT": "Inside the right-hand-drive R34 GT-R: black three-spoke steering wheel on the right, round analog gauges in a binnacle, a small display high on the center dash, six-speed shifter, black bucket seats; every gauge and screen soft and unreadable."
+  },
+  "seedance_locks": {
+    "CHAR_LOCK": "THE WOMAN (the same Korean woman in her mid-20s from the first frame)",
+    "CHAR_END": "Face, low chignon with silver binyeo and ivory peony, and ivory hanbok unchanged.",
+    "CAR_LOCK": "THE CAR (the same Bayside Blue R34 GT-R coupe from the first frame)",
+    "LOCK_FRONT": "Car shape, Bayside Blue paint, angular headlights and front intake unchanged, blank license plate.",
+    "LOCK_REAR": "Car shape, Bayside Blue paint and four round taillights unchanged, blank license plate.",
+    "LOCK_SIDE": "Car shape, Bayside Blue paint, rear wing and dark wheels unchanged, blank license plate.",
+    "LOCK_PAINT": "Car shape and Bayside Blue paint unchanged.",
+    "CAM_STATIC": "Static camera on a tripod, no camera movement"
+  },
   "setups": [
     {
       "id": "S01",
-      "name": "Vicolo di Bukchon: R34 3/4 frontale, abbaglianti (rif. shot 1, 12, 13)",
+      "name": "Vicolo di Bukchon: R34 quasi frontale, abbaglianti (rif. shot 1, 12, 13)",
       "location": "Bukchon Hanok Village (Gahoe-dong), vicolo stretto in salita, notte dopo la pioggia: muri di pietra e intonaco, gronde di tegole nere ricurve, portoni di legno, lanterne di carta calde, lastricato bagnato. Stesso set di S09.",
-      "camera": "35mm ad altezza paraurti (60 cm). Un solo movimento: dolly-in continuo e liscio con ease-in/out in 6 s, dal 3/4 frontale largo (~6 m, auto nella meta' centro-destra, vicolo che fugge a sinistra) al dettaglio del faro piu' vicino (~1,5 m).",
-      "action": "[0-2,3 s] auto ferma, anabbaglianti accesi, pioggia nei fasci. [2,4 s] gli abbaglianti lampeggiano due volte e restano accesi (sostituisce i fari a scomparsa dello shot 12, che la R34 non ha). [3-6 s] luce piena, la camera arriva sul faro (shot 13 nativo, senza crop).",
+      "camera": "35mm ad altezza paraurti (60 cm). Il vicolo fugge dritto verso un punto di fuga appena a destra del centro; l'auto a ~6 m, quasi frontale (leggero 3/4, muso verso sinistra camera), occupa il centro-sinistra del quadro. Un solo movimento: dolly-in continuo e liscio con ease-in/out fino al dettaglio del faro piu' vicino (quello a destra del quadro, ~1,5 m), che a 5,0 s riempie circa due terzi del quadro; poi fermo.",
+      "action": "[0-2,3 s] auto ferma, anabbaglianti accesi, pioggia nei fasci. [2,4 s] gli abbaglianti lampeggiano due volte e restano accesi (sostituisce i fari a scomparsa dello shot 12, che la R34 non ha). [2,4-5,0 s] luce piena, la camera arriva sul faro (shot 13 nativo, senza crop). [5,0-6,0 s] fermo sul dettaglio.",
       "seedance_duration_s": 6,
-      "blockout_notes": "Set VICOLO (riusato da S09): due pareti con zoccolo di pietra grigio, intonaco chiaro e fascia di gronda nera sporgente 0,6 m con estremita' rialzate; portoni = pannelli scuri incassati; lanterne = sfere emissive bianco-ambra (#FFB866, strength ~6) in fila verso il punto di fuga; pavimento a lastre lucide (roughness 0,08-0,12). Auto proxy R34 (riusata in tutto lo spot): box smussato blu (#1F5FAE desaturato), cabina trapezoidale, alettone = piastra su due montanti, presa anteriore scura, ruote = cilindri neri. Fari = due rettangoli emissivi bianchi angolati: strength 8 fino al frame del lampeggio, poi 30/8/30/8 e fisso a 30 (copiare i frame esatti dal clip); indicatori = piccoli rettangoli ambra; due spot nei fari con volumetrica leggera per i fasci. Pioggia = card verticali sottili leggibili solo nei fasci. Camera 35mm, sensore 36 mm, 1920x1080, 24 fps, h 0,6 m; dolly in linea retta da A a B con le stesse curve del clip (clip come sfondo al 50%, verificare primo e ultimo frame). World navy scuro, EEVEE con ombre morbide, SSR e bloom leggero.",
+      "blockout_notes": "Set VICOLO (riusato da S09): due pareti con zoccolo di pietra grigio, intonaco chiaro e fascia di gronda nera sporgente 0,6 m con estremita' rialzate; portoni = pannelli scuri incassati; lanterne = sfere emissive bianco-ambra (#FFB866, strength ~6) in fila verso il punto di fuga (appena a destra del centro); pavimento a lastre lucide (roughness 0,08-0,12). Auto proxy R34 (riusata in tutto lo spot): box smussato blu (#1F5FAE desaturato), cabina trapezoidale, alettone = piastra su due montanti, presa anteriore scura, ruote = cilindri neri; qui quasi frontale, muso verso sinistra camera, nel centro-sinistra. Fari = due rettangoli emissivi bianchi angolati: strength 8 fino al frame del lampeggio, poi 30/8/30/8 e fisso a 30 (copiare i frame esatti dal clip); indicatori = piccoli rettangoli ambra; due spot nei fari con volumetrica leggera per i fasci. Pioggia = card verticali sottili leggibili solo nei fasci. Camera 35mm, sensore 36 mm, 1920x1080, 24 fps, h 0,6 m; dolly in linea retta da A (~6 m) a B (faro destro del quadro, ~1,5 m) con le stesse curve del clip, arrivo a 5,0 s (clip come sfondo al 50%, verificare primo e ultimo frame). World navy scuro, EEVEE con ombre morbide, SSR e bloom leggero.",
       "shots_covered": [
         1,
         12,
         13
       ],
       "seedance_mode": "first_frame",
-      "face_visible": false
+      "face_visible": false,
+      "face_in_input": false,
+      "post_push": false
     },
     {
       "id": "S02",
       "name": "Stanza hanok: in piedi, seduta formale, profilo (rif. shot 2, 9, 17)",
       "location": "Stanza di hanok di notte: porte a graticcio con carta hanji retroilluminata, pavimento ondol in carta oliata color miele lucido, trave scura, paravento basso con peonie sbiadite al bordo destro. E' la stessa stanza in fondo al corridoio di S11.",
-      "camera": "35mm ad altezza vita, frontale e perfettamente simmetrica, lei a figura intera nel terzo centrale. Camera fissa con push-in minimo (pochi cm). Shot 17 = crop 1,5x centrato su di lei seduta.",
-      "action": "[0-1,8 s] in piedi, mani giunte in vita, respira. [1,8-4,0 s] si inginocchia lentamente nella seduta formale, la chima si apre a cerchio sul pavimento (analogo del seiza dello shot 9). [4,0-4,8 s] immobile, sguardo in camera. [4,8-6,0 s] gira la testa a destra fino al profilo, verso la porta di carta (analogo della girata dello shot 17).",
-      "seedance_duration_s": 6,
-      "blockout_notes": "Set HANOK (riusato in fondo al corridoio di S11): scatola 4x4 m; parete di fondo = griglia di montanti scuri sottili (#3B2A1A) con pannelli emissivi caldi e deboli (#F3DDB0, strength 2-3) per la hanji retroilluminata; pavimento miele lucido (#B88E55, roughness ~0,25) con riflesso morbido; trave scura in alto; paravento = piano a due tinte. Manichino in argilla crema riggato (testa a uovo senza tratti, collo cilindrico), corpo a colonna che si allarga a campana per la chima; chignon = sfera nera bassa con bastoncino bianco orizzontale (binyeo) e piccola sfera bianca (peonia); nastro corallo = card sul petto (#D9603B). Animazione sui frame del clip: in piedi -> inginocchiata (bacino che scende, la campana si schiaccia in un disco con shape key) -> testa ruotata di ~80 gradi a destra. Camera 35mm frontale h ~1,0 m, micro push-in. Luci: grande area light calda dietro la parete di carta + fill caldo da sinistra camera. Monocromo seppia identico al finale.",
+      "camera": "35mm ad altezza vita, frontale e perfettamente simmetrica, lei a figura intera nel terzo centrale. Camera fissa su treppiede (push digitale 1,00-1,03 in post). Shot 17 = crop 1,5x centrato su di lei seduta.",
+      "action": "[0-1,8 s] in piedi, mani giunte in vita, respira. [1,8-4,0 s] si inginocchia lentamente nella seduta formale, la chima si apre a cerchio sul pavimento (analogo del seiza dello shot 9). [4,0-5,2 s] immobile, sguardo in camera. [5,2-6,4 s] gira la testa alla sua destra (verso sinistra schermo) fino al profilo pulito, lo sguardo lungo la stanza (analogo della girata dello shot 17). [6,4-7,0 s] tiene il profilo. first_frame kf_S02 (in piedi) + last_frame lf_S02 (seduta, di profilo: modifica di kf_S02), che fa anche da keyframe di ripiego.",
+      "seedance_duration_s": 7,
+      "blockout_notes": "Set HANOK (riusato in fondo al corridoio di S11): scatola 4x4 m; parete di fondo = griglia di montanti scuri sottili (#3B2A1A) con pannelli emissivi caldi e deboli (#F3DDB0, strength 2-3) per la hanji retroilluminata; pavimento miele lucido (#B88E55, roughness ~0,25) con riflesso morbido; trave scura in alto; paravento = piano a due tinte. Manichino in argilla crema riggato (testa a uovo senza tratti, collo cilindrico), corpo a colonna che si allarga a campana per la chima; chignon = sfera nera bassa con bastoncino bianco orizzontale (binyeo) e una sfera bianca grande (peonia) sul lato sinistro, dietro l'orecchio sinistro; nastro corallo = card sul petto (#D9603B). Animazione sui frame del clip: in piedi -> inginocchiata (bacino che scende, la campana si schiaccia in un disco con shape key) -> testa ruotata di ~80 gradi alla sua destra (verso sinistra schermo). Camera 35mm frontale h ~1,0 m, fissa (il push 1,00-1,03 si fa in compositing su entrambi i pannelli). Luci: grande area light calda dietro la parete di carta + fill caldo da sinistra camera. Monocromo seppia identico al finale.",
       "shots_covered": [
         2,
         9,
         17
       ],
-      "seedance_mode": "first_frame",
-      "face_visible": true
+      "seedance_mode": "first_frame+last_frame",
+      "face_visible": true,
+      "face_in_input": true,
+      "post_push": true
     },
     {
       "id": "S03",
       "name": "Abitacolo con guida a destra: mani sul volante (rif. shot 3, 6, 14)",
       "location": "Dentro la R34 (guida a destra) che avanza piano nella pioggia notturna di Seoul; parabrezza con gocce, neon sfocati oltre il vetro.",
       "camera": "Over-the-shoulder dal sedile posteriore, dietro e a sinistra della spalla sinistra di lei (lei siede a destra): spalla avorio in primo piano a destra. 50mm, profondita' di campo minima, fuoco su mani e corona del volante. Camera solidale all'auto, ferma. Shot 14 = crop 1,4x sulle mani.",
-      "action": "[0-1,6 s] mano destra appoggiata in cima al volante (ore 12). [1,6-3,2 s] la mano sinistra sale e afferra il volante a ore 9. [3,2-5,0 s] entrambe le mani stringono, le dita si flettono, piccola correzione di sterzo. Il bokeh dei neon scivola piano verso sinistra sul parabrezza. Volto fuori campo.",
+      "action": "[0-1,6 s] solo la mano destra appoggiata in cima al volante (ore 12), polso destro nudo. [1,6-3,2 s] la mano sinistra, con il bangle di giada al polso, entra in campo e afferra il volante a ore 9. [3,2-5,0 s] entrambe le mani stringono, le dita si flettono, piccola correzione di sterzo. Il bokeh dei neon scivola piano verso sinistra sul parabrezza. Volto fuori campo.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Set INTERNO: plancia = box scuro smussato (#141414) con cupola strumenti, due dischi emissivi bianco-ambra (#FF9A3C, strength ~3) e un piccolo rettangolo emissivo al centro (MFD, nessun numero). Volante = toro nero sottile + tre razze + mozzo, rotazione di pochi gradi copiata dal clip. Parabrezza = piano inclinato; dietro, una card emissiva grande con macchie sfocate magenta/ciano/ambra la cui UV scorre verso sinistra alla velocita' del clip. Spalla e braccio del manichino in argilla crema in primo piano a destra; mani semplificate (palmo a box, dita a capsule) riggate per la presa; bangle = toro verde sottile. Camera 50mm imparentata a un empty dell'auto (noise di 1-2 mm per la vibrazione), DOF ~f/1.8 a fuoco sulla corona. Lato guida a destra, coerente con S10.",
+      "blockout_notes": "Set INTERNO: plancia = box scuro smussato (#141414) con cupola strumenti, due dischi emissivi bianco-ambra (#FF9A3C, strength ~3) e un piccolo rettangolo emissivo al centro (MFD, nessun numero). Volante = toro nero sottile + tre razze + mozzo, rotazione di pochi gradi copiata dal clip. Parabrezza = piano inclinato; dietro, una card emissiva grande con macchie sfocate magenta/ciano/ambra la cui UV scorre verso sinistra alla velocita' del clip. Spalla e braccio del manichino in argilla crema in primo piano a destra; mani semplificate (palmo a box, dita a capsule) riggate per la presa; bangle = toro verde sottile sul polso sinistro (il destro e' nudo). Camera 50mm imparentata a un empty dell'auto (noise di 1-2 mm per la vibrazione), DOF ~f/1.8 a fuoco sulla corona. Lato guida a destra, coerente con S10.",
       "shots_covered": [
         3,
         6,
         14
       ],
       "seedance_mode": "first_frame",
-      "face_visible": false
+      "face_visible": false,
+      "face_in_input": false,
+      "post_push": false
     },
     {
       "id": "S04",
       "name": "Primo piano beauty: clip ancora d'identita' (rif. shot 4, 8)",
       "location": "Interno hanok: fondale di carta hanji beige caldo, completamente fuori fuoco.",
-      "camera": "Primo piano frontale dal petto in su, centrato, 85mm ad altezza occhi, profondita' di campo minima. Camera fissa con push-in di pochi cm.",
-      "action": "[0-2,0 s] sguardo leggermente in basso a sinistra. [2,0-3,0 s] alza gli occhi nell'obiettivo. [3,0-5,0 s] tiene lo sguardo, un battito di ciglia lento, accenno di sorriso, gli orecchini oscillano appena. E' il clip del test di moderazione dei volti: si genera per primo (480p/4 s).",
+      "camera": "Primo piano frontale dal petto in su, centrato, 85mm ad altezza occhi, profondita' di campo minima. Camera fissa su treppiede (push digitale 1,00-1,03 in post).",
+      "action": "[0-2,0 s] sguardo leggermente in basso a sinistra. [2,0-3,0 s] alza gli occhi nell'obiettivo. [3,0-5,0 s] tiene lo sguardo, un battito di ciglia lento, accenno di sorriso, gli orecchini oscillano appena. Il test di moderazione dei volti si fa sulla voce separata S04_t480 (480p, 5 s, output S04_t480.mp4), che non tocca S04.mp4.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Set RITRATTO: testa = ovoide crema senza tratti su collo cilindrico (come shot 4 e 8 del riferimento); colletto bianco a Y (due card incrociate) e fiocco corallo; chignon nero dietro la testa con il binyeo bianco che sporge ai lati e una piccola sfera bianca (peonia); orecchini = due capsule oro (#C9A24B) pendenti con oscillazione smorzata (noise). Fondale = piano beige caldo (#876E4D) con leggero gradiente. Il manichino non ha occhi: lo sguardo che sale si rende con un tilt della testa di ~5-8 gradi verso l'alto nei frame in cui lei alza gli occhi. Luce: grande area light morbida frontale + rim caldo debole. Camera 85mm ad altezza occhi, DOF f/1.8, micro push-in di 3-5 cm.",
+      "blockout_notes": "Set RITRATTO: testa = ovoide crema senza tratti su collo cilindrico (come shot 4 e 8 del riferimento); colletto bianco a Y (due card incrociate) e fiocco corallo; chignon nero dietro la testa con il binyeo bianco che sporge ai lati e una sfera bianca grande (peonia) sul lato sinistro della testa (a destra nel quadro), dietro l'orecchio; orecchini = due capsule oro (#C9A24B) pendenti con oscillazione smorzata (noise). Fondale = piano beige caldo (#876E4D) con leggero gradiente. Il manichino non ha occhi: lo sguardo che sale si rende con un tilt della testa di ~5-8 gradi verso l'alto nei frame in cui lei alza gli occhi. Luce: grande area light morbida frontale + rim caldo debole. Camera 85mm ad altezza occhi, DOF f/1.8, fissa (push in compositing).",
       "shots_covered": [
         4,
         8
       ],
       "seedance_mode": "first_frame",
-      "face_visible": true
+      "face_visible": true,
+      "face_in_input": true,
+      "post_push": true
     },
     {
-      "id": "S05",
-      "name": "Di spalle con la N Seoul Tower, poi si gira con gli occhiali (rif. shot 5, 22, 25)",
+      "id": "S05a",
+      "name": "Di spalle con la N Seoul Tower, immobile nella brezza (rif. shot 5, 22)",
       "location": "Strada panoramica in collina sopra Seoul, di notte. In lontananza la N Seoul Tower illuminata di blu sul Namsan, sopra il tappeto di luci della citta': il blu della torre fa rima con il Bayside Blue.",
-      "camera": "85mm ad altezza petto: il tele comprime e ingigantisce la torre. Lei a sinistra del centro dalla vita in su, torre al centro-destra, parafango e cofano blu in basso a sinistra. Camera fissa con micro push-in. Shot 25 = crop 1,3x su viso e busto con la torre nel quadro.",
-      "action": "[0-2,8 s] di spalle guarda la torre; la brezza muove l'organza del durumagi (medaglione peonia sulla schiena) e le nappe del norigae. [2,8-5,2 s] si gira lentamente verso camera; porta gia' gli occhiali da sole cat-eye scuri (di spalle se ne vedono solo le stanghette). [5,2-7,0 s] frontale e immobile, mento appena alzato, torre blu dietro. first_frame + last_frame per fissare il volto dopo la girata. Ripiego: solo girata della testa sopra la spalla destra (versione 'fattibile').",
-      "seedance_duration_s": 7,
-      "blockout_notes": "Set TORRE: cielo = colore del mondo navy (#172435) con lieve gradiente; torre = traliccio wireframe bianco sottile (fusto conico, disco dell'osservatorio, antenna) con anello emissivo azzurro (#5DA9FF), a destra e in grande scala come la torre del riferimento; skyline = blocchi neri bassi; luci della citta' = migliaia di sferette emissive calde (instancing) sfocate dal DOF. Auto proxy: porzione di box blu smussato in basso a sinistra. Manichino di spalle: durumagi = guscio a campana semitrasparente (alpha ~0,4) con disco corallo sulla schiena (medaglione); chignon nero + binyeo bianco orizzontale + sfera bianca; occhiali = rettangolo grigio scuro, visibile dopo la girata; nappe del norigae con leggero cloth o shape key. Animazione: rotazione del manichino di 180 gradi sul proprio asse nei frame della girata del clip. Camera 85mm h 1,4 m, DOF moderato (f/2.8), micro push-in. Rim freddo dal lato della torre.",
+      "camera": "85mm ad altezza petto: il tele comprime e ingigantisce la torre. Lei di spalle a sinistra del centro dalla vita in su, torre al centro-destra, parafango e cofano blu in basso a sinistra. Camera fissa su treppiede (push digitale 1,00-1,03 in post).",
+      "action": "[0-5,0 s] di spalle, immobile, guarda la torre; la brezza solleva piano l'organza del durumagi (medaglione peonia sulla schiena) e muove le nappe del norigae; le luci della citta' tremolano. Non si gira mai: il volto resta nascosto. Niente occhiali in questo setup.",
+      "seedance_duration_s": 5,
+      "blockout_notes": "Set TORRE: cielo = colore del mondo navy (#172435) con lieve gradiente; torre = traliccio wireframe bianco sottile (fusto conico, disco dell'osservatorio, antenna) con anello emissivo azzurro (#5DA9FF), al centro-destra e in grande scala come la torre del riferimento; skyline = blocchi neri bassi; luci della citta' = migliaia di sferette emissive calde (instancing) sfocate dal DOF. Auto proxy: porzione di box blu smussato in basso a sinistra. Manichino di spalle: durumagi = guscio a campana semitrasparente (alpha ~0,4) con disco corallo sulla schiena (medaglione); chignon nero + binyeo bianco orizzontale + sfera bianca grande sul lato sinistro; nappe del norigae e orlo del guscio con leggero cloth o shape key mossi dalla brezza. Nessuna rotazione del manichino. Camera 85mm h 1,4 m, DOF moderato (f/2.8), fissa (push in compositing). Rim freddo dal lato della torre.",
       "shots_covered": [
         5,
-        22,
+        22
+      ],
+      "seedance_mode": "first_frame",
+      "face_visible": false,
+      "face_in_input": false,
+      "post_push": true
+    },
+    {
+      "id": "S05b",
+      "name": "Frontale dal basso con occhiali, torre a sinistra (rif. shot 25)",
+      "location": "La stessa strada panoramica di S05a: N Seoul Tower blu a sinistra del quadro, sfocata, cielo navy, luci della citta' sfocate in basso.",
+      "camera": "Mezzo primo piano frontale dal petto in su, dal basso (85mm sotto l'altezza del petto, inclinato verso l'alto), lei centrata; torre a sinistra, morbida. Camera fissa su treppiede (push digitale 1,00-1,03 in post). Shot 25 nativo, senza crop.",
+      "action": "[0-2,0 s] ferma, rivolta all'obiettivo con gli occhiali cat-eye scuri; la brezza muove le ciocche libere e gli orecchini d'oro. [2,0-4,0 s] alza appena il mento, sorriso appena percettibile; la torre blu resta accesa dietro di lei.",
+      "seedance_duration_s": 4,
+      "blockout_notes": "Riusa il set TORRE di S05a con nuova camera dal basso: torre wireframe con anello azzurro a sinistra del quadro, fuori fuoco (f/2), luci della citta' sfocate in basso. Manichino crema frontale dal petto in su: colletto bianco a Y e fiocco corallo, chignon con binyeo bianco e sfera bianca grande sul lato sinistro della testa (a destra nel quadro), occhiali = rettangolo grigio scuro; orecchini = capsule oro con oscillazione smorzata. Animazione: tilt della testa di pochi gradi verso l'alto nei frame del clip. Camera 85mm h ~1,2 m inclinata verso l'alto, fissa (push in compositing). Rim freddo dal lato della torre, bounce caldo dal basso.",
+      "shots_covered": [
         25
       ],
-      "seedance_mode": "first_frame+last_frame",
-      "face_visible": true
+      "seedance_mode": "first_frame",
+      "face_visible": true,
+      "face_in_input": true,
+      "post_push": true
     },
     {
       "id": "S06",
-      "name": "Gangnam-daero: campo largo con ombrello trasparente (rif. shot 7, 24)",
-      "location": "Gangnam-daero di notte sotto la pioggia: viale largo, torri di vetro, maxischermi LED con forme astratte, insegne al neon illeggibili, strisce pedonali, asfalto bagnato a specchio.",
-      "camera": "Campo largo ad altezza ginocchio (~50 cm), 35mm, profondita' di campo ampia, orizzonte in bolla. Auto di profilo con il muso a sinistra, al centro-basso; lei in piedi accanto al parafango anteriore. Camera fissa con micro push-in. Shot 24: whip pan fatto in post (blur direzionale + scie per ~5 frame) che si risolve su questo campo largo.",
-      "action": "[0-2,5 s] pioggia fitta, gocce che rimbalzano, i maxischermi cambiano colore lentamente, scie di traffico lontane. [2,5-5,0 s] lei inclina l'ombrello all'indietro e gira il viso verso camera.",
+      "name": "Gangnam-daero: campo largo con ombrello nero (rif. shot 7, 24)",
+      "location": "Gangnam-daero di notte sotto la pioggia: viale largo, torri di vetro, maxischermi LED con soli campi di colore astratti (niente lettere, niente volti, niente persone), insegne al neon illeggibili, strisce pedonali, asfalto bagnato a specchio.",
+      "camera": "Campo largo ad altezza ginocchio (~50 cm), 35mm, profondita' di campo moderata: auto e ragazza nitide, torri e maxischermi dietro morbidamente fuori fuoco; orizzonte in bolla. Auto di profilo con il muso a sinistra, al centro-basso; lei in piedi accanto al parafango anteriore con un ombrello nero (come lo shot 7 del riferimento). Camera fissa su treppiede (push digitale 1,00-1,03 in post). Shot 24: whip pan fatto in post (blur direzionale + scie per ~5 frame) che si risolve su questo campo largo.",
+      "action": "[0-2,5 s] pioggia fitta, gocce che rimbalzano, i maxischermi cambiano lentamente campi di colore, scie di traffico lontane. [2,5-5,0 s] lei inclina l'ombrello all'indietro e gira il viso verso camera.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Set GANGNAM (stesso linguaggio dello Shibuya del riferimento, riusato da S08): blocchi neri alti (#0B0D10) con card emissive pastello (menta #CDE4DD, rosa #F2B8CF, lavanda #CBB8F0, bianco) al posto dei maxischermi, con color ramp animata per il cambio colore; strisce emissive sottili per le insegne; suolo nero lucidissimo (roughness ~0,05) che riflette tutto; strisce pedonali = card bianche opache. Auto proxy di profilo con alettone e fari emissivi. Manichino crema in piedi (gonna a cono); ombrello = cono semitrasparente (vetro, alpha ~0,3) su asta, inclinato di ~15 gradi e testa che gira nei frame del clip. Pioggia = card verticali sottili. Camera 35mm h 0,5 m, micro push-in. Shot 24: il whip si applica in compositing identico ai due pannelli.",
+      "blockout_notes": "Set GANGNAM (stesso linguaggio dello Shibuya del riferimento, riusato da S08a e S08b): blocchi neri alti (#0B0D10) con card emissive pastello (menta #CDE4DD, rosa #F2B8CF, lavanda #CBB8F0, bianco) al posto dei maxischermi, con color ramp animata per il cambio colore, sfocate dal DOF; strisce emissive sottili per le insegne; suolo nero lucidissimo (roughness ~0,05) che riflette tutto; strisce pedonali = card bianche opache. Auto proxy di profilo con alettone e fari emissivi. Manichino crema in piedi (gonna a cono); ombrello = cono nero opaco su asta, inclinato di ~15 gradi, e testa che gira nei frame del clip. Pioggia = card verticali sottili. Camera 35mm h 0,5 m, DOF moderato, fissa (push in compositing). Shot 24: il whip si applica in compositing identico ai due pannelli.",
       "shots_covered": [
         7,
         24
       ],
       "seedance_mode": "first_frame",
-      "face_visible": true
+      "face_visible": true,
+      "face_in_input": true,
+      "post_push": true
     },
     {
       "id": "S07",
       "name": "Retro della R34 davanti a Gwanghwamun: quattro fanali tondi e vapore (rif. shot 10, 19)",
       "location": "Viale largo e vuoto nel centro di Seoul (asse di Sejong-daero) di notte dopo la pioggia, dritto verso la porta Gwanghwamun del Gyeongbokgung illuminata: basamento in pietra con tre archi, tetti ricurvi a due livelli illuminati d'oro dal basso, dancheong sotto le gronde, montagna scura dietro. Asfalto a specchio, foschia. (Innesto dal trattamento 'cinema'.)",
-      "camera": "50mm ad altezza vita (~1,0 m), centrata sull'asse del viale, simmetria perfetta a un punto di fuga; auto ferma a ~6 m nella meta' inferiore, porta dorata che emerge sopra il tetto. Camera fissa con micro push-in. Shot 19 = crop 1,6x in basso a sinistra su fanali sinistri, scarico e vapore.",
+      "camera": "50mm statica, centrata sull'asse del viale, a 70 cm di altezza, circa 4 m dietro l'auto; simmetria perfetta a un punto di fuga; auto ferma nella meta' inferiore, porta dorata che emerge sopra il tetto. Camera fissa su treppiede (push digitale 1,00-1,03 in post). Shot 19 = crop 1,6x in basso a destra su fanali destri, terminale di scarico e vapore (la GT-R R34 di serie ha un solo terminale, a destra: verificare su foto prima del keyframe).",
       "action": "[0-1,5 s] quattro fanali tondi accesi, un filo di vapore dallo scarico. [1,5 s] i freni si accendono piu' forti: fiammata rossa sull'asfalto bagnato. [1,5-5,0 s] uno sbuffo di vapore sale e si apre nella luce rossa; foschia leggera, riflessi oro e rossi che tremano.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Set PALAZZO: strada = lungo piano nero lucido (roughness ~0,08) con linee di corsia tenui; porta = basamento a box con 3 archi (boolean) + due livelli di tetto (lastre scure con angoli rialzati), strisce emissive oro (#E8A84A, strength ~8) sotto le gronde + 3 area light dal basso; montagna = silhouette scura low-poly contro cielo navy (#172435); foschia = volume scatter a bassa densita'. Retro dell'auto proxy: alettone = piastra su due montanti; 4 dischi emissivi rosa-salmone (#FF8A80; 2 grandi esterni, 2 piccoli interni), strength da 6 a 18 nel frame della frenata; targa = rettangolo bianco vuoto; diffusore = box scuro; vapore = volume con noise a bassa densita' (o card morbida) che sale dallo scarico. Camera 50mm h 1,0 m centrata, micro push-in; lo shot 19 applica lo stesso crop 1,6x al render.",
+      "blockout_notes": "Set PALAZZO: strada = lungo piano nero lucido (roughness ~0,08) con linee di corsia tenui; porta = basamento a box con 3 archi (boolean) + due livelli di tetto (lastre scure con angoli rialzati), strisce emissive oro (#E8A84A, strength ~8) sotto le gronde + 3 area light dal basso; montagna = silhouette scura low-poly contro cielo navy (#172435); foschia = volume scatter a bassa densita'. Retro dell'auto proxy: alettone = piastra su due montanti; 4 dischi emissivi rosa-salmone (#FF8A80; 2 grandi esterni, 2 piccoli interni), strength da 6 a 18 nel frame della frenata; targa = rettangolo bianco vuoto; diffusore = box scuro; un solo terminale di scarico (cilindro) a destra; vapore = volume con noise a bassa densita' (o card morbida) che sale dallo scarico. Camera 50mm h 0,7 m centrata, ~4 m dietro l'auto, fissa (push in compositing); lo shot 19 applica lo stesso crop 1,6x al render.",
       "shots_covered": [
         10,
         19
       ],
       "seedance_mode": "first_frame",
-      "face_visible": false
+      "face_visible": false,
+      "face_in_input": false,
+      "post_push": true
     },
     {
-      "id": "S08",
-      "name": "Gangnam: cammina verso i fanali, si volta, mano ai capelli (rif. shot 11, 15, 16, 23)",
-      "location": "Marciapiede di Gangnam sotto la pioggia, accanto all'auto ferma; dietro, maxischermi e neon in bokeh.",
-      "camera": "50mm ad altezza petto, camera fissa alle spalle di lei (~2,5 m), profondita' di campo ridotta. Auto qualche metro davanti, leggermente a destra, di 3/4 posteriore con i 4 fanali tondi accesi. Shot 15 = crop 1,3x, shot 16 = crop 1,6x su testa e mano.",
-      "action": "[0-2,6 s] di spalle cammina lentamente verso il retro dell'auto (due passi), l'organza ondeggia, medaglione peonia sulla schiena (shot 23). [2,8-4,2 s] si ferma accanto al parafango posteriore e gira la testa sopra la spalla sinistra guardando in camera (shot 11). [4,6-7,0 s] alza la mano sinistra e si sistema una ciocca dietro l'orecchio, accenno di sorriso (shot 15, 16). [7,0-8,0 s] tiene la posa. first_frame + last_frame. Ripiego se la mano deforma: per 15/16 si usano istanti della girata con gli stessi crop (versione 'fattibile').",
-      "seedance_duration_s": 8,
-      "blockout_notes": "Riusa il set GANGNAM di S06 (blocchi neri con card emissive pastello sfocate dal DOF, suolo nero lucido). Auto proxy di 3/4 posteriore con 4 dischi emissivi rosa-salmone. Manichino crema di spalle con guscio durumagi semitrasparente e disco corallo sulla schiena. La chima lunga nasconde le gambe: la camminata e' una traslazione lungo il percorso del clip con leggero bob verticale e oscillazione della gonna (shape key) - niente walk cycle. Poi rotazione della testa di ~120 gradi sopra la spalla sinistra (empty) e braccio sinistro che sale alla testa, tutto sui frame del clip. Camera 50mm fissa h 1,4 m, DOF ~f/2. Shot 15 e 16: stessi crop 1,3x e 1,6x del pannello Seedance.",
+      "id": "S08a",
+      "name": "Gangnam: cammina verso i fanali e si volta (rif. shot 11, 23)",
+      "location": "Strada di Gangnam sotto la pioggia, accanto all'auto ferma; dietro, maxischermi e neon in bokeh.",
+      "camera": "50mm ad altezza petto, camera fissa alle spalle di lei (~2,5 m all'inizio), profondita' di campo ridotta. Auto qualche metro davanti, leggermente a destra, di 3/4 posteriore con i 4 fanali tondi accesi. Lei si allontana e rimpicciolisce nel quadro (da ginocchia in su a meta' stinco in su): niente zoom.",
+      "action": "[0-2,5 s] di spalle cammina lentamente verso il retro dell'auto, l'organza ondeggia, medaglione peonia sulla schiena (shot 23). [2,5-3,5 s] si ferma subito dietro l'auto, tra i fanali. [3,5-5,0 s] gira la testa sopra la spalla sinistra e guarda in camera, corpo ancora di spalle, mani rilassate lungo i fianchi (shot 11). Solo first_frame: se il volto inventato nella girata non coincide con S04, last_frame opzionale lf_S08a (modifica di kf_S08a) oppure S08a_omni.",
+      "seedance_duration_s": 5,
+      "blockout_notes": "Riusa il set GANGNAM di S06 (blocchi neri con card emissive pastello sfocate dal DOF, suolo nero lucido). Auto proxy di 3/4 posteriore con 4 dischi emissivi rosa-salmone. Manichino crema di spalle con guscio durumagi semitrasparente e disco corallo sulla schiena; sfera bianca grande (peonia) sul lato sinistro dello chignon. La chima lunga nasconde le gambe: la camminata e' una traslazione lungo il percorso del clip con leggero bob verticale e oscillazione della gonna (shape key) - niente walk cycle. Poi rotazione della testa di ~120 gradi sopra la spalla sinistra (empty), tutto sui frame del clip. Camera 50mm fissa h 1,4 m, DOF ~f/2.",
       "shots_covered": [
         11,
-        15,
-        16,
         23
       ],
-      "seedance_mode": "first_frame+last_frame",
-      "face_visible": true
+      "seedance_mode": "first_frame",
+      "face_visible": true,
+      "face_in_input": false,
+      "post_push": false
+    },
+    {
+      "id": "S08b",
+      "name": "Gangnam: frontale accanto al cofano, mano ai capelli (rif. shot 15, 16)",
+      "location": "La stessa strada di Gangnam di S08a, davanti all'auto: cofano blu bagnato in primo piano a sinistra, neon in bokeh dietro.",
+      "camera": "50mm ad altezza petto, lei frontale accanto al parafango anteriore, nel terzo destro, dalla vita in su; cofano e bordo del parabrezza bagnati in primo piano a sinistra (come shot 15 e 16 del riferimento); profondita' di campo ridotta. Camera fissa. Shot 15 = crop 1,2x, shot 16 = crop 1,3x.",
+      "action": "[0-1,5 s] guarda fuori campo a destra. [1,5-3,5 s] alza la mano sinistra, si sistema una ciocca dietro l'orecchio sinistro con dita sottili e naturali, poi abbassa la mano (shot 15). [3,5-5,0 s] guarda in camera con un accenno di sorriso (shot 16).",
+      "seedance_duration_s": 5,
+      "blockout_notes": "Riusa il set GANGNAM di S06 (card emissive pastello sfocate dal DOF). Auto proxy: cofano e parafango anteriore blu in primo piano a sinistra, con parabrezza = piano scuro lucido. Manichino crema frontale dalla vita in su nel terzo destro: colletto a Y, fiocco corallo, guscio durumagi semitrasparente, chignon con binyeo e sfera bianca grande sul lato sinistro della testa (a destra nel quadro). Braccio sinistro riggato che sale all'orecchio e torna giu'; tilt della testa da destra verso camera nei frame del clip. Camera 50mm fissa h 1,4 m, DOF ~f/2. Shot 15 e 16: stessi crop 1,2x e 1,3x del pannello Seedance.",
+      "shots_covered": [
+        15,
+        16
+      ],
+      "seedance_mode": "first_frame",
+      "face_visible": true,
+      "face_in_input": true,
+      "post_push": false
     },
     {
       "id": "S09",
       "name": "Davanti ai fari nel vicolo, occhiali da sole (rif. shot 18, 20)",
       "location": "Lo stesso vicolo di Bukchon di S01, con l'auto frontale e i fari accesi.",
-      "camera": "35mm ad altezza vita, frontale e simmetrica. Auto centrata con il muso verso camera; lei subito davanti al cofano, tra i due fari, dalle ginocchia in su. Camera fissa con micro push-in.",
+      "camera": "35mm ad altezza vita, frontale e simmetrica. Auto centrata con il muso verso camera; lei subito davanti al cofano, tra i due fari, dalle ginocchia in su. Camera fissa su treppiede (push digitale 1,00-1,03 in post).",
       "action": "[0-2,5 s] immobile davanti ai fari, in controluce, con gli occhiali cat-eye gia' indossati; pioggia luminosa nei fasci, le nappe del norigae oscillano. [2,6-4,0 s] alza la mano destra, tocca la stanghetta degli occhiali e li sistema, riabbassa la mano (innesto 'fattibile': niente occhiali da infilare, interazione mano-oggetto minima). [4,0-5,0 s] immobile, rivolta all'obiettivo.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Riusa il set VICOLO di S01 con l'auto frontale e nuova camera assiale (35mm, h 1,0 m). Fari emissivi molto forti + due spot puntati verso camera per il controluce e il bloom, pioggia volumetrica nei fasci (come shot 18 del riferimento). Manichino crema in piedi centrato davanti al muso (colonna + campana), braccia cilindriche riggate; occhiali = rettangolo grigio scuro sul volto; la mano destra sale alla tempia e torna giu' nei frame del clip. Lanterne sferiche emissive a muro. Micro push-in.",
+      "blockout_notes": "Riusa il set VICOLO di S01 con l'auto frontale e nuova camera assiale (35mm, h 1,0 m). Fari emissivi molto forti + due spot puntati verso camera per il controluce e il bloom, pioggia volumetrica nei fasci (come shot 18 del riferimento). Manichino crema in piedi centrato davanti al muso (colonna + campana), braccia cilindriche riggate, sfera bianca grande (peonia) sul lato sinistro della testa; occhiali = rettangolo grigio scuro sul volto; la mano destra sale alla tempia e torna giu' nei frame del clip. Lanterne sferiche emissive a muro. Camera fissa (push in compositing).",
       "shots_covered": [
         18,
         20
       ],
       "seedance_mode": "first_frame",
-      "face_visible": true
+      "face_visible": true,
+      "face_in_input": true,
+      "post_push": true
     },
     {
       "id": "S10",
       "name": "Portiera davanti al minimarket: i piedi scendono (rif. shot 21)",
       "location": "Marciapiede di una via laterale di Seoul davanti a un piccolo minimarket d'angolo senza marchi: luce fluorescente bianca fredda dalla vetrina, frigoriferi sfocati, tavolini e sedie di plastica verdi, ombrellone chiuso, insegna = pannello luminoso bianco vuoto, pozzanghere.",
-      "camera": "Bassa, all'altezza della soglia (~40 cm), 35mm. Vista di 3/4 del fianco destro dell'auto (lato guida, guida a destra) con la portiera aperta; il minimarket illuminato dietro l'auto. Camera fissa.",
-      "action": "[0-1,5 s] portiera aperta, abitacolo illuminato, la mano di lei sul montante; testa e spalle restano nell'ombra dell'abitacolo (niente volto: nessun rischio di moderazione). [1,5-3,5 s] raccoglie l'orlo della chima ed esce con i piedi uno dopo l'altro: le scarpe di raso avorio si posano sul marciapiede bagnato, piccola increspatura in una pozzanghera. [3,5-5,0 s] comincia ad alzarsi sporgendosi dalla portiera. Elegante, nessuna sessualizzazione.",
+      "camera": "Bassa, in strada, all'altezza della soglia (~40 cm), 35mm. Vista di 3/4 posteriore del fianco destro dell'auto (lato guida, guida a destra) con la portiera del guidatore aperta verso camera; il minimarket illuminato dietro l'auto, oltre lo stretto marciapiede. Il bordo alto del quadro taglia sulla linea del finestrino: testa e spalle di lei restano fuori campo. Camera fissa.",
+      "action": "[0-1,5 s] portiera aperta, abitacolo buio con un debole bagliore caldo nel vano piedi; si vede solo la meta' inferiore di lei, seduta di lato, una mano che raccoglie la chima. [1,5-3,5 s] esce con i piedi uno dopo l'altro: le scarpe di raso avorio si posano sull'asfalto bagnato, piccola increspatura in una pozzanghera. [3,5-5,0 s] entrambi i tacchi poggiano sull'asfalto, l'orlo della chima si assesta; resta seduta e la testa non entra mai in campo (niente volto: nessun rischio di moderazione). Elegante, nessuna sessualizzazione.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Set MINIMARKET: box negozio con grande vetrina = piano emissivo bianco freddo (#EAF4FF, strength ~10); frigoriferi = rettangoli emissivi piu' tenui all'interno; insegna = striscia emissiva bianca vuota; 3 tavolini e sedie verdi (#2E8B57) = cilindri e box; ombrellone chiuso = cono; marciapiede = box con cordolo; strada = piano nero lucido con pozzanghere (roughness variabile). Auto proxy di fianco con portiera come oggetto separato incernierato, aperta a ~70 gradi; interno scuro con luce di cortesia emissiva calda. Piedi = due capsule crema con scarpe a cuneo avorio animate in uscita; orlo della gonna = guscio a campana avorio. Camera 35mm h 0,4 m, fissa.",
+      "blockout_notes": "Set MINIMARKET: box negozio con grande vetrina = piano emissivo bianco freddo (#EAF4FF, strength ~10); frigoriferi = rettangoli emissivi piu' tenui all'interno; insegna = striscia emissiva bianca vuota; 3 tavolini e sedie verdi (#2E8B57) = cilindri e box; ombrellone chiuso = cono; marciapiede stretto = box con cordolo; strada = piano nero lucido con pozzanghere (roughness variabile). Auto proxy di 3/4 posteriore, fianco destro verso camera, portiera del guidatore come oggetto separato incernierato, aperta a ~70 gradi verso camera; interno scuro con un debole bagliore emissivo caldo nel vano piedi. Bacino, gambe e piedi = capsule crema con scarpe a cuneo avorio animate in uscita; orlo della gonna = guscio a campana avorio; nessuna testa in campo. Camera 35mm h 0,4 m, fissa, bordo alto del quadro sulla linea del finestrino.",
       "shots_covered": [
         21
       ],
       "seedance_mode": "first_frame",
-      "face_visible": false
+      "face_visible": false,
+      "face_in_input": false,
+      "post_push": false
     },
     {
       "id": "S11",
       "name": "Corridoio del palazzo verso la stanza hanok: chiusura (rif. shot 26)",
       "location": "Corridoio coperto di un palazzo nello stile del Gyeongbokgung: colonne di legno laccate di rosso, travi dipinte dancheong (verde, rosso, blu), lanterne di carta a coppie, pietra bagnata. In fondo si apre la stanza hanok di S02 con lei seduta al centro.",
-      "camera": "24mm ad altezza occhi, prospettiva centrale perfettamente simmetrica, profondita' di campo ampia. Push-in lentissimo di pochi cm: chiusura calma.",
-      "action": "Lei resta immobile, seduta in posa formale al centro della stanza in fondo. Le lanterne oscillano appena, gocce cadono dalle gronde ai lati, foschia leggera sul pavimento. Nessun altro movimento.",
+      "camera": "24mm ad altezza occhi, prospettiva centrale perfettamente simmetrica, profondita' di campo ampia. Camera fissa su treppiede (push digitale 1,00-1,03 in post): chiusura calma.",
+      "action": "Lei resta immobile, seduta in posa formale al centro della stanza in fondo, occhi bassi, lineamenti non distinguibili a quella distanza. Le lanterne oscillano appena, gocce cadono dalle gronde ai lati, foschia leggera sul pavimento. Nessun altro movimento.",
       "seedance_duration_s": 5,
-      "blockout_notes": "Corridoio: due file di colonne cilindriche rosso scuro, travi a box con fasce di colore piatte (dancheong semplificato), soffitto scuro; lanterne = coppie di sfere emissive bianco-calde (#FFE2B0) appese con leggera oscillazione (driver sinusoidale); pavimento scuro lucido con soglia in pietra in primo piano. In fondo la stanza di S02 riusata tale e quale (parete a griglia emissiva calda, pavimento miele) con il manichino seduto (disco della gonna). Camera 24mm simmetrica h 1,2 m, push-in lentissimo. Palette marrone e ambra come lo shot 26 del riferimento.",
+      "blockout_notes": "Corridoio: due file di colonne cilindriche rosso scuro, travi a box con fasce di colore piatte (dancheong semplificato), soffitto scuro; lanterne = coppie di sfere emissive bianco-calde (#FFE2B0) appese con leggera oscillazione (driver sinusoidale); pavimento scuro lucido con soglia in pietra in primo piano. In fondo la stanza di S02 riusata tale e quale (parete a griglia emissiva calda, pavimento miele) con il manichino seduto (disco della gonna). Camera 24mm simmetrica h 1,2 m, fissa (push in compositing). Palette marrone e ambra come lo shot 26 del riferimento.",
       "shots_covered": [
         26
       ],
       "seedance_mode": "first_frame",
-      "face_visible": false
+      "face_visible": false,
+      "face_in_input": false,
+      "post_push": true
     }
   ],
   "shots": [
@@ -182,7 +257,7 @@
       "frames": 8,
       "start_frame": 0,
       "setup": "S01",
-      "moment": "1.00-1.29 s del clip S01 (frame 24-31). Inizio del dolly: campo largo 3/4 frontale nel vicolo di Bukchon, anabbaglianti accesi, pioggia nei fasci.",
+      "moment": "1.00-1.29 s del clip S01 (frame 24-31). Inizio del dolly: campo largo, R34 quasi frontale nel vicolo di Bukchon, anabbaglianti accesi, pioggia nei fasci.",
       "description": "Apertura: la R34 Bayside Blue ferma nel vicolo di hanok bagnato, lanterne calde, i fari come luce chiave.",
       "clip_in_frame": 24,
       "crop": null
@@ -202,7 +277,7 @@
       "frames": 6,
       "start_frame": 14,
       "setup": "S03",
-      "moment": "1.00-1.21 s del clip S03 (frame 24-29). Solo la mano destra appoggiata in cima al volante.",
+      "moment": "1.00-1.21 s del clip S03 (frame 24-29). Solo la mano destra appoggiata in cima al volante, polso destro nudo.",
       "description": "Abitacolo con guida a destra: mano sul volante, strumenti accesi, bokeh di neon oltre il parabrezza bagnato.",
       "clip_in_frame": 24,
       "crop": null
@@ -221,8 +296,8 @@
       "n": 5,
       "frames": 14,
       "start_frame": 26,
-      "setup": "S05",
-      "moment": "1.00-1.54 s del clip S05 (frame 24-37). Di spalle, ferma, l'organza mossa dalla brezza.",
+      "setup": "S05a",
+      "moment": "1.00-1.54 s del clip S05a (frame 24-37). Di spalle, ferma, l'organza mossa dalla brezza.",
       "description": "Di spalle con il medaglione peonia, la N Seoul Tower blu compressa dal tele, il parafango blu in basso a sinistra.",
       "clip_in_frame": 24,
       "crop": null
@@ -232,7 +307,7 @@
       "frames": 18,
       "start_frame": 40,
       "setup": "S03",
-      "moment": "2.21-2.92 s del clip S03 (frame 53-70). La mano sinistra sale e afferra il volante a ore 9.",
+      "moment": "2.21-2.92 s del clip S03 (frame 53-70). La mano sinistra, con il bangle di giada, entra e afferra il volante a ore 9.",
       "description": "Due mani sul volante, cruscotto acceso: torna il motivo del volante.",
       "clip_in_frame": 53,
       "crop": null
@@ -242,8 +317,8 @@
       "frames": 19,
       "start_frame": 58,
       "setup": "S06",
-      "moment": "1.00-1.75 s del clip S06 (frame 24-42). Lei ferma con l'ombrello trasparente, i maxischermi cambiano colore.",
-      "description": "Campo largo su Gangnam-daero bagnato: auto di profilo, lei accanto con l'ombrello, maxischermi astratti.",
+      "moment": "1.00-1.75 s del clip S06 (frame 24-42). Lei ferma con l'ombrello nero, i maxischermi cambiano campi di colore.",
+      "description": "Campo largo su Gangnam-daero bagnato: auto di profilo, lei accanto con l'ombrello nero, maxischermi astratti.",
       "clip_in_frame": 24,
       "crop": null
     },
@@ -262,9 +337,9 @@
       "frames": 14,
       "start_frame": 87,
       "setup": "S02",
-      "moment": "4.04-4.58 s del clip S02 (frame 97-110). Appena seduta in posa formale, frontale, chima aperta a cerchio, ferma.",
+      "moment": "4.17-4.71 s del clip S02 (frame 100-113). Appena seduta in posa formale, frontale, chima aperta a cerchio, ferma.",
       "description": "Seduta formale al centro della stanza, simmetria totale (analogo del seiza).",
-      "clip_in_frame": 97,
+      "clip_in_frame": 100,
       "crop": null
     },
     {
@@ -272,19 +347,19 @@
       "frames": 10,
       "start_frame": 101,
       "setup": "S07",
-      "moment": "1.00-1.38 s del clip S07 (frame 24-33). Quattro fanali tondi accesi, prima della frenata.",
+      "moment": "0.83-1.21 s del clip S07 (frame 20-29). Quattro fanali tondi accesi, prima della frenata (che parte a 1,5 s).",
       "description": "Retro della R34 centrato sul viale, la porta Gwanghwamun dorata in fondo: i quattro fanali tondi, firma dell'auto.",
-      "clip_in_frame": 24,
+      "clip_in_frame": 20,
       "crop": null
     },
     {
       "n": 11,
       "frames": 11,
       "start_frame": 111,
-      "setup": "S08",
-      "moment": "3.29-3.71 s del clip S08 (frame 79-89). A meta' della girata: la testa ruota sopra la spalla sinistra verso camera.",
+      "setup": "S08a",
+      "moment": "4.00-4.42 s del clip S08a (frame 96-106). Ferma dietro l'auto, tra i fanali: la testa ruota sopra la spalla sinistra verso camera.",
       "description": "Gangnam: accanto ai fanali posteriori si volta e guarda in camera sopra la spalla.",
-      "clip_in_frame": 79,
+      "clip_in_frame": 96,
       "crop": null
     },
     {
@@ -292,9 +367,9 @@
       "frames": 15,
       "start_frame": 122,
       "setup": "S01",
-      "moment": "2.29-2.88 s del clip S01 (frame 55-69). Dolly a meta': il doppio lampeggio degli abbaglianti cade ~3 frame dopo il taglio (sul beat 10).",
+      "moment": "2.25-2.83 s del clip S01 (frame 54-68). Dolly a meta': il doppio lampeggio degli abbaglianti cade ~4 frame dopo il taglio (f125,6 del montaggio, beat 10 a f125,9).",
       "description": "Gli abbaglianti lampeggiano nella pioggia: l'evento che sostituisce i fari a scomparsa.",
-      "clip_in_frame": 55,
+      "clip_in_frame": 54,
       "crop": null
     },
     {
@@ -302,9 +377,9 @@
       "frames": 11,
       "start_frame": 137,
       "setup": "S01",
-      "moment": "5.21-5.62 s del clip S01 (frame 125-135). Fine del dolly: il faro riempie il quadro, abbagliante fisso, pioggia in controluce.",
+      "moment": "5.00-5.42 s del clip S01 (frame 120-130). Fine del dolly: il faro riempie due terzi del quadro, abbagliante fisso, pioggia in controluce.",
       "description": "Dettaglio del faro acceso, gocce nel fascio.",
-      "clip_in_frame": 125,
+      "clip_in_frame": 120,
       "crop": null
     },
     {
@@ -313,7 +388,7 @@
       "start_frame": 148,
       "setup": "S03",
       "moment": "3.92-4.46 s del clip S03 (frame 94-107). Crop 1,4x sulle mani che stringono il volante e flettono le dita.",
-      "description": "Stretto sulle mani: le dita stringono la corona, il bangle di giada.",
+      "description": "Stretto sulle mani: le dita stringono la corona, il bangle di giada al polso sinistro.",
       "clip_in_frame": 94,
       "crop": {
         "zoom": 1.4,
@@ -328,15 +403,15 @@
       "n": 15,
       "frames": 13,
       "start_frame": 162,
-      "setup": "S08",
-      "moment": "5.00-5.50 s del clip S08 (frame 120-132). Crop 1,3x: la mano sinistra sale verso i capelli.",
-      "description": "Accanto all'auto alza la mano verso i capelli, neon in bokeh.",
-      "clip_in_frame": 120,
+      "setup": "S08b",
+      "moment": "2.08-2.58 s del clip S08b (frame 50-62). Crop 1,2x: la mano sinistra sistema la ciocca dietro l'orecchio sinistro.",
+      "description": "Accanto al cofano bagnato alza la mano e si sistema la ciocca dietro l'orecchio, neon in bokeh.",
+      "clip_in_frame": 50,
       "crop": {
-        "zoom": 1.3,
+        "zoom": 1.2,
         "center": [
-          0.56,
-          0.42
+          0.58,
+          0.45
         ],
         "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
       }
@@ -345,15 +420,15 @@
       "n": 16,
       "frames": 10,
       "start_frame": 175,
-      "setup": "S08",
-      "moment": "6.21-6.58 s del clip S08 (frame 149-158). Crop 1,6x: si sistema la ciocca dietro l'orecchio, accenno di sorriso.",
-      "description": "Piu' stretto: la ciocca dietro l'orecchio, sorriso appena accennato.",
-      "clip_in_frame": 149,
+      "setup": "S08b",
+      "moment": "3.58-3.96 s del clip S08b (frame 86-95). Crop 1,3x: la ciocca appena sistemata, guarda in camera con un accenno di sorriso.",
+      "description": "Piu' stretto: lo sguardo arriva in camera, sorriso appena accennato.",
+      "clip_in_frame": 86,
       "crop": {
-        "zoom": 1.6,
+        "zoom": 1.3,
         "center": [
-          0.56,
-          0.33
+          0.6,
+          0.4
         ],
         "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
       }
@@ -363,9 +438,9 @@
       "frames": 17,
       "start_frame": 185,
       "setup": "S02",
-      "moment": "5.08-5.75 s del clip S02 (frame 122-138). Crop 1,5x: da seduta gira la testa a destra fino al profilo.",
-      "description": "Nella stanza hanok gira il viso di profilo verso la porta di carta luminosa.",
-      "clip_in_frame": 122,
+      "moment": "5.29-5.96 s del clip S02 (frame 127-143). Crop 1,5x: da seduta gira la testa alla sua destra fino al profilo.",
+      "description": "Nella stanza hanok gira il viso di profilo, lo sguardo lungo la stanza.",
+      "clip_in_frame": 127,
       "crop": {
         "zoom": 1.5,
         "center": [
@@ -390,14 +465,14 @@
       "frames": 11,
       "start_frame": 212,
       "setup": "S07",
-      "moment": "3.00-3.42 s del clip S07 (frame 72-82). Crop 1,6x in basso a sinistra: fanali in frenata e sbuffo di vapore dallo scarico.",
+      "moment": "3.00-3.42 s del clip S07 (frame 72-82). Crop 1,6x in basso a destra: fanali destri in frenata e sbuffo di vapore dal terminale di scarico.",
       "description": "Dettaglio basso: fanali rossi e vapore di scarico nella luce rossa, riflessi oro sull'asfalto.",
       "clip_in_frame": 72,
       "crop": {
         "zoom": 1.6,
         "center": [
-          0.34,
-          0.66
+          0.62,
+          0.68
         ],
         "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
       }
@@ -417,7 +492,7 @@
       "frames": 7,
       "start_frame": 234,
       "setup": "S10",
-      "moment": "2.21-2.46 s del clip S10 (frame 53-59). Le scarpe di raso avorio toccano il marciapiede bagnato.",
+      "moment": "2.21-2.46 s del clip S10 (frame 53-59). Le scarpe di raso avorio toccano l'asfalto bagnato.",
       "description": "Portiera aperta davanti al minimarket bianco: i piedi scendono sul bagnato.",
       "clip_in_frame": 53,
       "crop": null
@@ -426,18 +501,18 @@
       "n": 22,
       "frames": 20,
       "start_frame": 241,
-      "setup": "S05",
-      "moment": "1.79-2.58 s del clip S05 (frame 43-62). Ancora di spalle, piu' avanti nel push-in: la brezza solleva l'organza e le nappe.",
+      "setup": "S05a",
+      "moment": "3.00-3.79 s del clip S05a (frame 72-91). Ancora di spalle, immobile: la brezza solleva l'organza e le nappe, la torre ferma in fondo.",
       "description": "Ritorno al motivo della torre: di spalle verso la N Seoul Tower.",
-      "clip_in_frame": 43,
+      "clip_in_frame": 72,
       "crop": null
     },
     {
       "n": 23,
       "frames": 15,
       "start_frame": 261,
-      "setup": "S08",
-      "moment": "1.00-1.58 s del clip S08 (frame 24-38). Cammina di spalle verso i fanali posteriori.",
+      "setup": "S08a",
+      "moment": "1.00-1.58 s del clip S08a (frame 24-38). Cammina di spalle verso i fanali posteriori.",
       "description": "Cammina di spalle verso il retro della R34, medaglione peonia e organza che ondeggia.",
       "clip_in_frame": 24,
       "crop": null
@@ -456,25 +531,18 @@
       "n": 25,
       "frames": 25,
       "start_frame": 289,
-      "setup": "S05",
-      "moment": "5.79-6.79 s del clip S05 (frame 139-163). Crop 1,3x: frontale dopo la girata, occhiali cat-eye, torre blu dietro, immobile.",
-      "description": "Frontale con gli occhiali e la N Seoul Tower dietro: lo shot piu' lungo prima della chiusura.",
-      "clip_in_frame": 139,
-      "crop": {
-        "zoom": 1.3,
-        "center": [
-          0.45,
-          0.4
-        ],
-        "_nota": "centro normalizzato (0-1, origine in alto a sinistra); stesso crop sopra e sotto, da rifinire sui clip veri"
-      }
+      "setup": "S05b",
+      "moment": "1.00-2.00 s del clip S05b (frame 24-48). Frontale dal basso con gli occhiali cat-eye, torre blu a sinistra, la brezza muove ciocche e orecchini.",
+      "description": "Frontale dal basso con gli occhiali e la N Seoul Tower a sinistra: lo shot piu' lungo prima della chiusura.",
+      "clip_in_frame": 24,
+      "crop": null
     },
     {
       "n": 26,
       "frames": 22,
       "start_frame": 314,
       "setup": "S11",
-      "moment": "1.50-2.38 s del clip S11 (frame 36-57). Push-in lentissimo, lanterne che oscillano appena.",
+      "moment": "1.50-2.38 s del clip S11 (frame 36-57). Immobile, lanterne che oscillano appena (push digitale in post).",
       "description": "Chiusura: il corridoio del palazzo porta alla stanza hanok, lei seduta al centro in fondo. Calma e simmetria.",
       "clip_in_frame": 36,
       "crop": null

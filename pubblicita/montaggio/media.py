@@ -76,6 +76,18 @@ def probe(path: str | Path) -> MediaInfo:
     return MediaInfo(p, int(v["width"]), int(v["height"]), fps, dur, has_audio)
 
 
+def duration(path: str | Path) -> float:
+    """Durata del contenitore in secondi (vale anche per file solo audio)."""
+    out = run([FFPROBE, "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)], "ffprobe")
+    return float(out.stdout.decode().strip())
+
+
+def has_audio(path: str | Path) -> bool:
+    out = run([FFPROBE, "-v", "error", "-select_streams", "a", "-show_entries", "stream=index",
+               "-of", "csv=p=0", str(path)], "ffprobe")
+    return bool(out.stdout.decode().strip())
+
+
 def count_frames(path: str | Path) -> int:
     """Conta i frame decodificati (lento ma esatto: usato nei test e nelle verifiche)."""
     out = run([FFPROBE, "-v", "error", "-select_streams", "v:0", "-count_frames",

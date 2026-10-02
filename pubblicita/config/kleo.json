@@ -1,0 +1,4 @@
+{
+  "_info": "Etichetta del pannello inferiore con il marchio Kleo AI (kleooai.com) al posto del testo del modello.",
+  "panels": {"bottom": {"label": {"items": [{"icon": "kleo_logo.png"}, {"text": "Kleo AI"}]}}}
+}
