@@ -9,3 +9,6 @@ venv/
 .pytest_cache/
 data/
 diagnostica_*.txt
+
+# Pipeline spot: render, clip generati e chiavi locali
+pubblicita/output/
