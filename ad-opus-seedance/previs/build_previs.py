@@ -17,12 +17,23 @@ Optional keys inside a shot's "previs" block (all have defaults, see RECIPES):
   lens_mm / lens_to_mm focal length (sensor 36 mm) / zoom target
   speed                convoy speed in m/s: car + camera + target travel along +Y
                        (cam_from/cam_to/look_at are then RELATIVE to the car)
-  handheld             camera shake amplitude in metres (0 = off)
+  handheld             camera shake amplitude in metres (0 = off); also adds a small roll wobble
+                       (HANDHELD_ROLL_DEG_PER_M degrees of roll per metre of amplitude)
+  flash [s,...]        camera-flash cue: one bright frame (+FLASH_EV exposure) at each time (seconds
+                       from the start of the shot) followed by a half-strength decay frame
   car_pos [x,y,z], car_yaw (deg), car_path [[x,y,z],...], car_ease (exponent)
   figure_path [[x,y,z],[x,y,z]], figure_action (walk|flick|poses|lean|stand),
   figure_yaw (deg)
 All coordinates are relative to the shot's own world origin (shots live in
 separate worlds 1000 m apart, so they never see each other).
+
+Camera aiming: a Track-To constraint on a look-at empty, except where that would be wrong -
+  * zenith crossing (e.g. the S09 top-down shot whose aim passes straight down): Track-To flips its
+    roll by 180 degrees exactly at the zenith, so the camera gets roll-free per-frame rotation keys
+    (heading fixed at the first frame's aim, pitch swept through straight-down);
+  * handheld shots: per-frame rotation keys too, so a roll wobble can be added.
+Run with --encode-only to re-encode the whole timeline from an existing frames dir after
+re-rendering a single shot with --shots SXX --frames-only.
 """
 import argparse
 import json
@@ -30,6 +41,7 @@ import math
 import os
 import random
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
@@ -53,6 +65,9 @@ def parse_args(argv=None):
     ap.add_argument("--scale", type=float, default=100.0,
                     help="render resolution in percent of 1280x720 (default 100; use 25 for quick tests)")
     ap.add_argument("--frames-only", action="store_true", help="render the PNG sequence only, skip the mp4 encode")
+    ap.add_argument("--encode-only", action="store_true",
+                    help="build/render nothing: encode ALL shots' frames already in --frames-dir to the output mp4 "
+                         "(out/previs.mp4 unless --out); use after re-rendering single shots with --shots X --frames-only")
     ap.add_argument("--out", default="", help="output mp4 (default: out/previs.mp4 for a full 100%% run, "
                                               "otherwise <frames-dir>/../previs_partial.mp4)")
     ap.add_argument("--frames-dir", default=str(DEFAULT_FRAMES),
@@ -72,7 +87,7 @@ if __name__ == "__main__":
     ARGS = parse_args()
 
 import bpy  # noqa: E402
-from mathutils import Euler, Vector  # noqa: E402
+from mathutils import Euler, Matrix, Vector  # noqa: E402
 
 # --------------------------------------------------------------------------------------
 # constants
@@ -83,6 +98,10 @@ WHEEL_R = 0.33
 HIP_Z = 0.92
 SEAT_Z = 0.55
 TAIL_X, TAIL_Z, TAIL_Y = 0.56, 0.74, -2.275     # TAIL_Y = outer surface of the round taillight (rear panel at -2.2)
+ZENITH_TOL = 0.08                  # (horizontal aim distance / drop) below which the aim counts as "straight down"
+HANDHELD_ROLL_DEG_PER_M = 12.0     # handheld roll wobble: degrees per metre of handheld amplitude (0.05 m -> 0.6 deg)
+FLASH_EV = (2.0, 0.7)              # exposure (EV) of a camera-flash frame and of the decay frame after it
+WALL_LAMP_Z = 2.0                  # tunnel wall lamp height (m): just above the hood line of sight of the S08 wheel shot
 
 # display greys (what you see on screen); converted to linear for object.color
 PAL = dict(
@@ -96,13 +115,14 @@ RECIPES = {
     "S02": dict(lens=50, car="at_lookat"),
     "S03": dict(lens=30, car="at_lookat", taillight="ignite_quick",
                 figure=dict(action="walk", path=[[-1.2, 13.0, 0.0], [-1.2, 11.4, 0.0]], appear=0.35)),
-    "S04": dict(lens=32, car="pos:1.7,1.2", handheld=0.015, figure=dict(action="walk")),
+    "S04": dict(lens=32, car="pos:1.7,1.2", handheld=0.05, figure=dict(action="walk")),
     "S05": dict(lens=70, car="pos:1.5,3.0", figure=dict(action="flick")),
     "S06": dict(lens=40, car="macro_taillight", taillight="ignite"),
     "S07": dict(lens=32, car="origin", speed=26.0),
     "S08": dict(lens=45, car="wheel_at_lookat", speed=26.0),
     "S09": dict(lens=22, car="at_lookat", speed=26.0),
-    "S10": dict(lens=42, car="none", figure=dict(action="poses", seated=True)),
+    "S10": dict(lens=42, car="none", figure=dict(action="poses", seated=True),
+                flash=(0.18, 0.57, 0.95)),     # camera flashes in the middle of the three pose changes
     "S11": dict(lens=30, car="at_lookat", flame=True, figure=dict(action="lean")),
     "S12": dict(lens=32, car="path", ease=2.0),
 }
@@ -685,6 +705,11 @@ def build_tunnel(tag, world):
         for sx in (-1, 1):
             g.box((sx * 4.0, yy + 2.0, 6.82), (0.55, 1.3, 0.14))
     make_obj(f"{tag}_lamps", g, C("light"), world)
+    g = Geo()   # wall-mounted lamp boxes every 6 m (offset so they never sit on a rib): they give the
+    for yy in range(int(y0), int(y1), 6):   # lamp rhythm in the low S08 wheel close-up, where the ceiling is out of frame
+        for sx in (-1, 1):
+            g.box((sx * 5.70, yy + 3.0, WALL_LAMP_Z), (0.14, 1.1, 0.22))
+    make_obj(f"{tag}_walllamps", g, C("light"), world)
     g = Geo()
     for yy in range(int(y0), int(y1), 6):
         for x in (-1.9, 1.9):
@@ -740,6 +765,71 @@ def build_booth(tag, world):
 # --------------------------------------------------------------------------------------
 def noise(t, ph, amp):
     return amp * (0.6 * math.sin(2 * math.pi * 1.7 * t + ph[0]) + 0.4 * math.sin(2 * math.pi * 3.9 * t + ph[1]))
+
+
+def heading_of(dv):
+    """Horizontal heading (rad) of an aim vector, in the convention of aim_rotation (0 = looking along +Y)."""
+    return math.atan2(-dv[0], dv[1])
+
+
+def aim_rotation(dv, roll=0.0, yaw_ref=None, prev=None):
+    """XYZ euler of a camera (view = local -Z, image-up = local +Y) looking along dv with no roll.
+
+    Same orientation as a Track-To (-Z, up Y) constraint when yaw_ref is None, plus an optional roll
+    (rad) about the view axis. With yaw_ref (heading in rad) the heading is held fixed and the pitch is the
+    signed angle off straight-down along that heading, so an aim that passes through the zenith sweeps
+    smoothly through 0 instead of flipping the picture by 180 degrees like Track-To does.
+    prev = previous euler (keeps the angles continuous from frame to frame)."""
+    h = math.hypot(dv[0], dv[1])
+    if yaw_ref is None:
+        psi = heading_of(dv) if h > 1e-9 else 0.0
+        th = math.atan2(h, -dv[2])                      # 0 = straight down, 90 deg = horizontal
+    else:
+        psi = yaw_ref
+        th = math.atan2(dv[0] * -math.sin(psi) + dv[1] * math.cos(psi), -dv[2])
+    m = Matrix.Rotation(psi, 3, "Z") @ Matrix.Rotation(th, 3, "X") @ Matrix.Rotation(roll, 3, "Z")
+    return m.to_euler("XYZ", prev) if prev is not None else m.to_euler("XYZ")
+
+
+def force_interpolation(idb, data_path, kind):
+    """Set the interpolation of every key of one animated property. (The interp() preference above does not
+    take effect in headless Blender 5, where new keys always come out BEZIER, so cues that need a hard
+    step set it explicitly.)"""
+    ad = idb.animation_data
+    if not ad or not ad.action:
+        return
+    act, fcs = ad.action, []
+    if hasattr(act, "layers"):                                   # Blender >= 4.4 slotted actions
+        for layer in act.layers:
+            for strip in layer.strips:
+                for cb in strip.channelbags:
+                    fcs.extend(cb.fcurves)
+    else:
+        fcs = list(act.fcurves)
+    for fc in fcs:
+        if fc.data_path == data_path:
+            for k in fc.keyframe_points:
+                k.interpolation = kind
+
+
+def key_flash(scene, f0, f1, fps, times_s):
+    """Camera-flash cue: exposure pops (FLASH_EV[0] on the flash frame, FLASH_EV[1] on the next, 0 elsewhere).
+    Keyed on the scene's view transform with constant interpolation; outside [f0, f1] the curve holds 0, so
+    the other shots are not touched."""
+    ev = {f0: 0.0, f1: 0.0}
+    for t in times_s:
+        fr = f0 + max(0, min(f1 - f0, rnd(t * fps)))
+        ev[fr] = FLASH_EV[0]
+        if fr + 1 <= f1 and ev.get(fr + 1, 0.0) < FLASH_EV[1]:
+            ev[fr + 1] = FLASH_EV[1]
+        if fr + 2 <= f1:
+            ev.setdefault(fr + 2, 0.0)
+    vs = scene.view_settings
+    for fr in sorted(ev):
+        vs.exposure = ev[fr]
+        vs.keyframe_insert("exposure", frame=fr)
+    force_interpolation(scene, "view_settings.exposure", "CONSTANT")
+    vs.exposure = 0.0
 
 
 def resolve_car(sid, pv, recipe, cam, look):
@@ -907,6 +997,10 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
                     if k <= f1:
                         ob.color = c_
                         ob.keyframe_insert("color", frame=k)
+    # --- camera-flash cue (exposure pops on the scene view transform)
+    flash = pv.get("flash", recipe.get("flash"))
+    if flash:
+        key_flash(bpy.context.scene, f0, f1, fps, flash)
     # --- camera
     cdata = bpy.data.cameras.new(f"{sid}_cam")
     cdata.lens = float(recipe.get("lens", 32))
@@ -915,14 +1009,30 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
     bpy.context.scene.collection.objects.link(cam)
     cam.parent = world
     tgt = new_empty(f"{sid}_look", world)
-    con = cam.constraints.new("TRACK_TO")
-    con.target = tgt
-    con.track_axis = "TRACK_NEGATIVE_Z"
-    con.up_axis = "UP_Y"
     hh = float(recipe.get("handheld", 0.0))
+    roll_amp = math.radians(HANDHELD_ROLL_DEG_PER_M * hh)
+
+    def aim_vec(u):
+        """camera -> look target at normalised shot time u (the convoy offset moves both, so it cancels)."""
+        c_, l_ = lerp(cam_from, cam_to, u), lerp(look_from, look_to, u)
+        return [l_[i] - c_[i] for i in range(3)]
+
+    # Does the aim pass (nearly) straight down? Track-To (up = +Y) flips its roll by 180 degrees at the zenith,
+    # so such a shot (S09 top-down) gets roll-free rotation keys instead: heading fixed at the start aim.
+    aims = [aim_vec(i / 40.0) for i in range(41)]
+    ratios = [math.hypot(d[0], d[1]) / max(1e-6, abs(d[2])) for d in aims]
+    zenith = (min(ratios) < ZENITH_TOL < max(ratios)) and aims[0][2] < 0 and aims[-1][2] < 0
+    yaw_ref = heading_of(next(d for d in aims if math.hypot(d[0], d[1]) > 1e-6)) if zenith else None
+    explicit_rot = zenith or roll_amp > 0           # per-frame rotation keys instead of the Track-To constraint
+    if not explicit_rot:
+        con = cam.constraints.new("TRACK_TO")
+        con.target = tgt
+        con.track_axis = "TRACK_NEGATIVE_Z"
+        con.up_axis = "UP_Y"
     rng = random.Random(sid)
     ph = [[rng.uniform(0, 6.28) for _ in range(2)] for _ in range(6)]
-    frames_keyed = list(range(f0, f1 + 1)) if hh > 0 else [f0, f1]
+    frames_keyed = list(range(f0, f1 + 1)) if (hh > 0 or explicit_rot) else [f0, f1]
+    prev_rot = None
     with interp("LINEAR"):
         for f in frames_keyed:
             u = (f - f0) / n if n else 0.0
@@ -938,6 +1048,11 @@ def build_shot(shot, idx_in_env, f0, f1, fps):
             cam.keyframe_insert("location", frame=f)
             tgt.location = lk
             tgt.keyframe_insert("location", frame=f)
+            if explicit_rot:
+                prev_rot = aim_rotation([lk[i] - c[i] for i in range(3)], roll=noise(t, ph[5], roll_amp),
+                                        yaw_ref=yaw_ref, prev=prev_rot)
+                cam.rotation_euler = prev_rot
+                cam.keyframe_insert("rotation_euler", frame=f)
         if "lens_to_mm" in pv:
             cdata.lens = float(recipe.get("lens", 32))
             cdata.keyframe_insert("lens", frame=f0)
@@ -986,6 +1101,13 @@ def frame_table(shots, fps):
     return out
 
 
+def png_size(path):
+    """(width, height) from the PNG header."""
+    with open(path, "rb") as fh:
+        head = fh.read(24)
+    return struct.unpack(">II", head[16:24])
+
+
 def encode(frames, frames_dir, out_path, fps, crf):
     seq = Path(frames_dir) / "_seq"
     if seq.exists():
@@ -1025,13 +1147,25 @@ def main(args):
     height = max(2, int(round(720 * scale / 100 / 2)) * 2)
     frames_dir = Path(args.frames_dir)
     frames_dir.mkdir(parents=True, exist_ok=True)
-    full_run = not want and scale >= 100
+    full_run = not want and (scale >= 100 or args.encode_only)
     if args.out:
         out = Path(args.out)
     elif full_run:
         out = DEFAULT_OUT
     else:
         out = frames_dir.parent / "previs_partial.mp4"
+
+    if args.encode_only:
+        all_frames = [fr for _, a, b in table for fr in range(a, b + 1)]
+        missing = [fr for fr in all_frames if not (frames_dir / f"f_{fr:04d}.png").exists()]
+        if missing:
+            raise SystemExit(f"--encode-only: {len(missing)} frames missing in {frames_dir}, e.g. f_{missing[0]:04d}.png")
+        sizes = {png_size(frames_dir / f"f_{fr:04d}.png") for fr in all_frames}
+        if len(sizes) != 1:
+            raise SystemExit(f"--encode-only: frames have mixed sizes {sorted(sizes)}; re-render them at one --scale")
+        encode(all_frames, frames_dir, out, fps, args.crf)
+        print(f"encoded {len(all_frames)} frames {sizes.pop()} ->", out)
+        return 0
 
     t_build = time.time()
     sc = setup_scene(width, height, fps, args.aa)
