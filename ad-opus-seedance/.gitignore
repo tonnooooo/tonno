@@ -1,0 +1,4 @@
+reference/
+out/clips/
+*.wav
+__pycache__/

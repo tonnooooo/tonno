@@ -1,0 +1,89 @@
+{
+  "title": "NIGHT SHIFT - split-screen ad (previs on top, Seedance 2.5 render below)",
+  "format": { "canvas": [720, 1280], "fps": 24, "duration_s": 15.0, "clip_aspect": "16:9" },
+  "layout_reference": "stacked 9:16: brand header, Blender viewport card, final-render card, cream background with teal wave lines (measured in compose/layout_measurements.json)",
+  "header": { "text": "Opus 5.5", "note": "brand text is a parameter; same as the reference ad" },
+  "badges": { "top": "Blender", "bottom": "Seedance 2.5" },
+  "look": {
+    "grade": "teal-and-orange night cinema, wet asphalt reflections, anamorphic flares, shallow depth of field, 35mm film grain",
+    "negative": "no text, no logos, no watermark, no subtitles, no brand names"
+  },
+  "cast": {
+    "hero_character": "young man, short wet black hair, round yellow-tinted sunglasses, silver reflective bomber jacket, black cargo trousers, white sneakers",
+    "hero_car": "pearl-white 1990s Japanese sport coupe, large rear wing, electric-blue lightning-and-wave ink livery along the flanks, gold multi-spoke wheels, round red-orange taillights"
+  },
+  "shots": [
+    {
+      "id": "S01", "start": 0.0, "dur": 1.2, "env": "garage",
+      "camera": "low wide, slow dolly-in toward the coupe parked far down the garage; lights flicker on one by one",
+      "previs": { "cam_from": [-1.5, -14.0, 0.5], "cam_to": [-1.0, -9.0, 0.7], "look_at": [0.0, 4.0, 0.9] },
+      "seedance_prompt": "Cinematic low-angle wide shot inside a vast empty underground parking garage, teal fluorescent tube lights flickering on one after another, a pearl-white 1990s Japanese sport coupe with an electric-blue lightning-wave ink livery parked far away at the end of the lane, polished wet concrete floor with reflections, slow dolly-in, volumetric haze, anamorphic lens, teal and orange grade."
+    },
+    {
+      "id": "S02", "start": 1.2, "dur": 1.2, "env": "garage",
+      "camera": "side close-up, camera tracks along the car flank from the rear wheel toward the door, livery and gold wheel in frame",
+      "previs": { "cam_from": [3.2, -2.4, 0.55], "cam_to": [3.2, 1.2, 0.65], "look_at": [0.0, 0.0, 0.55] },
+      "seedance_prompt": "Close lateral tracking shot along the flank of a pearl-white 1990s Japanese sport coupe, electric-blue lightning-and-wave ink livery, gold multi-spoke wheel, parked in an underground garage with teal fluorescent light reflecting on the glossy paint, shallow depth of field, anamorphic bokeh, smooth gimbal move."
+    },
+    {
+      "id": "S03", "start": 2.4, "dur": 1.2, "env": "garage",
+      "camera": "rear three-quarter low; round taillights light up; far in the background a figure appears and starts walking",
+      "previs": { "cam_from": [-3.0, -6.5, 0.6], "cam_to": [-2.0, -5.0, 0.7], "look_at": [0.0, 0.0, 0.8] },
+      "seedance_prompt": "Rear three-quarter low shot of a pearl-white 1990s sport coupe with a big rear wing in an underground garage, round red-orange taillights switching on and glowing, far behind it a lone figure in a silver bomber jacket starts walking toward camera, teal fluorescent ceiling lights, light mist, cinematic."
+    },
+    {
+      "id": "S04", "start": 3.6, "dur": 1.4, "env": "garage",
+      "camera": "handheld, camera backs up as the character walks straight toward the lens, medium to chest-up",
+      "previs": { "cam_from": [0.0, -9.0, 1.5], "cam_to": [0.0, -7.2, 1.45], "look_at": [0.0, 0.0, 1.4], "figure_path": [[0.0, -1.0, 0.0], [0.0, -5.4, 0.0]] },
+      "seedance_prompt": "Handheld tracking shot backing up in front of a young man in a silver reflective bomber jacket, round yellow-tinted sunglasses, short wet black hair, walking confidently straight toward the camera through an underground parking garage, a pearl-white sport coupe behind him, teal fluorescent lights, cinematic shallow depth of field."
+    },
+    {
+      "id": "S05", "start": 5.0, "dur": 1.0, "env": "garage",
+      "camera": "tight close-up on the face; he slides the sunglasses down with two fingers, grins, then flicks a hand toward the lens",
+      "previs": { "cam_from": [0.0, -2.0, 1.62], "cam_to": [0.0, -1.7, 1.62], "look_at": [0.0, 0.0, 1.6], "figure_path": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]] },
+      "seedance_prompt": "Tight cinematic close-up of a young man's face, yellow-tinted round sunglasses, he slides them down his nose with two fingers and grins, then flicks his hand toward the camera, teal garage lights reflecting in his eyes, shallow depth of field, film grain."
+    },
+    {
+      "id": "S06", "start": 6.0, "dur": 1.0, "env": "garage",
+      "camera": "extreme macro of one round taillight igniting from dark to glowing red-orange, lens flare",
+      "previs": { "cam_from": [-0.6, -2.4, 0.78], "cam_to": [-0.6, -2.0, 0.78], "look_at": [-0.6, -3.1, 0.78] },
+      "seedance_prompt": "Extreme macro shot of a round car taillight igniting from dark to a glowing red-orange, concentric ring lens detail, bright anamorphic lens flare, black background, shallow depth of field, cinematic."
+    },
+    {
+      "id": "S07", "start": 7.0, "dur": 1.2, "env": "highway",
+      "camera": "low rear follow shot behind the coupe cruising an empty night highway, camera slightly right of centre",
+      "previs": { "cam_from": [1.2, -11.0, 0.9], "cam_to": [1.0, -8.5, 0.9], "look_at": [0.0, 10.0, 0.9] },
+      "seedance_prompt": "Low rear follow shot of a pearl-white sport coupe with a large wing driving on an empty night highway, red taillights glowing, wet asphalt, city lights and green road signs in the distance, blue-teal night grade, smooth chase camera."
+    },
+    {
+      "id": "S08", "start": 8.2, "dur": 1.2, "env": "tunnel",
+      "camera": "wheel close-up at speed, tunnel sodium lamps streak past in orange",
+      "previs": { "cam_from": [2.4, -0.4, 0.4], "cam_to": [2.4, 0.4, 0.4], "look_at": [0.0, 0.0, 0.4] },
+      "seedance_prompt": "Close-up of a spinning gold multi-spoke wheel on a pearl-white sport coupe racing through a highway tunnel, orange sodium lamps streaking past in motion blur, reflections sliding on the paint, dramatic orange and teal grade, high speed."
+    },
+    {
+      "id": "S09", "start": 9.4, "dur": 1.2, "env": "tunnel",
+      "camera": "overhead top-down shot following the car through the tunnel, lane markings flowing beneath",
+      "previs": { "cam_from": [0.0, -2.0, 7.5], "cam_to": [0.0, 2.0, 7.5], "look_at": [0.0, 0.0, 0.0] },
+      "seedance_prompt": "Top-down overhead drone shot of a pearl-white sport coupe driving through a highway tunnel, dashed lane markings flowing beneath, orange sodium lights, smooth forward motion, cinematic."
+    },
+    {
+      "id": "S10", "start": 10.6, "dur": 1.4, "env": "booth",
+      "camera": "static frontal, neon-magenta photo booth, the young man strikes three rapid poses with camera flashes",
+      "previs": { "cam_from": [0.0, -3.4, 1.4], "cam_to": [0.0, -3.0, 1.4], "look_at": [0.0, 0.0, 1.35], "figure_path": [[0.0, 0.4, 0.0], [0.0, 0.4, 0.0]] },
+      "seedance_prompt": "Static frontal shot inside a neon-magenta retro photo booth, a young man in a silver bomber jacket and yellow-tinted round sunglasses strikes three quick poses, bright camera flashes between poses, magenta and cyan neon wash, playful energy, cinematic."
+    },
+    {
+      "id": "S11", "start": 12.0, "dur": 1.2, "env": "garage",
+      "camera": "rear low, he leans on the car door while the exhaust pops a blue flame",
+      "previs": { "cam_from": [-3.0, -5.0, 0.55], "cam_to": [-2.4, -4.4, 0.6], "look_at": [0.0, 0.0, 0.7], "figure_path": [[-2.0, -0.4, 0.0], [-2.0, -0.4, 0.0]] },
+      "seedance_prompt": "Low rear three-quarter shot in an underground garage, a young man in a silver bomber jacket leans against a pearl-white sport coupe while the exhaust pops a bright blue flame with sparks, teal lights, wet floor reflections, cinematic."
+    },
+    {
+      "id": "S12", "start": 13.2, "dur": 1.8, "env": "highway",
+      "camera": "rear wide from a high lane, the coupe shrinks into the distance, taillights becoming two small red dots",
+      "previs": { "cam_from": [0.0, -6.0, 1.2], "cam_to": [0.0, -2.0, 1.6], "look_at": [0.0, 40.0, 0.8], "car_path": [[0.0, 0.0, 0.0], [0.0, 90.0, 0.0]] },
+      "seedance_prompt": "Wide rear shot on an empty night highway, a pearl-white sport coupe accelerating away from camera and shrinking into the distance until only its two red taillights remain, wet asphalt reflecting city lights, teal and orange night grade, cinematic."
+    }
+  ]
+}
