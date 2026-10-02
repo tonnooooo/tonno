@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "what": "Pixel measurements of the layout reference ad (third-party creator video, kept outside the repo). Only geometry, colours and timing of the template were measured; no footage or logos are stored.",
+    "reference_video": {"size": [720, 1280], "fps": 24, "frames": 359, "duration_s": 14.958},
+    "units": "all numbers are reference pixels at 720x1280. The reference was evidently designed at 1080x1920 and downscaled by 2/3 (card y=336/1070, h=594, margin 12, radius 24 at 1080 give exactly the numbers below), so --scale 1.5 reproduces the original 1080x1920 grid.",
+    "method": "numpy on full-res decoded frames: temporal median image for static elements, edge/profile scans for boxes and corner radius, integrated line-profile deficiency for wave colours, per-frame bar-end tracking for progress, per-frame intro crops for animation timing, IoU font search for the typeface.",
+    "regenerate_waves": "python compose/measure_waves.py --ref <reference.mp4>   (writes compose/wave_model.json)"
+  },
+
+  "canvas": {"w": 720, "h": 1280, "fps": 24},
+
+  "background": {
+    "note": "cream / off-white with a very slight vertical+horizontal drift; measured on wave-free, shadow-free pixels",
+    "corners_rgb": {"tl": [241, 243, 240], "tr": [244, 244, 239], "bl": [238, 238, 238], "br": [238, 238, 239]}
+  },
+
+  "cards": {
+    "top":    {"x": 8, "y": 224.0,  "w": 704, "h": 396, "radius": 16, "aspect": "16:9", "bottom_edge_y": 620.0,
+               "measured": "left edge x=8.0, right edge x=712.0, top edge y=224.0 (sharp), bottom edge y=620.0; corner radius fit 16 (+-1) from corner coverage"},
+    "bottom": {"x": 8, "y": 713.33, "w": 704, "h": 396, "radius": 16, "aspect": "16:9", "bottom_edge_y": 1109.33,
+               "measured": "top edge y=713.35, bottom edge y=1109.5 (design grid y=1070 at 1080 scale); vertical gap between cards 93.3 px"},
+    "margin_x": 8,
+    "shadow": {
+      "colour": [0, 0, 0], "alpha": 0.15, "offset_y": 9, "gaussian_sigma": 11,
+      "measured": "darkening below the bottom edge ~25 levels (216 vs 240), at the sides ~14, above the top edge ~6 -> soft shadow offset ~9 px downward, sigma ~11 px"
+    }
+  },
+
+  "header": {
+    "logo": {
+      "x": 328, "y": 72, "w": 64, "h": 64, "radius": 1.5, "rgb": [215, 118, 86],
+      "glyph": "white starburst, ~47 px diameter (reference: 12 organic petals; ours: clean 8-ray burst, own drawing)",
+      "measured": "box x=329.5..391.5 (+-1), y=72..136, flat colour (215,118,86); centred horizontally on 360"
+    },
+    "text": {
+      "default": "Opus 5.5", "size_px": 47, "tracking_em": -0.043, "rgb": [26, 32, 28],
+      "font": "Hanken Grotesk Bold (OFL; chosen as best IoU match 0.81 of 13 candidate families against the reference glyph mask; no Inter match: reference is narrower with lower x-height ratio)",
+      "bbox": {"x0": 276, "x1": 445, "cap_top_y": 154, "baseline_y": 187, "descender_y": 196, "centre_x": 360.5},
+      "measured": "cap height 33 px, text width 170 px, colour (26,32,28), semi-bold"
+    }
+  },
+
+  "badge": {
+    "note": "dark translucent pill (backdrop blurred) with 1.5 px light outline, icon + white semi-bold label",
+    "offset_from_card": {"x": 12, "y": 12},
+    "height": 40, "radius": 11,
+    "fill_rgba": [8, 10, 14, 0.74], "outline_rgba": [255, 255, 255, 0.11], "outline_w": 2,
+    "backdrop_blur_px": 6,
+    "icon_box": 24, "pad_left": 8, "gap_icon_text": 9, "pad_right": 13,
+    "text": {"size_px": 19, "tracking_em": -0.043, "rgb": [255, 255, 255], "font": "Hanken Grotesk SemiBold"},
+    "measured_top_pill": "outer x=20..136 (w=116), y=236..276 (h=40); inner fill x=22..134, y=238..274; fill rgb ~(19,22,25) over card grey 33; icon x=28..51 y=246..265; 'Blender' text x=62..123, cap y=248..261 (cap 13.3 px)",
+    "measured_bottom_pill": "outer x=20.5..291.8 (w~271) for 'Mira AI x After Effects'; y = card top + 12, h 40"
+  },
+
+  "progress": {
+    "height": 4, "track_rgba": [255, 255, 255, 0.29],
+    "top_fill_rgb": [232, 132, 28], "bottom_fill_rgb": [20, 168, 138],
+    "geometry": "last 4 px of each card (y=616..619 top card, 1105.3..1109.3 bottom card), clipped by the card's rounded corners; fill grows linearly from the card's left edge",
+    "behaviour": "fill end x = 8 + 704 * t / 14.96 (fits t=0.5 -> 32, 6.5 -> 314, 12 -> 574, 14.5 -> 694 within 3 px); both bars move in lock-step; reaches the right edge at the last frame",
+    "measured": "orange (228,129,25)-(233,134,30) over rows 616..619, unfilled track ~ (122,122,122) over card (67,67,67) = white at 29%"
+  },
+
+  "waves": {
+    "note": "thin wave lines behind the cards and header; geometry is animated slowly (curves morph over ~12 s). Keyframed model in wave_model.json (measured by measure_waves.py: worst per-frame mean error 1.8 px).",
+    "model_file": "wave_model.json",
+    "styles": {
+      "T1_light_teal":  {"rgb": [150, 226, 206], "width": 1.8},
+      "T2_dark_teal":   {"rgb": [76, 182, 175],  "width": 2.4},
+      "T3_grey":        {"rgb": [196, 196, 201], "width": 1.8},
+      "T5_teal_corner": {"rgb": [100, 214, 186], "width": 2.0},
+      "M1_grey":        {"rgb": [196, 197, 202], "width": 1.8},
+      "M2a_teal_hill":  {"rgb": [100, 214, 186], "width": 2.0},
+      "M2b_teal_rise":  {"rgb": [100, 214, 186], "width": 2.0},
+      "B1a_teal_left":  {"rgb": [100, 214, 186], "width": 2.2},
+      "B1b_teal_right": {"rgb": [100, 214, 186], "width": 2.2},
+      "B2_teal_low":    {"rgb": [134, 204, 190], "width": 1.8}
+    },
+    "measured": "line colours from integrated line-profile deficiency (bg - sum of pixel drop / width); widths 1.8-2.4 px"
+  },
+
+  "intro_animation": {
+    "note": "all other elements (cards, badges, waves, background) are present from frame 0; progress bars start at 0",
+    "logo": {"t0_s": 0.0417, "dur_s": 0.292, "effect": "fade in 0->1, scale 0.88->1, rotation ~+12deg -> 0 (ease-out), slight blur that clears"},
+    "words": [
+      {"word": "Opus", "t0_s": 0.375, "dur_s": 0.46},
+      {"word": "5.5",  "t0_s": 0.625, "dur_s": 0.46}
+    ],
+    "word_effect": "fade in 0->1 (starts light grey), rise ~22 px, blur ~7 px -> 0 (ease-out); words staggered by 0.25 s; header complete at ~1.1 s"
+  }
+}
